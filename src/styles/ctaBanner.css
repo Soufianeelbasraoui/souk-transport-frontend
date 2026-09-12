@@ -1,0 +1,61 @@
+.cta-banner-section {
+  background-color: #ffffff;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.cta-banner-card {
+  background-color: #1e293b;
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  color: #ffffff;
+}
+
+.cta-banner-title {
+  font-weight: 800;
+  font-size: 2.1rem;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.cta-banner-subtitle {
+  color: #94a3b8;
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+.btn-cta-orange {
+  background-color: #ff7a00;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-cta-orange:hover {
+  background-color: #e66e00;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-cta-outline {
+  background-color: transparent;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 1px solid #475569;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-cta-outline:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: translateY(-2px);
+}

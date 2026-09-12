@@ -1,0 +1,84 @@
+.hero-section {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.hero-main-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.hero-main-title .text-orange {
+  color: #ff7a00 !important;
+}
+
+.hero-subtitle {
+  font-size: 1.10rem;
+  color: #475569;
+  font-weight: 300;
+  line-height: 1.5;
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
+  max-width: 520px;
+}
+
+.btn-hero-orange {
+  background-color: #ff7a00;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 1.05rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-orange:hover {
+  background-color: #e66e00;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-hero-outline {
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hero-outline:hover {
+  border-color: #0f172a;
+  color: #0f172a;
+  transform: translateY(-2px);
+}
+
+.hero-feature-item {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-feature-icon {
+  color: #10b981; 
+}
+
+.hero-map-img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.05));
+}

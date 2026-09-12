@@ -1,0 +1,77 @@
+.recent-trajets-section {
+  background-color: #ffffff;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.trajet-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.trajet-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04);
+}
+
+.trajet-cities {
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.badge-dispo {
+  background-color: #dcfce7;
+  color: #166534;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.trajet-info-item {
+  font-size: 0.875rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-card-action {
+  background-color: #1e293b;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 10px;
+  border: none;
+  width: 100%;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-card-action:hover {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+.btn-explorer {
+  background-color: #ff7a00;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-explorer:hover {
+  background-color: #e66e00;
+  color: #ffffff;
+}

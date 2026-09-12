@@ -1,0 +1,45 @@
+.faq-section {
+  background-color: #ffffff;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Customisation de l'Accordion Bootstrap */
+.custom-accordion .accordion-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px !important;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.custom-accordion .accordion-button {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1rem;
+  padding: 1.25rem 1.5rem;
+  background-color: #ffffff;
+  box-shadow: none !important;
+}
+
+.custom-accordion .accordion-button:not(.collapsed) {
+  color: #ff7a00;
+  background-color: #fffaf5;
+}
+
+.custom-accordion .accordion-button::after {
+  background-size: 1.1rem;
+}
+
+.custom-accordion .accordion-body {
+  color: #475569;
+  font-size: 0.925rem;
+  line-height: 1.6;
+  padding: 0 1.5rem 1.25rem 1.5rem;
+  background-color: #fffaf5;
+}
