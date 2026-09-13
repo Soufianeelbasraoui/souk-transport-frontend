@@ -20,8 +20,11 @@ import ConsulterCamion from '../pages/transporteur/camion/Consulter';
 import ModifierTrajet from '../pages/transporteur/trajets/Modifier';
 import ConsulterTrajet from '../pages/transporteur/trajets/Consulter';
 import Profile from '../pages/transporteur/trajets/Profile';
-import CamionsPage from '../pages/admin/CamionsPage';
 import UsersPage from '../pages/admin/users/UsersPage';
+import ModifierUser from '../pages/admin/users/Modifier';
+import ConsulterUser from '../pages/admin/users/Consulter';
+import CamionsPage from '../pages/admin/camions/CamionsPage';
+import AjouterUser from '../pages/admin/users/ajouter';
 
 
 
@@ -40,13 +43,16 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <RoleRoute roles={["ADMIN"]}>
-                  <DashboardAdmin/>
+                <DashboardAdmin/>
               </RoleRoute>
             </ProtectedRoute>
           }
         />
       <Route path='/admin/camions' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><CamionsPage/></RoleRoute></ProtectedRoute>}/>
       <Route path='/admin/users' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><UsersPage/></RoleRoute></ProtectedRoute>} />
+      <Route path='/admin/users/new' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><AjouterUser/></RoleRoute></ProtectedRoute>} />
+      <Route path='/admin/users/edit/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ModifierUser/></RoleRoute></ProtectedRoute>} />
+      <Route path='/admin/users/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterUser/></RoleRoute></ProtectedRoute>} />
 
 
 
