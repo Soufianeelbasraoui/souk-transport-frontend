@@ -2,23 +2,20 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import "../../styles/global.css";
 import api from "../../services/api";
+import "./style/styleTransporteur.css";
 
 function ReservationsRecues() {
     const [reservations, setReservations] = useState([]);
-
-    // Charger les réservations
     useEffect(() => {
-        api.get("/api/reservations/transporteur/mes-reservations")
-            .then((res) => setReservations(res.data))
+        api.get("/api/reservations/transporteur/mes-reservations") .then((res) => 
+            setReservations(res.data))
             .catch((err) => console.error(err));
     }, []);
 
-    // Accepter
     const handleAccepter = (id) => {
         api.patch(`/api/reservations/${id}/accepter`).then(() => {
                 setReservations((prev) =>  prev.map((item) =>item.id === id ? { ...item, statutReservation: "ACCEPTEE" } : item ));
-            })
-            .catch((err) => console.error(err));
+            }).catch((err) => console.error(err));
     };
 
     const handleRefuser = (id) => {
@@ -40,10 +37,8 @@ function ReservationsRecues() {
                 </div>
 
                 <div className="dashboard-card recent-trajets">
-
                     <div className="card-header-custom">
                         <input type="text" placeholder="Rechercher..." />
-
                         <select defaultValue="">
                             <option value="">Filtrer par statut</option>
                             <option value="EN_ATTENTE">En attente</option>
@@ -54,7 +49,6 @@ function ReservationsRecues() {
 
                     <div className="table-responsive">
                         <table className="dashboard-table">
-
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -107,7 +101,6 @@ function ReservationsRecues() {
                                 </tr>
                                 )}
                             </tbody>
-
                         </table>
                     </div>
                 </div>

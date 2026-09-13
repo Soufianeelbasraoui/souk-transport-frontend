@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import Sidebar from "../../components/layout/Sidebar";
-import '../../styles/global.css';
+import Sidebar from "../../../components/layout/Sidebar";
+import '../../../styles/global.css';
+import "../style/styleTransporteur.css";
 import { useEffect,useState } from "react";
-import api from "../../services/api";
+import api from "../../../services/api";
 import { MdOutlineEdit,MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
 
@@ -112,9 +113,17 @@ useEffect(() => {
                             </span>
                           </td>
                           <td>
-                             <button><MdOutlineEdit/></button>
-                             <button><BiShowAlt/></button>
-                             <button><MdDelete/></button>
+                            <div className="action-btns">
+                              <Link to={`/transporteur/trajets/${item.id}`} className="action-btn view">
+                                <BiShowAlt />
+                              </Link>
+                              <Link to={`/transporteur/trajets/edit/${item.id}`} className="action-btn edit">
+                                <MdOutlineEdit />
+                              </Link>
+                              <button className="action-btn delete">
+                                <MdDelete />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))

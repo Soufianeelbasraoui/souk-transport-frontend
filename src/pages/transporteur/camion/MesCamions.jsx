@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import Sidebar from "../../components/layout/Sidebar";
-import "../../styles/global.css";
-import api from "../../services/api";
+import Sidebar from "../../../components/layout/Sidebar";
+import "../../../styles/global.css";
+import "../style/styleTransporteur.css";
+import api from "../../../services/api";
 import { useEffect, useState } from "react";
 import { MdOutlineEdit,MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
@@ -51,8 +52,10 @@ function MesCamions() {
                   <th>CAMION</th>
                   <th>IMMATRICULATION</th>
                   <th>MODÈLE</th>
-                  <th>CAPACITÉ</th>
+                  <th>CAPACITÉ</th> 
+                  <th>type</th>
                   <th>STATUT</th>
+                 
                   <th>ACTIONS</th>
                 </tr>
               </thead>
@@ -64,15 +67,25 @@ function MesCamions() {
                         <td>{item.immatriculation}</td>
                         <td>{item.modele}</td>
                         <td>{item.capacite}</td>
+                        <td>{item.type}</td>
                         <td>
                           <span className={`badge ${item.disponible ? 'bg-success' : 'bg-danger'}`}>
                              {item.disponible ? 'Disponible' : 'Non disponible'}
                           </span>
                         </td>
+                        
                         <td>
-                          <button><MdOutlineEdit/></button>
-                          <button><BiShowAlt/></button>
-                          <button><MdDelete/></button>
+                          <div className="action-btns">
+                            <Link to={`/transporteur/camions/${item.id}`} className="action-btn view" title="Voir">
+                              <BiShowAlt />
+                            </Link>
+                            <Link to={`/transporteur/camions/edit/${item.id}`} className="action-btn edit" title="Modifier">
+                              <MdOutlineEdit />
+                            </Link>
+                            <button className="action-btn delete" title="Supprimer">
+                              <MdDelete />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))

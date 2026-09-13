@@ -41,7 +41,8 @@ const navConfig = {
     { to: '/transporteur/camions', label: 'Mes Camions', icon: FaTruck },
     { to: '/transporteur/trajets', label: 'Mes Trajets', icon: FaRoute },
     { to: '/transporteur/reservations', label: 'Réservations', icon: FaInbox },
-    { to: '/transporteur/cargaisons', label: 'Cargaisons', icon: FaBoxOpen },
+    {to:'/transporteur/profile', label:"Mon Profil",icon:FaUser}
+
   ],
   EXPEDITEUR: [
     { to: '/expediteur/dashboard', label: 'Tableau de bord', icon: FaTachometerAlt },
@@ -104,11 +105,6 @@ const navConfig = {
         </nav>
         <div className="sidebar-section-title account-title"> COMPTE</div>
         <nav className="sidebar-menu">
-          <NavLink to={profilePath} className={({ isActive }) =>  `sidebar-link ${isActive ? "active" : ""}`} >
-            <FaUser className="sidebar-link-icon" />
-            <span>  Mon Profil</span>
-          </NavLink>
-
           <NavLink to="/settings" className={({ isActive }) =>  `sidebar-link ${isActive ? "active" : ""}`}>
             <FaCog className="sidebar-link-icon" />
             <span> Paramètres</span></NavLink>

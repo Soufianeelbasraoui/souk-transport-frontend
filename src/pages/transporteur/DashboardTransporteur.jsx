@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import "../../styles/global.css";
-import "../../styles/dashboardTransporteur.css";
+import "./style/styleTransporteur.css";
 import { FaTruck, FaBox, FaMoneyBillWave, FaUsers } from "react-icons/fa";
 import api from "../../services/api";
 import { Link } from "react-router-dom";
@@ -38,7 +38,6 @@ function DashboardTransporteur() {
     })
 
     api.get("api/reservations/transporteur/count").then((res)=>{
-      
       setCountMesReservation(res.data);
     })
     api.get("/transporteur/count").then((res)=>{
@@ -146,7 +145,6 @@ function DashboardTransporteur() {
                         <tr key={item.id}>
                           <td>
                             <span className="trajet-id">
-                              {" "}
                               T-{String(item.id).padStart(4, "0")}
                             </span>
                           </td>
@@ -159,8 +157,7 @@ function DashboardTransporteur() {
                           </td>
                           <td>
                             <span className="date-cell">
-                              {item.dateDepart
-                                ? new Date(item.dateDepart).toLocaleDateString(
+                              {item.dateDepart ? new Date(item.dateDepart).toLocaleDateString(
                                     "fr-FR",
                                     {
                                       day: "2-digit",
