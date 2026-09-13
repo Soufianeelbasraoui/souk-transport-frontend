@@ -3,23 +3,23 @@ import { Link } from "react-router-dom";
 import { MdOutlineEdit, MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
 
-import Sidebar from "../../components/layout/Sidebar";
-import api from "../../services/api";
+import Sidebar from "../../../components/layout/Sidebar";
+import api from "../../../services/api";
 
-import "../../styles/global.css";
-import "./styles/admin.css";
+import "../../../styles/global.css";
+import "../users/../styles/admin.css";
 
-function CamionsPage() {
-  const [camions, setCamions] = useState([]);
+function UsersPage() {
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     api
-      .get("/api/camions/mesCamions")
+      .get("/api/users")
       .then((res) => {
-        setCamions(res.data || []);
+        setUsers(res.data.content || []);
       })
       .catch((error) => {
-        console.error("Erreur camions :", error);
+        console.error("Erreur utilisateurs :", error);
       });
   }, []);
 
@@ -28,81 +28,91 @@ function CamionsPage() {
       <Sidebar />
 
       <main className="main-content">
-
-        {/* Header */}
         <div className="page-header">
           <div>
-            <h1>Camions</h1>
-            <p>Gérez les camions.</p>
+            <h1>Utilisateurs</h1>
+            <p>
+              Gérez les comptes utilisateurs, leurs rôles et leurs statuts.
+            </p>
           </div>
 
-          <Link
-            to="/transporteur/camions/new"
-            className="btn-primary"
-          >
-            Ajouter un camion
+          <Link to="/admin/users/new" className="btn-primary">
+            Ajouter un utilisateur
           </Link>
         </div>
-
-        {/* Card */}
         <div className="admin-card">
-
-          {/* Search */}
           <div className="admin-card-header">
+
             <div className="admin-search">
-              <input
-                type="search"
-                placeholder="Rechercher un camion..."
-              />
+              <input  type="search"  placeholder="Rechercher un utilisateur..."/>
+            </div>
+
+            <div className="admin-filters">
+
+              <div className="admin-filter">
+                <select defaultValue="">
+                  <option value="">Tous les rôles</option>
+                  <option value="ADMIN">Administrateur</option>
+                  <option value="TRANSPORTEUR">Transporteur</option>
+                  <option value="EXPEDITEUR">Expéditeur</option>
+                </select>
+              </div>
+
+              <div className="admin-filter">
+                <select defaultValue="">
+                  <option value="">Tous les statuts</option>
+                  <option value="ACTIF">Actif</option>
+                  <option value="INACTIF">Inactif</option>
+                </select>
+              </div>
+
             </div>
           </div>
-
-          {/* Table */}
           <div className="admin-table-wrapper">
             <table className="admin-table">
 
               <thead>
                 <tr>
-                  <th>CAMION</th>
-                  <th>IMMATRICULATION</th>
-                  <th>MODÈLE</th>
-                  <th>CAPACITÉ</th>
-                  <th>TYPE</th>
+                  <th>UTILISATEUR</th>
+                  <th>ROLE</th>
+                  <th>TÉLÉPHONE</th>
+                  <th>VILLE</th>
                   <th>STATUT</th>
                   <th>ACTIONS</th>
                 </tr>
               </thead>
 
               <tbody>
-                {camions.length > 0 ? (
-                  camions.map((camion) => (
-                    <tr key={camion.id}>
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <tr key={user.id}>
 
                       <td className="admin-identity">
-                        <strong>{camion.marque}</strong>
+                        <strong>
+                          {user.nom} {user.prenom}
+                        </strong>
+                        <span>{user.email}</span>
                       </td>
-
-                      <td>{camion.immatriculation}</td>
-
-                      <td>{camion.modele}</td>
-
-                      <td>{camion.capacite}</td>
 
                       <td>
-                        {camion.type?.replace(/_/g, " ")}
+                        <span className="admin-badge admin-badge-role">
+                          {user.role}
+                        </span>
                       </td>
+
+                      <td>{user.telephone || "-"}</td>
+
+                      <td>{user.ville || "-"}</td>
 
                       <td>
                         <span
                           className={`admin-badge ${
-                            camion.disponible
+                            user.statutUser === "ACTIF"
                               ? "admin-badge-success"
                               : "admin-badge-danger"
                           }`}
                         >
-                          {camion.disponible
-                            ? "Disponible"
-                            : "Non disponible"}
+                          {user.statutUser}
                         </span>
                       </td>
 
@@ -110,7 +120,7 @@ function CamionsPage() {
                         <div className="admin-actions">
 
                           <Link
-                            to={`/admin/camions/${camion.id}`}
+                            to={`/admin/users/${user.id}`}
                             className="admin-action admin-action-view"
                             title="Voir"
                           >
@@ -118,7 +128,7 @@ function CamionsPage() {
                           </Link>
 
                           <Link
-                            to={`/admin/camions/edit/${camion.id}`}
+                            to={`/admin/users/edit/${user.id}`}
                             className="admin-action admin-action-edit"
                             title="Modifier"
                           >
@@ -140,8 +150,8 @@ function CamionsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="admin-empty">
-                      Aucun camion trouvé.
+                    <td colSpan="6" className="admin-empty">
+                      Aucun utilisateur trouvé.
                     </td>
                   </tr>
                 )}
@@ -156,4 +166,4 @@ function CamionsPage() {
   );
 }
 
-export default CamionsPage;
+export default UsersPage;
