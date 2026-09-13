@@ -21,7 +21,8 @@ import ModifierTrajet from '../pages/transporteur/trajets/Modifier';
 import ConsulterTrajet from '../pages/transporteur/trajets/Consulter';
 import Profile from '../pages/transporteur/trajets/Profile';
 import CamionsPage from '../pages/admin/CamionsPage';
-import UsersPage from '../pages/admin/UsersPage';
+import UsersPage from '../pages/admin/users/UsersPage';
+
 
 
 function AppRoutes() {

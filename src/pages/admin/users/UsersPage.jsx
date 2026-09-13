@@ -6,8 +6,8 @@ import { BiShowAlt } from "react-icons/bi";
 import Sidebar from "../../../components/layout/Sidebar";
 import api from "../../../services/api";
 
-import "../../styles/global.css";
-import "./styles/admin.css";
+import "../../../styles/global.css";
+import "../users/../styles/admin.css";
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -28,8 +28,6 @@ function UsersPage() {
       <Sidebar />
 
       <main className="main-content">
-
-        {/* Header */}
         <div className="page-header">
           <div>
             <h1>Utilisateurs</h1>
@@ -42,11 +40,7 @@ function UsersPage() {
             Ajouter un utilisateur
           </Link>
         </div>
-
-        {/* Card */}
         <div className="admin-card">
-
-          {/* Search / filters */}
           <div className="admin-card-header">
 
             <div className="admin-search">
@@ -74,8 +68,6 @@ function UsersPage() {
 
             </div>
           </div>
-
-          {/* Table */}
           <div className="admin-table-wrapper">
             <table className="admin-table">
 
