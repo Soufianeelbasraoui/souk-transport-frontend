@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
+import Sidebar from "../../components/layout/Sidebar";
+import api from "../../services/api";
 
-import "../../../styles/global.css";
-import "../style/profile.css"
+import "../../styles/global.css";
+import "./style/profile.css"
 
 
 function Profile() {

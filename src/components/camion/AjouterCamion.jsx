@@ -1,22 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
-import "../../../styles/global.css";
-import "../style/publierTrajet.css";
+import Sidebar from "../layout/Sidebar";
+import api from "../../services/api";
+import "../../styles/global.css";
+import "../../styles/formPage.css";
+import { jwtDecode } from "jwt-decode";
 
-const TYPE_CAMION_OPTIONS = [
-  "FOURGON",
-  "SEMI_REMORQUE",
-  "BENNE",
-  "CITERNE",
-  "FRIGORIFIQUE",
-  "PLATEAU",
-  "PORTE_CONTENEUR",
-];
 
 const schema = yup.object({
   marque: yup.string().required("La marque est obligatoire"),
@@ -29,8 +21,14 @@ const schema = yup.object({
 
 function AjouterCamion() {
   const navigate = useNavigate();
+  
+  const token=localStorage.getItem("token");
+  const user=jwtDecode(token)
+
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
+  const [typesCamion, setTypesCamion] = useState([]);
+
 
   const {
     register,
@@ -47,12 +45,27 @@ function AjouterCamion() {
     try {
       await api.post("/api/camions", data);
       setSubmitSuccess("Camion ajouté avec succès ! Redirection en cours…");
-      setTimeout(() => navigate("/transporteur/camions"), 2000);
+      setTimeout(() => {
+        if(user.role==="ADMIN"){
+          navigate("/admin/camions");
+        }else if(user.role==="TRANSPORTEUR"){
+          navigate("/transporteur/camions")
+        }
+      }, 2000);
+      
     } catch (error) {
       setSubmitError( error.response?.data?.message || "Une erreur est survenue. Veuillez réessayer."
       );
     }
   };
+  useEffect(()=>{
+      api.get("/api/camions/types").then((res) => {
+        setTypesCamion(res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  },[])
 
   return (
     <div className="app">
@@ -63,12 +76,11 @@ function AjouterCamion() {
             <h1>Ajouter un camion</h1>
             <p>Remplissez les informations pour enregistrer votre camion.</p>
           </div>
-          <Link to="/transporteur/camions" className="btn-cancel">
+          <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
             ← Mes camions
           </Link>
         </div>
 
-        {/* Form card */}
         <div className="form-card">
           <div className="form-card-header">
             <div>
@@ -80,8 +92,6 @@ function AjouterCamion() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-card-body">
               <div className="form-grid">
-
-                {/* Marque */}
                 <div className="form-group">
                   <label>Marque</label>
                   <input
@@ -90,12 +100,9 @@ function AjouterCamion() {
                     placeholder="Ex : Mercedes"
                     {...register("marque")}
                   />
-                  {errors.marque && (
-                    <span className="field-error">{errors.marque.message}</span>
-                  )}
+                  {errors.marque && ( <span className="field-error">{errors.marque.message}</span>)}
                 </div>
 
-                {/* Modèle */}
                 <div className="form-group">
                   <label>Modèle</label>
                   <input
@@ -104,86 +111,46 @@ function AjouterCamion() {
                     placeholder="Ex : Actros"
                     {...register("modele")}
                   />
-                  {errors.modele && (
-                    <span className="field-error">{errors.modele.message}</span>
-                  )}
+                  {errors.modele && (<span className="field-error">{errors.modele.message}</span>)}
                 </div>
-
-                {/* Type */}
+                
                 <div className="form-group">
                   <label>Type de camion</label>
-                  <select
-                    className={`form-control-custom ${errors.type ? "is-error" : ""}`}
-                    {...register("type")}
-                  >
-                    <option value="">-- Sélectionner un type --</option>
-                    {TYPE_CAMION_OPTIONS.map((t) => (
-                      <option key={t} value={t}>
-                        {t.replace(/_/g, " ")}
-                      </option>
-                    ))}
+                  <select  className={`form-control-custom ${ errors.type ? "is-error" : ""}`} {...register("type")}>
+                    <option value=""> -- Sélectionner un type -- </option>
+                    {typesCamion.map((type) => ( <option key={type} value={type}> {type.replace(/_/g, " ")} </option>))}
                   </select>
-                  {errors.type && (
-                    <span className="field-error">{errors.type.message}</span>
-                  )}
+                  {errors.type && (<span className="field-error"> {errors.type.message} </span> )}
                 </div>
 
-                {/* Immatriculation */}
                 <div className="form-group">
                   <label>Immatriculation</label>
-                  <input
-                    type="text"
-                    className={`form-control-custom ${errors.immatriculation ? "is-error" : ""}`}
-                    placeholder="Ex : 12345-A-1"
-                    {...register("immatriculation")}
-                  />
-                  {errors.immatriculation && (
-                    <span className="field-error">{errors.immatriculation.message}</span>
-                  )}
+                  <input  type="text"className={`form-control-custom ${errors.immatriculation ? "is-error" : ""}`} placeholder="Ex : 12345-A-1" {...register("immatriculation")}/>
+                  {errors.immatriculation && (<span className="field-error">{errors.immatriculation.message}</span> )}
                 </div>
 
-                {/* Capacité */}
                 <div className="form-group">
                   <label>Capacité (Tonnes)</label>
-                  <input
-                    type="number"
-                    min="0.1"
-                    step="0.1"
-                    className={`form-control-custom ${errors.capacite ? "is-error" : ""}`}
-                    placeholder="Ex : 10"
-                    {...register("capacite")}
-                  />
-                  {errors.capacite && (
-                    <span className="field-error">{errors.capacite.message}</span>
-                  )}
+                  <input type="number" min="0.1"  step="0.1" className={`form-control-custom ${errors.capacite ? "is-error" : ""}`} placeholder="Ex : 10" {...register("capacite")} />
+                  {errors.capacite && (  <span className="field-error">{errors.capacite.message}</span>)}
                 </div>
 
-                {/* Disponible */}
                 <div className="form-group" style={{ justifyContent: "center" }}>
                   <label>Disponibilité</label>
                   <label style={{ flexDirection: "row", gap: 10, alignItems: "center", cursor: "pointer", fontWeight: 400 }}>
-                    <input
-                      type="checkbox"
-                      style={{ width: 16, height: 16, accentColor: "#f47b20" }}
-                      {...register("disponible")}
-                    />
+                    <input type="checkbox" style={{ width: 16, height: 16, accentColor: "#f47b20" }} {...register("disponible")}/>
                     Camion disponible
                   </label>
                 </div>
 
               </div>
 
-              {submitError && (
-                <p className="field-error" style={{ marginTop: 16 }}>⚠ {submitError}</p>
-              )}
-              {submitSuccess && (
-                <p style={{ marginTop: 16, color: "#2a7d30", fontSize: 13 }}>✅ {submitSuccess}</p>
-              )}
+              {submitError && ( <p className="field-error" style={{ marginTop: 16 }}> {submitError}</p> )}
+              {submitSuccess && (  <p style={{ marginTop: 16, color: "#2a7d30", fontSize: 13 }}>✅ {submitSuccess}</p>  )}
             </div>
 
-            {/* Footer */}
             <div className="form-card-footer">
-              <Link to="/transporteur/camions" className="btn-cancel">
+              <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
                 Annuler
               </Link>
               <button type="submit" className="btn-submit" disabled={isSubmitting}>
@@ -192,7 +159,6 @@ function AjouterCamion() {
             </div>
           </form>
         </div>
-
       </main>
     </div>
   );

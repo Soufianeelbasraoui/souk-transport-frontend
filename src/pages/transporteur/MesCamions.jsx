@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import Sidebar from "../../../components/layout/Sidebar";
-import "../../../styles/global.css";
-import "../style/styleTransporteur.css";
-import api from "../../../services/api";
+import Sidebar from "../../components/layout/Sidebar";
+import "../../styles/global.css";
+import "./style/transporteur.css";
+import api from "../../services/api";
 import { useEffect, useState } from "react";
 import { MdOutlineEdit,MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
@@ -41,7 +41,7 @@ function MesCamions() {
         </div>
         <div className="dashboard-card recent-trajets">
           <div className="card-header-custom">
-               <div>
+               <div className="trasporteur-search">
                  <input type="text" placeholder="Rechercher un camion..." />
                 </div>
           </div>

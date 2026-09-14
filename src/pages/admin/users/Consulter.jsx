@@ -5,8 +5,7 @@ import Sidebar from "../../../components/layout/Sidebar";
 import api from "../../../services/api";
 
 import "../../../styles/global.css";
-import "../styles/admin.css";
-import "../../transporteur/style/publierTrajet.css";
+import "../../../styles/formPage.css";
 
 function ConsulterUser() {
   const { id } = useParams();

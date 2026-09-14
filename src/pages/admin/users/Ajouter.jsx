@@ -7,8 +7,7 @@ import Sidebar from "../../../components/layout/Sidebar";
 import api from "../../../services/api";
 
 import "../../../styles/global.css";
-import "../styles/admin.css";
-import "../../transporteur/style/publierTrajet.css";
+import "../../../styles/formPage.css";
 
 const schema = yup.object({
   nom: yup.string().required("Le nom est obligatoire"),

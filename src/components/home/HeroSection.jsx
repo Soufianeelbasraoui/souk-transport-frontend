@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiExternalLink, FiCheck } from 'react-icons/fi';
 import moroccoMap from '../../assets/morocco-map.png';
-import '../../styles/hero.css';
+import './style/hero.css';
 
 const HeroSection = () => {
   return (

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import "../../styles/global.css";
 import api from "../../services/api";
-import "./style/styleTransporteur.css";
+import "./style/transporteur.css";
 
 function ReservationsRecues() {
     const [reservations, setReservations] = useState([]);

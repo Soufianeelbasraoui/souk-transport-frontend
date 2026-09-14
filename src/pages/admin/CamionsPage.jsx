@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { MdOutlineEdit, MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
 
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
+import Sidebar from "../../components/layout/Sidebar";
+import api from "../../services/api";
 
-import "../../../styles/global.css";
-import "../styles/admin.css";
-import Loader from "../../../components/common/Loader";
-import ConfirmDialog from "../../../components/common/ConfirmDialog";
+import "../../styles/global.css";
+import "./styles/admin.css";
+import Loader from "../../components/common/Loader";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 function CamionsPage() {
   const [camions, setCamions] = useState([]);
@@ -53,7 +53,7 @@ function CamionsPage() {
             <h1>Camions</h1>
             <p>Gérez les camions.</p>
           </div>
-          <Link to="/transporteur/camions/new" className="btn-primary" > Ajouter un camion</Link>
+          <Link to="/admin/camions/new" className="btn-primary" > Ajouter un camion</Link>
         </div>
         <div className="admin-card">
           <div className="admin-card-header">

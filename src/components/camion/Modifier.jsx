@@ -5,30 +5,20 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import * as yup from "yup";
 
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
+import Sidebar from "../layout/Sidebar";
+import api from "../../services/api";
 
-import "../../../styles/global.css";
-import "../style/publierTrajet.css";
-import Loader from "../../../components/common/Loader";
+import "../../styles/global.css";
+import "../../styles/formPage.css";
+import Loader from "../common/Loader";
+import { jwtDecode } from "jwt-decode";
 
 const schema = yup.object({
   marque: yup.string().required("La marque est obligatoire"),
-
   modele: yup.string().required("Le modèle est obligatoire"),
-
   type: yup.string().required("Le type de camion est obligatoire"),
-
-  immatriculation: yup
-    .string()
-    .required("L'immatriculation est obligatoire"),
-
-  capacite: yup
-    .number()
-    .typeError("La capacité doit être un nombre")
-    .positive("La capacité doit être positive")
-    .required("La capacité est obligatoire"),
-
+  immatriculation: yup.string().required("L'immatriculation est obligatoire"),
+  capacite: yup.number().typeError("La capacité doit être un nombre").positive("La capacité doit être positive").required("La capacité est obligatoire"),
   disponible: yup.boolean(),
 });
 
@@ -36,10 +26,15 @@ function ModifierCamion() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const token=localStorage.getItem("token");
+  const user=jwtDecode(token);
+
+
   const [typesCamion, setTypesCamion] = useState([]);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
   const [loading, setLoading] = useState(true);
+
 
   const {
     register,
@@ -51,31 +46,22 @@ function ModifierCamion() {
   });
 
   useEffect(() => {
-    api
-      .get(`/api/camions/${id}`)
-      .then((res) => {
+    api.get(`/api/camions/${id}`).then((res) => {
         setValue("marque", res.data.marque);
         setValue("modele", res.data.modele);
         setValue("type", res.data.type);
         setValue("immatriculation", res.data.immatriculation);
         setValue("capacite", res.data.capacite);
         setValue("disponible", res.data.disponible ?? true);
-
         setLoading(false);
       })
       .catch((error) => {
-        console.error(error);
-
-        setSubmitError(
-          "Impossible de charger les données du camion."
-        );
-
+        console.error(error)
+        setSubmitError( "Impossible de charger les données du camion." );
         setLoading(false);
       });
 
-    api
-      .get("/api/camions/types")
-      .then((res) => {
+    api.get("/api/camions/types").then((res) => {
         setTypesCamion(res.data);
       })
       .catch((error) => {
@@ -83,27 +69,25 @@ function ModifierCamion() {
       });
   }, [id, setValue]);
 
+
   const onSubmit = async (data) => {
     setSubmitError("");
     setSubmitSuccess("");
 
     try {
       await api.put(`/api/camions/${id}`, data);
-
-      setSubmitSuccess(
-        "Camion modifié avec succès ! Redirection en cours…"
-      );
-
+      setSubmitSuccess("Camion modifié avec succès ! Redirection en cours…");
       setTimeout(() => {
-        navigate("/transporteur/camions");
+        if(user.role==="ADMIN"){
+          navigate("/admin/camions");
+        }else if(user.role==="TRANSPORTEUR"){
+          navigate("/transporteur/camions")
+        }
+        
       }, 2000);
     } catch (error) {
       console.error(error);
-
-      setSubmitError(
-        error.response?.data?.message ||
-          "Une erreur est survenue. Veuillez réessayer."
-      );
+      setSubmitError( error.response?.data?.message ||"Une erreur est survenue. Veuillez réessayer." );
     }
   };
 
@@ -114,21 +98,16 @@ function ModifierCamion() {
   return (
     <div className="app">
       <Sidebar />
-
       <main className="main-content">
         <div className="page-header">
           <div>
             <h1>Modifier le camion</h1>
-
             <p>
               Mettez à jour les informations du camion.
             </p>
           </div>
 
-          <Link
-            to="/transporteur/camions"
-            className="btn-cancel"
-          >
+          <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
             ← Mes camions
           </Link>
         </div>
@@ -169,62 +148,25 @@ function ModifierCamion() {
                 <div className="form-group">
                   <label>Modèle</label>
 
-                  <input
-                    type="text"
-                    className={`form-control-custom ${
-                      errors.modele ? "is-error" : ""
-                    }`}
-                    placeholder="Ex : Actros"
-                    {...register("modele")}
-                  />
-
-                  {errors.modele && (
-                    <span className="field-error">
-                      {errors.modele.message}
-                    </span>
-                  )}
+                  <input type="text" className={`form-control-custom ${errors.modele ? "is-error" : "" }`} placeholder="Ex : Actros"  {...register("modele")} />
+                  {errors.modele && ( <span className="field-error"> {errors.modele.message} </span> )}
                 </div>
 
                 <div className="form-group">
                   <label>Type de camion</label>
 
-                  <select
-                    className={`form-control-custom ${
-                      errors.type ? "is-error" : ""
-                    }`}
-                    {...register("type")}
-                  >
-                    <option value="">
-                      -- Sélectionner un type --
-                    </option>
-
-                    {typesCamion.map((type) => (
-                      <option key={type} value={type}>
-                        {type.replace(/_/g, " ")}
-                      </option>
-                    ))}
+                  <select  className={`form-control-custom ${ errors.type ? "is-error" : ""}`} {...register("type")}>
+                    <option value=""> -- Sélectionner un type -- </option>
+                    {typesCamion.map((type) => ( <option key={type} value={type}> {type.replace(/_/g, " ")} </option>))}
                   </select>
 
-                  {errors.type && (
-                    <span className="field-error">
-                      {errors.type.message}
-                    </span>
-                  )}
+                  {errors.type && (<span className="field-error"> {errors.type.message} </span> )}
                 </div>
 
                 <div className="form-group">
                   <label>Immatriculation</label>
 
-                  <input
-                    type="text"
-                    className={`form-control-custom ${
-                      errors.immatriculation
-                        ? "is-error"
-                        : ""
-                    }`}
-                    placeholder="Ex : 12345-A-1"
-                    {...register("immatriculation")}
-                  />
+                  <input  type="text" className={`form-control-custom ${ errors.immatriculation  ? "is-error" : ""}`}  placeholder="Ex : 12345-A-1" {...register("immatriculation")} />
 
                   {errors.immatriculation && (
                     <span className="field-error">
@@ -289,7 +231,7 @@ function ModifierCamion() {
                   className="field-error"
                   style={{ marginTop: 16 }}
                 >
-                  ⚠ {submitError}
+                   {submitError}
                 </p>
               )}
 
@@ -301,27 +243,18 @@ function ModifierCamion() {
                     fontSize: 13,
                   }}
                 >
-                  ✅ {submitSuccess}
+                 {submitSuccess}
                 </p>
               )}
             </div>
 
             <div className="form-card-footer">
               <Link
-                to="/transporteur/camions"
-                className="btn-cancel"
-              >
-                Annuler
+                to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel"> Annuler
               </Link>
 
               <button
-                type="submit"
-                className="btn-submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Enregistrement…"
-                  : "Enregistrer les modifications"}
+                type="submit" className="btn-submit"  disabled={isSubmitting}> {isSubmitting ? "Enregistrement…": "Enregistrer les modifications"}
               </button>
             </div>
           </form>

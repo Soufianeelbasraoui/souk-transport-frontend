@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
+import Sidebar from "../layout/Sidebar";
+import api from "../../services/api";
 
-import "../../../styles/global.css";
-import "../style/publierTrajet.css";
+import "../../styles/global.css";
+import "../../styles/formPage.css";
+import Loader from "../common/Loader";
+import { jwtDecode } from "jwt-decode";
 
 
 function ConsulterTrajet() {
 
   const { id } = useParams();
+   const token=localStorage.getItem("token");
+  const user=jwtDecode(token)
 
   const [trajet, setTrajet] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,13 +33,14 @@ function ConsulterTrajet() {
       });
 
   }, [id]);
+  if(loading){
+    return<Loader/>
+  }
 
 
   return (
     <div className="app">
-
       <Sidebar />
-
       <main className="main-content">
         <div className="page-header">
           <div>
@@ -45,36 +50,21 @@ function ConsulterTrajet() {
             </p>
           </div>
 
-          <Link
-            to="/transporteur/trajets"
-            className="btn-cancel"
-          >
+          <Link  to={user.role==="ADMIN" ?"/admin/trajets":"/transporteur/trajets"}  className="btn-cancel" >
             ← Mes trajets
           </Link>
 
         </div>
-        {loading && (
-          <p>Chargement du trajet...</p>
-        )}
-        {error && (
-          <div className="alert-banner error">
-            {error}
-          </div>
-        )}
-
+    
+        {error && (  <div className="alert-banner error"> {error} </div> )}
         {!loading && !error && trajet && (
-
           <div className="form-card">
             <div className="form-card-header">
 
               <div>
-                <h5>
-                  Trajet #{String(trajet.id).padStart(4, "0")}
-                </h5>
+                <h5>  Trajet #{String(trajet.id).padStart(4, "0")} </h5>
 
-                <p>
-                  Statut :{" "}
-
+                <p> Statut :{" "}
                   <span
                     className={`status-badge ${
                       trajet.statutTrajet === "PUBLIE"
@@ -90,12 +80,7 @@ function ConsulterTrajet() {
               </div>
 
             </div>
-
-
-            {/* Body */}
             <div className="form-card-body">
-
-              {/* Route */}
               <div
                 className="route-preview"
                 style={{ marginBottom: "20px" }}
@@ -114,20 +99,12 @@ function ConsulterTrajet() {
                 </span>
 
               </div>
-
-
-              {/* Informations */}
               <div className="form-grid">
-
                 <div className="form-group">
                   <label>Date de départ</label>
 
                   <p className="form-control-custom">
-                    {trajet.dateDepart
-                      ? new Date(
-                          trajet.dateDepart
-                        ).toLocaleString("fr-FR")
-                      : "N/A"}
+                    {trajet.dateDepart  ? new Date( trajet.dateDepart).toLocaleString("fr-FR") : "N/A"}
                   </p>
                 </div>
 

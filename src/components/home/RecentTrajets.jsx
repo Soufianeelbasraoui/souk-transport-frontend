@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiCalendar, FiTruck, FiBox } from 'react-icons/fi';
-import '../../styles/recentTrajets.css';
+import './style/recentTrajets.css';
 import api from '../../services/api';
 import Loader from '../common/Loader';
 

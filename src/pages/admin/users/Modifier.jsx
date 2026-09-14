@@ -10,7 +10,7 @@ import api from "../../../services/api";
 
 import "../../../styles/global.css";
 import "../styles/admin.css";
-import "../../transporteur/style/publierTrajet.css";
+import "../../../styles/formPage.css";
 import Loader from "../../../components/common/Loader";
 
 const schema = yup.object({
