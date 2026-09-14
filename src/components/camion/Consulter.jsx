@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
-import "../../../styles/global.css";
-import "../style/publierTrajet.css";
-import "../style/styleTransporteur.css";
+import Sidebar from "../layout/Sidebar";
+import api from "../../services/api";
+import "../../styles/global.css";
+import "../../styles/formPage.css";
+import { jwtDecode } from "jwt-decode";
 
 function ConsulterCamion() {
   const { id } = useParams();
+
+   const token=localStorage.getItem("token");
+    const user=jwtDecode(token)
+    
   const [camion, setCamion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,7 +39,7 @@ function ConsulterCamion() {
             <h1>Consulter le camion</h1>
             <p>Consultez les informations détaillées du camion.</p>
           </div>
-          <Link to="/transporteur/camions" className="btn-cancel">
+          <Link  to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
             ← Mes camions
           </Link>
         </div>

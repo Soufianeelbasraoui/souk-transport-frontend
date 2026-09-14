@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
-import "../../../styles/global.css";
-import "../style/publierTrajet.css";
+import Sidebar from "../layout/Sidebar";
+import api from "../../services/api";
+import "../../styles/global.css";
+import "../../styles/formPage.css";
+import { jwtDecode } from "jwt-decode";
 
 const schema = yup.object({
   villeDepart: yup.string().required("La ville de départ est obligatoire"),
@@ -19,6 +20,10 @@ const schema = yup.object({
 
 function PublierTrajet() {
   const navigate = useNavigate();
+
+   const token=localStorage.getItem("token");
+  const user=jwtDecode(token)
+
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
   const [camions, setCamions] = useState([]);
@@ -60,7 +65,7 @@ function PublierTrajet() {
             <h1>Publier un trajet</h1>
             <p>Remplissez les informations pour publier votre trajet.</p>
           </div>
-          <Link to="/transporteur/trajets" className="btn-cancel">
+          <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
             ← Mes trajets
           </Link>
         </div>
@@ -98,7 +103,6 @@ function PublierTrajet() {
                   {errors.villeArrivee && (<span className="field-error">{errors.villeArrivee.message}</span>)}
                 </div>
 
-                {/* Date de départ */}
                 <div className="form-group">
                   <label>Date &amp; heure de départ</label>
                   <input
@@ -112,7 +116,6 @@ function PublierTrajet() {
                   )}
                 </div>
 
-                {/* Prix */}
                 <div className="form-group">
                   <label>Prix (MAD)</label>
                   <input
@@ -127,8 +130,6 @@ function PublierTrajet() {
                     <span className="field-error">{errors.prix.message}</span>
                   )}
                 </div>
-
-                {/* Poids disponible */}
                 <div className="form-group">
                   <label>Poids disponible (Tonnes)</label>
                   <input
@@ -182,14 +183,10 @@ function PublierTrajet() {
             </div>
 
             <div className="form-card-footer">
-              <Link to="/transporteur/trajets" className="btn-cancel">
+              <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
                 Annuler
               </Link>
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={isSubmitting || loadingCamions}
-              >
+              <button type="submit"  className="btn-submit" disabled={isSubmitting || loadingCamions} >
                 {isSubmitting ? "Publication…" : "Publier le trajet"}
               </button>
             </div>

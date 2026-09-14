@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import "../../styles/global.css";
-import "./style/styleTransporteur.css";
+import "./style/transporteur.css";
 import { FaTruck, FaBox, FaMoneyBillWave, FaUsers } from "react-icons/fa";
 import api from "../../services/api";
 import { Link } from "react-router-dom";

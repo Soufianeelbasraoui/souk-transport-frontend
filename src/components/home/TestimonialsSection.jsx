@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaStar } from 'react-icons/fa';
-import '../../styles/testimonials.css';
+import './style/testimonials.css';
 
 const TESTIMONIALS_DATA = [
   {

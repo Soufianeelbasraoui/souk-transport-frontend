@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import Sidebar from "../../../components/layout/Sidebar";
-import '../../../styles/global.css';
-import "../style/styleTransporteur.css";
+import Sidebar from "../../components/layout/Sidebar";
+import '../../styles/global.css';
+import "./style/transporteur.css";
 import { useEffect,useState } from "react";
-import api from "../../../services/api";
+import api from "../../services/api";
 import { MdOutlineEdit,MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
 
@@ -68,7 +68,6 @@ useEffect(() => {
                         <tr key={item.id}>
                           <td>
                             <span className="trajet-id">
-                              {" "}
                               T-{String(item.id).padStart(4, "0")}
                             </span>
                           </td>

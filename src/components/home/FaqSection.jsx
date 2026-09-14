@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../styles/faq.css';
+import './style/faq.css';
 
 const FAQ_ITEMS = [
   {

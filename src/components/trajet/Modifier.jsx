@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import * as yup from "yup";
-import Sidebar from "../../../components/layout/Sidebar";
-import api from "../../../services/api";
-import "../../../styles/global.css";
-import "../style/publierTrajet.css";
+import Sidebar from "../layout/Sidebar";
+import api from "../../services/api";
+import "../../styles/global.css";
+import "../../styles/formPage.css";
+import { jwtDecode } from "jwt-decode";
 
 const schema = yup.object({
   villeDepart: yup.string().required("La ville de départ est obligatoire"),
@@ -20,6 +21,10 @@ const schema = yup.object({
 function ModifierTrajet() {
   const { id } = useParams();
   const navigate = useNavigate();
+ 
+   const token=localStorage.getItem("token");
+   const user=jwtDecode(token)
+
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
   const [camions, setCamions] = useState([]);
@@ -69,7 +74,14 @@ function ModifierTrajet() {
     try {
       await api.put(`/api/trajets/${id}`, data);
       setSubmitSuccess("Trajet mis à jour avec succès ! Redirection en cours…");
-      setTimeout(() => navigate("/transporteur/trajets"), 2000);
+      setTimeout(() => {
+        if(user.role==="ADMIN"){
+          navigate("/admin/camions");
+        }else if(user.role==="TRANSPORTEUR"){
+          navigate("/transporteur/camions")
+        }
+        
+      }, 2000);
     } catch (error) {
       setSubmitError(error.response?.data?.message || "Une erreur est survenue lors de la modification.");
     }
@@ -84,7 +96,7 @@ function ModifierTrajet() {
             <h1>Modifier le trajet</h1>
             <p>Mettez à jour les informations de votre trajet.</p>
           </div>
-          <Link to="/transporteur/trajets" className="btn-cancel">
+          <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
             ← Mes trajets
           </Link>
         </div>
@@ -105,7 +117,7 @@ function ModifierTrajet() {
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="form-card-body">
                 <div className="form-grid">
-                  {/* Ville Départ */}
+                  
                   <div className="form-group">
                     <label>Ville de départ</label>
                     <input
@@ -161,10 +173,7 @@ function ModifierTrajet() {
                   </div>
                   <div className="form-group">
                     <label>Camion assigné</label>
-                    <select
-                      className={`form-control-custom ${errors.camionId ? "is-error" : ""}`}
-                      {...register("camionId")}
-                    >
+                    <select className={`form-control-custom ${errors.camionId ? "is-error" : ""}`} {...register("camionId")} >
                       <option value="">-- Sélectionner un camion --</option>
                       {camions.map((c) => (
                         <option key={c.id} value={String(c.id)}>
@@ -181,9 +190,11 @@ function ModifierTrajet() {
               </div>
 
               <div className="form-card-footer">
-                <Link to="/transporteur/trajets" className="btn-cancel">
+
+                <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
                   Annuler
                 </Link>
+
                 <button type="submit" className="btn-submit" disabled={isSubmitting}>
                   {isSubmitting ? "Enregistrement…" : "Enregistrer les modifications"}
                 </button>
