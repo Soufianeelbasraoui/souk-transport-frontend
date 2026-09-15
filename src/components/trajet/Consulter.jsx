@@ -139,8 +139,6 @@ function ConsulterTrajet() {
 
             </div>
 
-
-            {/* Footer */}
             <div className="form-card-footer">
 
               <Link

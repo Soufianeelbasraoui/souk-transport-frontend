@@ -37,8 +37,10 @@ function ReservationsRecues() {
                 </div>
 
                 <div className="dashboard-card recent-trajets">
-                    <div className="card-header-custom">
-                        <input type="text" placeholder="Rechercher..." />
+                    <div className="card-header-custom ">
+                        <div className="trasporteur-search">
+                          <input type="text" placeholder="Rechercher..." />
+                        </div>
                         <select defaultValue="">
                             <option value="">Filtrer par statut</option>
                             <option value="EN_ATTENTE">En attente</option>

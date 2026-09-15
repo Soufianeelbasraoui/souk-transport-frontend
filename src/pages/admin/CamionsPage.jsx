@@ -17,8 +17,7 @@ function CamionsPage() {
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    api.get("/api/camions/lister")
-      .then((res) => {
+    api.get("/api/camions/lister").then((res) => {
         console.log(res.data);
         setCamions(res.data.content);
       })
