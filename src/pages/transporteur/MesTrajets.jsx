@@ -6,9 +6,14 @@ import { useEffect,useState } from "react";
 import api from "../../services/api";
 import { MdOutlineEdit,MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
+import Loader from "../../components/common/Loader";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { set } from "react-hook-form";
 
 function MesTrajets(){
   const [mesTrajets, setMesTrajets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState(null);
 
 useEffect(() => {
     try {
@@ -18,8 +23,23 @@ useEffect(() => {
       });
     } catch (error) {
       console.log(error);
+    }finally{
+      setLoading(false)
     }
   }, []);
+
+  const handelDelet=(id)=>{
+    try{
+     api.delete(`/api/trajets/${id}`);
+     setMesTrajets(mesTrajets.filter((item)=>item.id!==id));
+     setDeleteId(null);
+    }catch(error){
+      console.log(error);
+    }
+  }
+  if(loading){
+    return<Loader/>
+  }
 
   return(
     <div className="app">
@@ -119,7 +139,7 @@ useEffect(() => {
                               <Link to={`/transporteur/trajets/edit/${item.id}`} className="action-btn edit">
                                 <MdOutlineEdit />
                               </Link>
-                              <button className="action-btn delete">
+                              <button className="action-btn delete" onClick={()=>setDeleteId(item.id)}>
                                 <MdDelete />
                               </button>
                             </div>
@@ -142,6 +162,13 @@ useEffect(() => {
           </div>
 
         </div>
+        <ConfirmDialog
+           show={deleteId!== null}
+           title="Supprimer le trajet"
+           message="Êtes-vous sûr de vouloir supprimer ce trajet ?"
+           onConfirm={handelDelet}
+           onCancel={()=>setDeleteId(null)}
+        />
      </main>
     </div>
   )

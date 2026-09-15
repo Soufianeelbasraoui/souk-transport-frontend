@@ -25,11 +25,8 @@ function MesCamions() {
 
   return (
     <div className="app">
-
       <Sidebar />
-
       <main className="main-content">
-
         <div className="page-header">
           <div>
             <h1>Mes Camions</h1>
@@ -43,7 +40,7 @@ function MesCamions() {
           <div className="card-header-custom">
                <div className="trasporteur-search">
                  <input type="text" placeholder="Rechercher un camion..." />
-                </div>
+          </div>
           </div>
           <div className="table-responsive">
             <table className="dashboard-table">

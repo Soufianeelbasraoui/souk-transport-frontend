@@ -17,8 +17,7 @@ function ConsulterCamion() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api
-      .get(`/api/camions/${id}`)
+    api.get(`/api/camions/${id}`)
       .then((res) => {
         setCamion(res.data);
         setLoading(false);
