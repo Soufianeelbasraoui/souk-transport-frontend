@@ -1,0 +1,54 @@
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px ;
+  box-sizing: border-box;
+}
+
+.pagination-text {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.pagination-text strong {
+  color: #0f172a;
+  font-weight: 500;
+}
+.pagination-wrapper .MuiPagination-ul {
+  gap: 6px;
+}
+
+.pagination-wrapper .MuiPaginationItem-root {
+  border: 1px solid #e2e8f0 ;
+  color: #1e293b;
+  border-radius: 5px ;
+  font-weight: 400;
+  font-size: 10px;
+  min-width: 30px;
+  height: 30px;
+  margin: 0;
+  background-color: #ffffff;
+}
+
+.pagination-wrapper .MuiPaginationItem-root:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.pagination-wrapper .MuiPaginationItem-root.Mui-selected {
+  background-color: #0b1f3b ;
+  color: #ffffff ;
+  border-color: #0b1f3b;
+}
+
+.pagination-wrapper .MuiPaginationItem-root.Mui-selected:hover {
+  background-color: #081528 ;
+}
+
+.pagination-wrapper .MuiPaginationItem-ellipsis {
+  border: none;
+  background: transparent;
+}
