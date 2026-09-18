@@ -6,12 +6,14 @@ import api from "../../services/api";
 import { useEffect, useState } from "react";
 import { MdOutlineEdit,MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 
 
 
 function MesCamions() {
     const [mesCamions, setMesCamions] = useState([]);
+    const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     api.get("/api/camions/mesCamions") .then((res) => {
@@ -22,6 +24,18 @@ function MesCamions() {
         console.error("Erreur camions :", error);
       });
   }, []);
+
+  const handleDelete = async () => {
+  try {
+    await api.delete(`/api/camions/${deleteId}`);
+
+    setMesCamions((prev) => prev.filter((item) => item.id !== deleteId));
+
+    setDeleteId(null);
+  } catch (error) {
+    console.error("Erreur suppression camion :", error);
+  }
+};
 
   return (
     <div className="app">
@@ -79,8 +93,11 @@ function MesCamions() {
                             <Link to={`/transporteur/camions/edit/${item.id}`} className="action-btn edit" title="Modifier">
                               <MdOutlineEdit />
                             </Link>
-                            <button className="action-btn delete" title="Supprimer">
-                              <MdDelete />
+                             <button
+                               className="action-btn delete"
+                               title="Supprimer"
+                               onClick={() => setDeleteId(item.id)}>
+                                 <MdDelete />
                             </button>
                           </div>
                         </td>
@@ -102,6 +119,13 @@ function MesCamions() {
           </div>
 
         </div>
+        <ConfirmDialog
+         show={deleteId !== null}
+         title="Supprimer le camion"
+         message="Êtes-vous sûr de vouloir supprimer ce camion ?"
+         onConfirm={handleDelete}
+         onCancel={() => setDeleteId(null)}
+      />
 
       </main>
 
