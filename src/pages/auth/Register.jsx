@@ -57,28 +57,37 @@ function Register() {
   const onSubmit = async (data) => {
     setRegisterError("");
     setSuccessMessage("");
+
     try {
-      let response;
       if (role === "EXPEDITEUR") {
-        response = await api.post("/auth/register/expediteur", data);
-      } else {
-        response = await api.post("/auth/register/transporteur", data);
-      }
+        const response = await api.post("/auth/register/expediteur", data);
+        const token = response.data.token;
 
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      const user = jwtDecode(token);
-      setSuccessMessage("Inscription réussie ! Redirection...");
+        if (token) {
+          localStorage.setItem("token", token);
+          const user = jwtDecode(token);
+          setSuccessMessage("Inscription réussie ! Redirection...");
 
-      setTimeout(() => {
-        if (user.role === "TRANSPORTEUR") {
-          navigate("/transporteur/dashboard");
-        } else if (user.role === "EXPEDITEUR") {
-          navigate("/expediteur/dashboard");
-        } else {
-          navigate("/");
+          setTimeout(() => {
+            if (user.role === "EXPEDITEUR") {
+              navigate("/expediteur/dashboard");
+            } else {
+              navigate("/");
+            }
+          }, 1000);
         }
-      }, 1000);
+      } else {
+        // Enregistrement Transporteur (Statut EN_ATTENTE au backend, pas de token retourné)
+        await api.post("/auth/register/transporteur", data);
+        
+        setSuccessMessage(
+          "Votre compte a été créé avec succès ! Il est actuellement en attente de validation par l'administrateur."
+        );
+
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
+      }
     } catch (error) {
       if (error.response?.status === 409) {
         setRegisterError("Adresse email déjà utilisée.");
@@ -110,11 +119,19 @@ function Register() {
 
             <div className="role-selection mb-3">
               <div className="role-buttons">
-                <button type="button" className={role === "EXPEDITEUR" ? "role-btn active" : "role-btn"}  onClick={() => handleRoleChange("EXPEDITEUR")}>
+                <button
+                  type="button"
+                  className={role === "EXPEDITEUR" ? "role-btn active" : "role-btn"}
+                  onClick={() => handleRoleChange("EXPEDITEUR")}
+                >
                   <FiPackage className="me-1" /> Expéditeur
                 </button>
 
-                <button  type="button" className={role === "TRANSPORTEUR" ? "role-btn active" : "role-btn"} onClick={() => handleRoleChange("TRANSPORTEUR")} >
+                <button
+                  type="button"
+                  className={role === "TRANSPORTEUR" ? "role-btn active" : "role-btn"}
+                  onClick={() => handleRoleChange("TRANSPORTEUR")}
+                >
                   <FiTruck className="me-1" /> Transporteur
                 </button>
               </div>

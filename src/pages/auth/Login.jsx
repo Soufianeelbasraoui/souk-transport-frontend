@@ -46,11 +46,16 @@ function Login() {
 
     } catch (error) {
       localStorage.removeItem("token");
-      setLoginError(
-        error.response?.status === 401 
-          ? "Email ou mot de passe incorrect." 
-          : "Impossible de se connecter. Vérifiez que le serveur est disponible."
-      );
+      
+      if (error.response?.data?.message) {
+        setLoginError(error.response.data.message);
+      } else if (error.response?.status === 401) {
+        setLoginError("Email ou mot de passe incorrect.");
+      } else if (error.response?.status === 403) {
+        setLoginError("Accès refusé. Votre compte n'est pas actif.");
+      } else {
+        setLoginError("Impossible de se connecter. Vérifiez que le serveur est disponible.");
+      }
     }
   };
 
@@ -60,7 +65,6 @@ function Login() {
       
       <div className="right-panel-container">
         <div className="login-content-wrapper">
-          {/* Link placé en dehors de la login-card */}
           <Link to="/" className="back-to-home-link">
             <span className="back-arrow-icon">
               <FiArrowLeft aria-hidden="true" />
@@ -100,7 +104,7 @@ function Login() {
                 {errors.password && (<span className="auth-error-text">{errors.password.message}</span>)}
               </div>
 
-              {loginError && <p className="auth-error-text mb-2">{loginError}</p>}
+              {loginError && <p className="auth-error-text mb-2 text-danger small">{loginError}</p>}
 
               <button type="submit" className="btn-submit mt-2">
                 Se connecter

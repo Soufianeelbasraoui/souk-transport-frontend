@@ -15,12 +15,12 @@ import ReservationsRecues from '../pages/transporteur/ReservationsRecues';
 
 
 import ConsulterCamion from '../components/camion/Consulter';
-import ModifierCamion from '../components/camion/Modifier';
+import ModifierCamion from '../components/camion/ModifierCamion';
 import AjouterCamion from '../components/camion/AjouterCamion';
 import MesTrajets from '../pages/transporteur/MesTrajets';
 import MesCamions from '../pages/transporteur/MesCamions';
 import PublierTrajet from '../components/trajet/PublierTrajet';
-import ModifierTrajet from '../components/trajet/Modifier';
+import ModifierTrajet from '../components/trajet/ModifierTrajet';
 import ConsulterTrajet from '../components/trajet/Consulter';
 import Profile from '../pages/transporteur/Profile';
 import UsersPage from '../pages/admin/users/UsersPage';
@@ -32,6 +32,15 @@ import CargaisonsPage from '../pages/admin/CargaisonsPage';
 import ReservationsPage from '../pages/admin/Reservations';
 import CreerCargaison from '../components/cargaison/CreerCargaison';
 import ConsulterCargaison from '../components/cargaison/Consulter';
+import TrajetsDisponibles from '../pages/expediteur/TrajetsDisponibles';
+import DetailTrajet from '../pages/expediteur/DetailTrajet';
+import MesCargaisons from '../pages/expediteur/MesCargaisons';
+import MesReservations from '../pages/expediteur/MesReservations';
+import Paiement from '../pages/expediteur/Paiement';
+import DetailReservation from '../pages/expediteur/DetailReservation';
+
+import PublicRoute from './PublicRoute';
+import Unauthorized from '../pages/unauthorized';
 
 
 
@@ -40,10 +49,13 @@ function AppRoutes() {
   return (
     <BrowserRouter>
      <Routes>
-      <Route path='/'element={<HomePage/>}/>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register/>}/>
+      <Route element={<PublicRoute/>}>
+         <Route path="/login" element={<Login />} />
+         <Route path="/register" element={<Register/>}/>
+      </Route>
+       <Route path='/'element={<HomePage/>}/>
       <Route path='/*' element={<NotFoundPgae/>}/>
+      <Route path="/unauthorized" element={<Unauthorized/>} />
 
       <Route  path='/admin/dashboard'   element={  <ProtectedRoute> <RoleRoute roles={["ADMIN"]}><DashboardAdmin/> </RoleRoute>  </ProtectedRoute> } />
       <Route path='/admin/camions' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><CamionsPage/></RoleRoute></ProtectedRoute>}/>
@@ -78,7 +90,17 @@ function AppRoutes() {
       <Route path='/transporteur/profile' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR"]}><Profile/></RoleRoute></ProtectedRoute>}/>
 
       <Route  path='/expediteur/dashboard'  element={   <ProtectedRoute> <RoleRoute roles={["EXPEDITEUR"]}> <DashboardExpediteur/> </RoleRoute></ProtectedRoute>  }/>
+      <Route path='/expediteur/trajets' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><TrajetsDisponibles/></RoleRoute></ProtectedRoute>}/>
       <Route path='/expediteur/cargaisons/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ConsulterCargaison/></RoleRoute></ProtectedRoute>}/>
+      <Route  path='/expediteur/detailtrajet/:id' element={<ProtectedRoute><RoleRoute  roles={["EXPEDITEUR"]}><DetailTrajet/></RoleRoute></ProtectedRoute>}/>
+      <Route  path='/expediteur/cargaisons' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><MesCargaisons/></RoleRoute></ProtectedRoute>}/>
+      <Route path='/expediteur/cargaisons/new' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><CreerCargaison/></RoleRoute></ProtectedRoute>}/>
+      <Route path='/expediteur/reservations' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><MesReservations/></RoleRoute></ProtectedRoute>}/>
+      <Route path='/expediteur/reservations/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><DetailReservation/></RoleRoute></ProtectedRoute>}/>
+
+      <Route path='/expediteur/paiements' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><Paiement/></RoleRoute></ProtectedRoute>}/>
+
+
     </Routes>
     </BrowserRouter>
   )
