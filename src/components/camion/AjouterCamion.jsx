@@ -45,14 +45,12 @@ function AjouterCamion() {
   useEffect(() => {
     if (!isAdmin) return;
 
-    api.get("/api/users/filter/role",{params: { role: "TRANSPORTEUR" }})
-      .then((res) => setTransporteurs(res.data.content || res.data))
+    api.get("/api/users/filter/role",{params: { role: "TRANSPORTEUR" }}).then((res) => setTransporteurs(res.data.content || res.data))
       .catch(() => setSubmitError("Impossible de charger les transporteurs."));
   }, [isAdmin]);
 
   useEffect(() => {
-    api.get("/api/camions/types")
-      .then((res) => setTypesCamion(res.data))
+    api.get("/api/camions/types").then((res) => setTypesCamion(res.data))
       .catch((error) => console.error(error));
   }, []);
 
@@ -63,7 +61,6 @@ function AjouterCamion() {
     try {
   
       await api.post("/api/camions", data);
-
       setSubmitSuccess("Camion ajouté avec succès ! Redirection en cours…");
 
       setTimeout(() => {
