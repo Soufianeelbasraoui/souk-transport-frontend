@@ -1,0 +1,153 @@
+.reservations-recues-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 15px 40px;
+}
+
+.recues-header {
+  margin-bottom: 24px;
+}
+
+.recues-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.recues-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.recues-toolbar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.recues-toolbar input,
+.recues-toolbar select {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.recues-card-table {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.recues-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.recues-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.recues-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.recues-table tr:hover td {
+  background: #f8fafc;
+}
+
+.res-ref-pill {
+  font-family: monospace;
+  font-weight: 700;
+  color: #0b1f3b;
+  background: #f1f5f9;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.price-text {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.btn-action-accept,
+.btn-action-refuse,
+.btn-confirm-payment {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-action-accept {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.btn-action-accept:hover {
+  background: #059669;
+}
+
+.btn-action-refuse {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.btn-action-refuse:hover {
+  background: #fecaca;
+}
+
+.btn-confirm-payment {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn-confirm-payment:hover {
+  background: #1d4ed8;
+}
+
+.paiement-badge-confirmed {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.paiement-badge-none {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-size: 12px;
+  font-weight: 500;
+}

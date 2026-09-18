@@ -28,15 +28,17 @@ useEffect(() => {
     }
   }, []);
 
-  const handelDelet=(id)=>{
-    try{
-     api.delete(`/api/trajets/${id}`);
-     setMesTrajets(mesTrajets.filter((item)=>item.id!==id));
-     setDeleteId(null);
-    }catch(error){
-      console.log(error);
-    }
+ const handelDelet = async () => {
+  try {
+    await api.delete(`/api/trajets/${deleteId}`);
+
+    setMesTrajets((prev) => prev.filter((item) => item.id !== deleteId));
+
+    setDeleteId(null);
+  } catch (error) {
+    console.error("Erreur suppression trajet :", error);
   }
+};
   if(loading){
     return<Loader/>
   }
@@ -139,9 +141,9 @@ useEffect(() => {
                               <Link to={`/transporteur/trajets/edit/${item.id}`} className="action-btn edit">
                                 <MdOutlineEdit />
                               </Link>
-                              <button className="action-btn delete" onClick={()=>setDeleteId(item.id)}>
-                                <MdDelete />
-                              </button>
+                                <button className="action-btn delete" onClick={() => setDeleteId(item.id)}>
+                                  <MdDelete />
+                                </button>
                             </div>
                           </td>
                         </tr>
@@ -162,12 +164,12 @@ useEffect(() => {
           </div>
 
         </div>
-        <ConfirmDialog
-           show={deleteId!== null}
-           title="Supprimer le trajet"
-           message="Êtes-vous sûr de vouloir supprimer ce trajet ?"
-           onConfirm={handelDelet}
-           onCancel={()=>setDeleteId(null)}
+         <ConfirmDialog
+            show={deleteId !== null}
+            title="Supprimer le trajet"
+            message="Êtes-vous sûr de vouloir supprimer ce trajet ?"
+            onConfirm={handelDelet}
+            onCancel={() => setDeleteId(null)}
         />
      </main>
     </div>
