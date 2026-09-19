@@ -241,11 +241,7 @@ function ModifierTrajet() {
                     {...register("villeDepart")}
                   />
 
-                  {errors.villeDepart && (
-                    <span className="field-error">
-                      {errors.villeDepart.message}
-                    </span>
-                  )}
+                  {errors.villeDepart && ( <span className="field-error"> {errors.villeDepart.message} </span>)}
 
                 </div>
 
