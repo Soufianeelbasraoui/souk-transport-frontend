@@ -9,6 +9,7 @@ import api from "../../services/api";
 import "../../styles/global.css";
 import "../../styles/formPage.css";
 import Loader from "../common/Loader";
+import { FiArrowLeft } from "react-icons/fi";
 
 function ConsulterCargaison() {
   const { id } = useParams();
@@ -49,7 +50,7 @@ function ConsulterCargaison() {
 
           <Link
             to={ user.role === "ADMIN"? "/admin/cargaisons"  : "/expediteur/cargaisons" } className="btn-cancel">
-            ← Mes cargaisons
+           <FiArrowLeft /> Mes cargaisons
           </Link>
         </div>
 
@@ -58,13 +59,11 @@ function ConsulterCargaison() {
         {!loading && !error && cargaison && (
           <div className="form-card">
             <div className="form-card-header">
-              <div>
+              <div className="d-flex justify-content-between align-items-center">
                 <h5>Cargaison #{String(cargaison.id).padStart(4, "0")}</h5>
                 <p>
                   <span
-                    className={`status-badge ${
-                      cargaison.statutCargaison === "LIVREE" ? "status-open" : cargaison.statutCargaison === "EN_TRANSIT" ? "status-progress" : "status-other" }`} >
-                      {cargaison.statutCargaison}
+                    className={`status-badge ${ cargaison.statutCargaison === "LIVREE" ? "status-open" : cargaison.statutCargaison === "EN_TRANSIT" ? "status-progress" : "status-other" }`} > {cargaison.statutCargaison}
                   </span>
                 </p>
               </div>
@@ -93,41 +92,10 @@ function ConsulterCargaison() {
                   </p>
                 </div>
 
-                <div className="form-section-title">Informations de l'expéditeur</div>
-
                 <div className="form-group">
                   <label>Expéditeur</label>
                   <p className="form-control-custom">
                     {cargaison.expediteurNom || `${cargaison.expediteur?.nom || ""} ${cargaison.expediteur?.prenom || ""  }`.trim() || "Non spécifié"}
-                  </p>
-                </div>
-
-                <div className="form-group">
-                  <label>Email</label>
-                  <p className="form-control-custom">
-                    {cargaison.expediteurEmail || cargaison.expediteur?.email || "N/A"}
-                  </p>
-                </div>
-
-                <div className="form-group">
-                  <label>Téléphone</label>
-                  <p className="form-control-custom">
-                    {cargaison.expediteurTelephone ||cargaison.expediteur?.telephone || "N/A"}
-                  </p>
-                </div>
-
-                <div className="form-group">
-                  <label>Date d'enregistrement</label>
-                  <p className="form-control-custom">
-                    {cargaison.dateCreation || cargaison.createdAt ? new Date(  cargaison.dateCreation || cargaison.createdAt ).toLocaleString("fr-FR"): "N/A"}
-                  </p>
-                </div>
-
-                <div className="form-group">
-                  <label>Trajet associé</label>
-                  <p className="form-control-custom">
-                    Trajet #
-                    {cargaison.trajetId || cargaison.trajet?.id || "N/A"}
                   </p>
                 </div>
               </div>
