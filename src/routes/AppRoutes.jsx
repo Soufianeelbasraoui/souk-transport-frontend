@@ -41,6 +41,7 @@ import DetailReservation from '../pages/expediteur/DetailReservation';
 
 import PublicRoute from './PublicRoute';
 import Unauthorized from '../pages/unauthorized';
+import ModifierCargaison from '../components/cargaison/ModifierCargaison';
 
 
 
@@ -73,6 +74,7 @@ function AppRoutes() {
       <Route path='/admin/cargaisons' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><CargaisonsPage/></RoleRoute></ProtectedRoute>}/>
       <Route path='/admin/cargaisons/new' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><CreerCargaison/></RoleRoute></ProtectedRoute>}/>
       <Route path='/admin/cargaisons/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterCargaison/></RoleRoute></ProtectedRoute>}/>
+      <Route path='/admin/cargaisons/edit/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ModifierCargaison/></RoleRoute></ProtectedRoute>}/>
       <Route path='/admin/reservations' element={<ProtectedRoute><RoleRoute  roles={["ADMIN"]}><ReservationsPage/></RoleRoute></ProtectedRoute>}/>
 
 
@@ -94,6 +96,7 @@ function AppRoutes() {
       <Route path='/expediteur/cargaisons/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ConsulterCargaison/></RoleRoute></ProtectedRoute>}/>
       <Route  path='/expediteur/detailtrajet/:id' element={<ProtectedRoute><RoleRoute  roles={["EXPEDITEUR"]}><DetailTrajet/></RoleRoute></ProtectedRoute>}/>
       <Route  path='/expediteur/cargaisons' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><MesCargaisons/></RoleRoute></ProtectedRoute>}/>
+      <Route path='/expediteur/cargaisons/edit/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ModifierCargaison/></RoleRoute></ProtectedRoute>}/>
       <Route path='/expediteur/cargaisons/new' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><CreerCargaison/></RoleRoute></ProtectedRoute>}/>
       <Route path='/expediteur/reservations' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><MesReservations/></RoleRoute></ProtectedRoute>}/>
       <Route path='/expediteur/reservations/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><DetailReservation/></RoleRoute></ProtectedRoute>}/>
