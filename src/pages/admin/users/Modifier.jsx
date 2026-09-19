@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -16,7 +15,7 @@ import Loader from "../../../components/common/Loader";
 const schema = yup.object({
   nom: yup.string().required("Le nom est obligatoire"),
   prenom: yup.string().required("Le prénom est obligatoire"),
-  email: yup.string() .email("Format d'email invalide") .required("L'email est obligatoire"),
+  email: yup.string().email("Format d'email invalide").required("L'email est obligatoire"),
   telephone: yup.string().nullable(),
   ville: yup.string().required("La ville est obligatoire"),
   role: yup.string().required("Le rôle est obligatoire"),
@@ -53,8 +52,8 @@ function ModifierUser() {
         setLoading(false);
       })
       .catch((error) => {
-        console.error(error);
-        setSubmitError( "Impossible de charger les données de cet utilisateur." );
+        console.error("Erreur chargement utilisateur :", error);
+        setSubmitError("Impossible de charger les données de cet utilisateur.");
         setLoading(false);
       });
   }, [id, setValue]);
@@ -65,24 +64,21 @@ function ModifierUser() {
 
     try {
       await api.put(`/api/users/${id}`, data);
-      setSubmitSuccess("Utilisateur modifié avec succès");
+      setSubmitSuccess("Utilisateur modifié avec succès.");
 
       setTimeout(() => {
         navigate("/admin/users");
       }, 1500);
     } catch (error) {
-      console.error(error);
+      console.error("Erreur serveur lors de la mise à jour :", error.response?.data || error);
 
-      const serverMessage =
-        error.response?.data?.message ||
-        (typeof error.response?.data === "string" ? error.response.data : null);
-
-      setSubmitError(
-        error.response?.status === 401
-          ? "Votre session a expiré. Reconnectez-vous puis réessayez."
-          : serverMessage ||
-          "Erreur lors de la modification de l'utilisateur"
-      );
+      if (error.response?.status === 401) {
+        setSubmitError("Votre session a expiré. Veuillez vous reconnecter.");
+      } else if (error.response?.status === 400) {
+        setSubmitError("Données invalides. Veuillez vérifier les informations saisies.");
+      } else {
+        setSubmitError("Une erreur est survenue lors de la modification de l'utilisateur.");
+      }
     }
   };
 
@@ -98,9 +94,7 @@ function ModifierUser() {
         <div className="page-header">
           <div>
             <h1>Modifier l'utilisateur</h1>
-            <p>
-              Mettez à jour les informations du profil utilisateur #{id}.
-            </p>
+            <p> Mettez à jour les informations du profil utilisateur #{id}. </p>
           </div>
 
           <Link to="/admin/users" className="btn-cancel">
@@ -116,148 +110,59 @@ function ModifierUser() {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-card-body">
-              {submitError && (
-                <div className="alert-banner error">
-                  {submitError}
-                </div>
-              )}
-
-              {submitSuccess && (
-                <div className="alert-banner success">
-                  {submitSuccess}
-                </div>
+              {submitError && ( <div className="alert-banner error"> {submitError}</div>  )}
+              {submitSuccess && (<div className="alert-banner success">{submitSuccess} </div>
               )}
 
               <div className="form-grid">
                 <div className="form-group">
                   <label>Nom</label>
-
-                  <input
-                    type="text"
-                    className={`form-control-custom ${
-                      errors.nom ? "is-error" : ""
-                    }`}
-                    {...register("nom")}
-                  />
-
-                  {errors.nom && (
-                    <span className="field-error">
-                      {errors.nom.message}
-                    </span>
-                  )}
+                  <input type="text" className={`form-control-custom ${errors.nom ? "is-error" : ""}`}  {...register("nom")} />
+                  {errors.nom && ( <span className="field-error">{errors.nom.message}</span> )}
                 </div>
 
                 <div className="form-group">
                   <label>Prénom</label>
-
-                  <input
-                    type="text"
-                    className={`form-control-custom ${
-                      errors.prenom ? "is-error" : ""
-                    }`}
-                    {...register("prenom")}
-                  />
-
-                  {errors.prenom && (
-                    <span className="field-error">
-                      {errors.prenom.message}
-                    </span>
-                  )}
+                  <input type="text" className={`form-control-custom ${errors.prenom ? "is-error" : ""}`} {...register("prenom")}  />
+                  {errors.prenom && (  <span className="field-error">{errors.prenom.message}</span> )}
                 </div>
 
                 <div className="form-group">
                   <label>Email</label>
-
-                  <input
-                    type="email"
-                    className={`form-control-custom ${
-                      errors.email ? "is-error" : ""
-                    }`}
-                    {...register("email")}
-                  />
-
-                  {errors.email && (
-                    <span className="field-error">
-                      {errors.email.message}
-                    </span>
-                  )}
+                  <input type="email"  className={`form-control-custom ${errors.email ? "is-error" : ""}`} {...register("email")} />
+                  {errors.email && (<span className="field-error">{errors.email.message}</span> )}
                 </div>
 
                 <div className="form-group">
                   <label>Téléphone</label>
-
-                  <input
-                    type="tel"
-                    className={`form-control-custom ${
-                      errors.telephone ? "is-error" : ""
-                    }`}
-                    {...register("telephone")}
-                  />
-
-                  {errors.telephone && (
-                    <span className="field-error">
-                      {errors.telephone.message}
-                    </span>
-                  )}
+                  <input  type="tel"  className={`form-control-custom ${errors.telephone ? "is-error" : ""}`} {...register("telephone")} />
+                  {errors.telephone && ( <span className="field-error">{errors.telephone.message}</span> )}
                 </div>
 
                 <div className="form-group">
                   <label>Ville</label>
-
-                  <input
-                    type="text"
-                    className={`form-control-custom ${
-                      errors.ville ? "is-error" : ""
-                    }`}
-                    {...register("ville")}
-                  />
-
-                  {errors.ville && (
-                    <span className="field-error">
-                      {errors.ville.message}
-                    </span>
-                  )}
+                  <input type="text" className={`form-control-custom ${errors.ville ? "is-error" : ""}`} {...register("ville")}/>
+                  {errors.ville && (<span className="field-error">{errors.ville.message}</span>)}
                 </div>
 
                 <div className="form-group">
                   <label>Rôle</label>
-
                   <select
-                    className={`form-control-custom ${
-                      errors.role ? "is-error" : ""
-                    }`}
-                    {...register("role")}
-                  >
+                    className={`form-control-custom ${errors.role ? "is-error" : ""}`} {...register("role")} >
                     <option value="EXPEDITEUR">Expéditeur</option>
                     <option value="TRANSPORTEUR">Transporteur</option>
                     <option value="ADMIN">Administrateur</option>
                   </select>
-
-                  {errors.role && (
-                    <span className="field-error">
-                      {errors.role.message}
-                    </span>
-                  )}
+                  {errors.role && (<span className="field-error">{errors.role.message}</span>)}
                 </div>
 
                 <div className="form-group">
                   <label>Statut</label>
-
-                  <select
-                    className={`form-control-custom ${
-                      errors.statutUser ? "is-error" : ""
-                    }`}
-                    {...register("statutUser")}
-                  >
-                    <option value="ACTIF">Actif</option>
-                    <option value="INACTIF">Inactif</option>
-                  </select>
-
-                  {errors.statutUser && (
-                    <span className="field-error">
-                      {errors.statutUser.message}
-                    </span>
-                  )}
+                    <select className={`form-control-custom ${errors.statutUser ? "is-error" : ""}`} {...register("statutUser")} >
+                      <option value="ACTIF">Actif (Valider)</option>
+                      <option value="EN_ATTENTE">En attente de validation</option>
+                      <option value="SUSPENDU">Suspendre</option>
+                    </select>
                 </div>
               </div>
             </div>
@@ -267,14 +172,8 @@ function ModifierUser() {
                 Annuler
               </Link>
 
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Enregistrement..."
-                  : "Enregistrer les modifications"}
+              <button  type="submit" className="btn-submit" disabled={isSubmitting}>
+                {isSubmitting ? "Enregistrement..." : "Enregistrer les modifications"}
               </button>
             </div>
           </form>

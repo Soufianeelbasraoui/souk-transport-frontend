@@ -10,132 +10,249 @@ import "./styles/admin.css";
 import Loader from "../../components/common/Loader";
 import Sidebar from "../../components/layout/Sidebar";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import PaginationComponent from "../../components/common/Pagination";
 
 function TrajetsPage() {
   const [trajets, setTrajets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
 
-  useEffect(() => {
-    api.get("/api/trajets").then((res) => {
-        console.log(res.data);
-        setTrajets(res.data.content);
-      })
-      .catch((error) => {
-        console.error("Erreur camions :", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [page, setPage] = useState(0);
 
-  const handelDelet = async (id) => {
+  const [search, setSearch] = useState("");
+
+  const pageSize = 10;
+
+  const fetchTrajets = async () => {
     try {
-      await api.delete(`/api/trajets/${id}`);
-      setTrajets(trajets.filter((item) => item.id !== id) );
-      setDeleteId(null);
+      setLoading(true);
+
+      let res;
+
+      if (search.trim() === "") {
+        res = await api.get(`/api/trajets?page=${page}&size=${pageSize}` );
+      } else {
+        res = await api.get( `/api/trajets/search?recherche=${search}&page=${page}&size=${pageSize}`
+        );
+      }
+
+      setTrajets(res.data.content || []);
+      setTotalPages(res.data.totalPages || 0);
+      setTotalElements(res.data.totalElements || 0);
     } catch (error) {
-      console.log(error);
+      console.error("Erreur trajets :", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  useEffect(() => {
+    fetchTrajets();
+  }, [page, search]);
+
+  const handelDelet = async () => {
+    try {
+      await api.delete(`/api/trajets/${deleteId}`);
+
+      setDeleteId(null);
+
+      fetchTrajets();
+    } catch (error) {
+      console.error("Erreur suppression trajet :", error);
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setPage(0);
+  };
+
+  // Pagination
+  const handlePageChange = (newPage) => {
+    setPage(newPage - 1);
+  };
 
   return (
     <div className="app admin-page">
       <Sidebar />
+
       <main className="main-content">
         <div className="page-header">
           <div>
             <h1>Trajets</h1>
-            <p>Gérez les Trajets.</p>
+            <p>Gérez les trajets.</p>
           </div>
-          <Link to="/admin/trajets/new" className="btn-primary" > Ajouter un Trajet</Link>
+
+          <Link
+            to="/admin/trajets/new"
+            className="btn-primary"
+          >
+            Ajouter un trajet
+          </Link>
         </div>
+
         <div className="admin-card">
+
+          {/* Recherche */}
           <div className="admin-card-header">
             <div className="admin-search">
-              <input  type="search"  placeholder="Rechercher un camion..." />
+              <input
+                type="search"
+                placeholder="Rechercher une ville..."
+                value={search}
+                onChange={handleSearch}
+              />
             </div>
           </div>
+
           <div className="admin-table-wrapper">
             <table className="admin-table">
-               <thead>
-                    <tr>
-                      <th>ID Trajet</th>
-                      <th>Départ &rarr; Arrivée</th>
-                      <th>Date</th>
-                      <th>Capacite</th>
-                      <th>Prix</th>
-                      <th>Statut</th>
-                      <th>Rés.</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
+
+              <thead>
+                <tr>
+                  <th>ID TRAJET</th>
+                  <th>DÉPART → ARRIVÉE</th>
+                  <th>DATE</th>
+                  <th>CAPACITÉ</th>
+                  <th>PRIX</th>
+                  <th>STATUT</th>
+                  <th>RÉS.</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+
               <tbody>
-                {trajets.length > 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan="8" className="admin-empty">
+                      <Loader />
+                    </td>
+                  </tr>
+                ) : trajets.length > 0 ? (
                   trajets.map((item) => (
                     <tr key={item.id}>
+
                       <td className="admin-identity">
-                        <strong>  T-{String(item.id).padStart(4, "0")}</strong>
+                        <strong>
+                          T-{String(item.id).padStart(4, "0")}
+                        </strong>
                       </td>
-                      <td> {item.villeDepart}&rarr;{item.villeArrivee}</td>
-                       <td>
-                         <span className="date-cell">
-                              {item.dateDepart
-                                ? new Date(item.dateDepart).toLocaleDateString(
-                                    "fr-FR",
-                                    {
-                                      day: "2-digit",
-                                      month: "2-digit",
-                                      year: "numeric",
-                                    },
-                                  )
-                                : "N/A"}
-                            </span>
-                       </td>
-                      <td> <strong>{item.poidsDisponible || "CAPACITÉ"} Tonnes</strong></td>
-                      <td> <strong>{item.prix}</strong></td>
+
                       <td>
-                        <span  className={`status-badge ${item.statutTrajet === "PUBLIE" ? "status-open" : item.statutTrajet === "EN_COURS" ? "status-progress" : "status-other"}`}>
-                           {item.statutTrajet}
-                         </span>
+                        {item.villeDepart} → {item.villeArrivee}
                       </td>
+
                       <td>
-                          {item.nombreReservations || 0}
+                        <span className="date-cell">
+                          {item.dateDepart
+                            ? new Date(
+                                item.dateDepart
+                              ).toLocaleDateString("fr-FR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              })
+                            : "N/A"}
+                        </span>
                       </td>
+
+                      <td>
+                        <strong>
+                          {item.poidsDisponible || 0} Tonnes
+                        </strong>
+                      </td>
+
+                      <td>
+                        <strong>{item.prix}</strong>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`status-badge ${
+                            item.statutTrajet === "PUBLIE"
+                              ? "status-open"
+                              : item.statutTrajet === "EN_COURS"
+                              ? "status-progress"
+                              : "status-other"
+                          }`}
+                        >
+                          {item.statutTrajet}
+                        </span>
+                      </td>
+
+                      <td>
+                        {item.nombreReservations || 0}
+                      </td>
+
                       <td>
                         <div className="admin-actions">
-                          <Link to={`/admin/trajets/${item.id}`} className="admin-action admin-action-view"><BiShowAlt /></Link>
-                          <Link to={`/admin/trajets/edit/${item.id}`} className="admin-action admin-action-edit"><MdOutlineEdit /> </Link>
-                          <button type="button" className="admin-action admin-action-delete" onClick={() => setDeleteId(item.id)}>
+
+                          <Link
+                            to={`/admin/trajets/${item.id}`}
+                            className="admin-action admin-action-view"
+                          >
+                            <BiShowAlt />
+                          </Link>
+
+                          <Link
+                            to={`/admin/trajets/edit/${item.id}`}
+                            className="admin-action admin-action-edit"
+                          >
+                            <MdOutlineEdit />
+                          </Link>
+
+                          <button
+                            type="button"
+                            className="admin-action admin-action-delete"
+                            onClick={() => setDeleteId(item.id)}
+                          >
                             <MdDelete />
                           </button>
+
                         </div>
                       </td>
+
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="admin-empty"  >  Aucun camion trouvé. </td>
+                    <td
+                      colSpan="8"
+                      className="admin-empty"
+                    >
+                      Aucun trajet trouvé.
+                    </td>
                   </tr>
                 )}
               </tbody>
+
             </table>
+            { totalElements > 0 && (
+              <PaginationComponent
+                page={page + 1}
+                totalPages={totalPages}
+                totalElements={totalElements}
+                pageSize={pageSize}
+                onPageChange={handlePageChange}
+                itemLabel="Trajets"
+              />
+            )}
           </div>
         </div>
 
         <ConfirmDialog
           show={deleteId !== null}
-          title="Supprimer le trajets"
-          message="Êtes-vous sûr de vouloir supprimer ce trajets ?"
+          title="Supprimer le trajet"
+          message="Êtes-vous sûr de vouloir supprimer ce trajet ?"
           onConfirm={handelDelet}
           onCancel={() => setDeleteId(null)}
         />
+
       </main>
     </div>
   );
 }
+
 export default TrajetsPage;
