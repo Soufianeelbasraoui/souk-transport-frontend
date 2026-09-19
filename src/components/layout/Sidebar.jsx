@@ -49,7 +49,6 @@ const navConfig = {
     { to: '/expediteur/trajets', label: 'Trajets dispo', icon: FaSearch },
     { to: '/expediteur/reservations', label: 'Mes Réservations', icon: FaClipboardList },
     { to: '/expediteur/cargaisons', label: 'Mes Cargaisons', icon: FaBoxOpen },
-    { to: '/expediteur/reservations', label: 'Réservations', icon: FaBuilding },
     { to: '/expediteur/paiements', label: 'Paiements', icon: FaCreditCard },
     { to: '/expediteur/historique', label: 'Historique', icon: FaHistory },
 

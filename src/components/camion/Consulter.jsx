@@ -100,7 +100,7 @@ function ConsulterCamion() {
 
             <div className="form-card-footer">
               <Link
-                to={`/transporteur/camions/edit/${camion.id}`}
+                to={user.role=="ADMIN"?`/admin/camions/edit/${camion.id}`:`/transporteur/camions/edit/${camion.id}`}
                 className="btn-submit"
               >
                 Modifier le camion

@@ -10,6 +10,7 @@ import api from "../../../services/api";
 
 import "../../../styles/global.css";
 import "../styles/admin.css";
+import PaginationComponent from "../../../components/common/Pagination";
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -19,35 +20,40 @@ function UsersPage() {
   const [statut, setStatut] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [deleteId, setDeleteId] = useState(null);
+  const pageSize=10;
 
 const loadUsers = async () => {
   try {
     setLoading(true);
     let res;
     if (search.trim() !== "") {
-      res = await api.get( `/api/users/search/nom?nom=${search}&page=${page}&size=10`  );
+      res = await api.get( `/api/users/search/nom?nom=${search}&page=${page}&size=${pageSize}`);
     } else if (role !== "") {
-      res = await api.get(`/api/users/filter/role?role=${role}&page=${page}&size=10`);
+      res = await api.get(`/api/users/filter/role?role=${role}&page=${page}&size=${pageSize}`);
 
     } else if (statut !== "") {
-      res = await api.get(`/api/users/filter/statut?statut=${statut}&page=${page}&size=10`
-      );
+      res = await api.get(`/api/users/filter/statut?statut=${statut}&page=${page}&size=${pageSize}` );
 
     } else {
-      res = await api.get( `/api/users?page=${page}&size=10`);
+      res = await api.get( `/api/users?page=${page}&size=${pageSize}`);
     }
+
     setUsers(res.data.content || []);
     setTotalPages(res.data.totalPages || 0);
+    setTotalElements(res.data.totalElements ||0);
   } catch (error) {
     console.error("Erreur utilisateurs :", error);
   } finally {
     setLoading(false);
   }
 };
+
   useEffect(() => {
     loadUsers();
   }, [page, search, role, statut]);
+
 
   const handleDelete = async () => {
     try {
@@ -82,6 +88,10 @@ const loadUsers = async () => {
   };
 
 
+  const handlePageChange=(newPage)=>{
+     setPage(newPage-1);
+  }
+
   return (
 
     <div className="app admin-page">
@@ -111,7 +121,7 @@ const loadUsers = async () => {
 
               <div className="admin-filter">
                 <select value={statut}  onChange={handleStatut}>
-                  <option value="">  Tous les statuts </option>
+                  <option value=""> Tous les statuts </option>
                   <option value="ACTIF"> Actif  </option>
                   <option value="INACTIF">Inactif</option>
                 </select>
@@ -174,18 +184,18 @@ const loadUsers = async () => {
                     )}
                   </tbody>
                 </table>
+                {totalElements > 0 && (
+              <PaginationComponent
+                page={page + 1}
+                totalPages={totalPages}
+                totalElements={totalElements}
+                pageSize={pageSize}
+                onPageChange={handlePageChange}
+                itemLabel="utilisateurs"
+              />
+            )}
               </div>
-              {totalPages > 1 && (
-                <div className="admin-pagination">
-                  <button className="btn btn-sm btn-outline-secondary"  disabled={page === 0}  onClick={() => setPage(page - 1)}>
-                    ← Précédent
-                  </button>
-                  <span>
-                    Page {page + 1} sur {totalPages}
-                  </span>
-                  <button  className="btn btn-sm btn-outline-secondary" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>  Suivant →  </button>
-                </div>
-              )}
+           
             </>
           )}
         </div>

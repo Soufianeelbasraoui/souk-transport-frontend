@@ -40,9 +40,7 @@ function DashboardTransporteur() {
     api.get("api/reservations/transporteur/count").then((res)=>{
       setCountMesReservation(res.data);
     })
-    api.get("/transporteur/count").then((res)=>{
-         setCountCargaisons(res.data);
-    })
+  
   },[])
 
   return (

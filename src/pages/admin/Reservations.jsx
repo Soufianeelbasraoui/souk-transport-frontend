@@ -1,8 +1,6 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { MdDelete, MdCheck, MdClose, MdUndo,
-} from "react-icons/md";
+import { MdDelete, MdCheck, MdClose, MdUndo } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
 
 import Sidebar from "../../components/layout/Sidebar";
@@ -12,28 +10,37 @@ import api from "../../services/api";
 
 import "../../styles/global.css";
 import "./styles/admin.css";
+import PaginationComponent from "../../components/common/Pagination";
 
 function ReservationsPage() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const pageSize = 10;
 
-  useEffect(() => {
-    api.get("/api/reservations").then((res) => setReservations(res.data || []))
-      .catch((err) => console.error("Erreur :", err))
-      .finally(() => setLoading(false));
-  }, []);
+ useEffect(() => {
+  setLoading(true);
 
+  api.get(`/api/reservations/page?page=${page - 1}&size=${pageSize}`).then((res) => {
+      setReservations(res.data?.content || []);
+      setTotalPages(res.data?.totalPages || 1);
+      setTotalElements(res.data?.totalElements || 0);
+    })
+    .catch((err) => {
+      console.error("Erreur lors de la récupération :", err);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, [page]);
   const updateStatus = async (id, action) => {
     try {
-      const res = await api.patch(
-        `/api/reservations/${id}/${action}`
-      );
-
+      const res = await api.patch(`/api/reservations/${id}/${action}`);
       setReservations((prev) =>
-        prev.map((item) =>
-          item.id === id ? res.data : item
-        )
+        prev.map((item) => (item.id === id ? res.data : item))
       );
     } catch (error) {
       console.error(`Erreur ${action} :`, error);
@@ -43,16 +50,17 @@ function ReservationsPage() {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/api/reservations/${id}`);
-
-      setReservations((prev) =>
-        prev.filter((item) => item.id !== id)
-      );
-
+      setReservations((prev) => prev.filter((item) => item.id !== id));
       setDeleteId(null);
     } catch (error) {
       console.error("Erreur suppression :", error);
     }
   };
+
+   const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
 
   if (loading) {
     return <Loader />;
@@ -61,28 +69,21 @@ function ReservationsPage() {
   return (
     <div className="app admin-page">
       <Sidebar />
-
       <main className="main-content">
-
         <div className="page-header">
           <div>
             <h1>Réservations</h1>
             <p>Gérez les réservations.</p>
           </div>
 
-          <Link
-            to="/admin/reservations/new"
-            className="btn-primary"
-          >
+          <Link to="/admin/reservations/new" className="btn-primary">
             Créer une réservation
           </Link>
         </div>
 
         <div className="admin-card">
-
           <div className="admin-table-wrapper">
             <table className="admin-table">
-
               <thead>
                 <tr>
                   <th>ID</th>
@@ -100,44 +101,15 @@ function ReservationsPage() {
                 {reservations.length > 0 ? (
                   reservations.map((item) => (
                     <tr key={item.id}>
-
                       <td className="admin-identity">
-                        <strong>
-                          R-{String(item.id).padStart(4, "0")}
-                        </strong>
+                        <strong> R-{String(item.id).padStart(4, "0")}</strong>
                       </td>
 
-                      <td>
-                        {item.dateReservation
-                          ? new Date(
-                              item.dateReservation
-                            ).toLocaleDateString("fr-FR")
-                          : "-"}
-                      </td>
-
-                      <td>
-                        {item.trajetId
-                          ? `Trajet #${item.trajetId}`
-                          : "-"}
-                      </td>
-
-                      <td>
-                        {item.cargaisonId
-                          ? `Cargaison #${item.cargaisonId}`
-                          : "-"}
-                      </td>
-
-                      <td>
-                        {item.poidsReserve != null
-                          ? `${item.poidsReserve} kg`
-                          : "-"}
-                      </td>
-
-                      <td>
-                        {item.prixConvenu != null
-                          ? `${item.prixConvenu} DH`
-                          : "-"}
-                      </td>
+                      <td>{item.dateReservation ? new Date( item.dateReservation ).toLocaleDateString("fr-FR") : "-"} </td>
+                      <td> {item.trajetId ? `Trajet #${item.trajetId}` : "-"} </td>
+                      <td> {item.cargaisonId ? `Cargaison #${item.cargaisonId}` : "-"}</td>
+                      <td> {item.poidsReserve != null? `${item.poidsReserve} kg`: "-"}</td>
+                      <td> {item.prixConvenu != null? `${item.prixConvenu} DH` : "-"} </td>
 
                       <td>
                         <span
@@ -156,8 +128,6 @@ function ReservationsPage() {
 
                       <td>
                         <div className="admin-actions">
-
-                          {/* Voir */}
                           <Link
                             to={`/admin/reservations/${item.id}`}
                             className="admin-action admin-action-view"
@@ -166,7 +136,6 @@ function ReservationsPage() {
                             <BiShowAlt />
                           </Link>
 
-                          {/* Accepter / Refuser */}
                           {item.statutReservation === "EN_ATTENTE" && (
                             <>
                               <button
@@ -174,10 +143,7 @@ function ReservationsPage() {
                                 className="admin-action admin-action-success"
                                 title="Accepter"
                                 onClick={() =>
-                                  updateStatus(
-                                    item.id,
-                                    "accepter"
-                                  )
+                                  updateStatus(item.id, "accepter")
                                 }
                               >
                                 <MdCheck />
@@ -188,64 +154,59 @@ function ReservationsPage() {
                                 className="admin-action admin-action-danger"
                                 title="Refuser"
                                 onClick={() =>
-                                  updateStatus(
-                                    item.id,
-                                    "refuser"
-                                  )
+                                  updateStatus(item.id, "refuser")
                                 }
                               >
                                 <MdClose />
                               </button>
+
+                              <button
+                                type="button"
+                                className="admin-action admin-action-warning"
+                                title="Annuler"
+                                onClick={() =>
+                                  updateStatus(item.id, "annuler")
+                                }
+                              >
+                                <MdUndo />
+                              </button>
                             </>
                           )}
 
-                          {/* Annuler */}
-                          {item.statutReservation === "ACCEPTEE" && (
+                          {(item.statutReservation === "EN_ATTENTE" ||
+                            item.statutReservation === "REFUSEE") && (
                             <button
                               type="button"
-                              className="admin-action admin-action-warning"
-                              title="Annuler"
-                              onClick={() =>
-                                updateStatus(
-                                  item.id,
-                                  "annuler"
-                                )
-                              }
+                              className="admin-action admin-action-delete"
+                              title="Supprimer"
+                              onClick={() => setDeleteId(item.id)}
                             >
-                              <MdUndo />
+                              <MdDelete />
                             </button>
                           )}
-
-                          {/* Supprimer */}
-                          <button
-                            type="button"
-                            className="admin-action admin-action-delete"
-                            title="Supprimer"
-                            onClick={() =>
-                              setDeleteId(item.id)
-                            }
-                          >
-                            <MdDelete />
-                          </button>
-
                         </div>
                       </td>
-
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="8"
-                      className="admin-empty"
-                    >
+                    <td colSpan="8" className="admin-empty">
                       Aucune réservation trouvée.
                     </td>
                   </tr>
                 )}
               </tbody>
-
             </table>
+            {totalElements > 0 && (
+              <PaginationComponent
+                page={page}
+                totalPages={totalPages}
+                totalElements={totalElements}
+                pageSize={pageSize}
+                onPageChange={handlePageChange}
+                itemLabel="réservations"
+              />
+            )}
           </div>
         </div>
 

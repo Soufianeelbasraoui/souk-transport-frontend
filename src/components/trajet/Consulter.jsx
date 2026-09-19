@@ -141,8 +141,9 @@ function ConsulterTrajet() {
 
             <div className="form-card-footer">
 
+
               <Link
-                to={`/transporteur/trajets/edit/${trajet.id}`}
+                to={user.role=="ADMIN" ? `/admin/trajets/edit/${trajet.id}`:`/transporteur/trajets/edit/${trajet.id}`}
                 className="btn-submit"
               >
                 Modifier le trajet
