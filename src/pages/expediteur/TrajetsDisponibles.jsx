@@ -8,26 +8,39 @@ import { Link } from "react-router-dom";
 
 function TrajetsDisponibles() {
   const [trajets, setTrajets] = useState([]);
+  const [villeDepart, setVilleDepart] = useState("");
+  const [villeArrivee, setVilleArrivee] = useState("");
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0); 
   const pageSize = 9;
 
-  useEffect(() => {
-    const chargerTrajets = async () => {
-      try {
-        const res = await api.get(`/api/trajets?page=${page - 1}&size=${pageSize}`);
+  const chargerTrajets = (targetPage = page) => {
+    const hasSearch = villeDepart.trim() !== "" || villeArrivee.trim() !== "";
+    const url = hasSearch ? `/api/trajets/rechercher/trajet?villeDepart=${villeDepart.trim()}&villeArrivee=${villeArrivee.trim()}&page=${targetPage - 1}&size=${pageSize}` : `/api/trajets?page=${targetPage - 1}&size=${pageSize}`;
+
+    api.get(url).then((res) => {
         setTrajets(res.data.content || []);
         setTotalPages(res.data.totalPages || 1);
-        setTotalElements(res.data.totalElements || 0); 
-      } catch (error) {
+        setTotalElements(res.data.totalElements || 0);
+      })
+      .catch((error) => {
         console.error("Erreur trajets :", error);
         setTrajets([]);
-      }
-    };
+      });
+  };
 
-    chargerTrajets();
+  useEffect(() => {
+    chargerTrajets(page);
   }, [page]);
+
+  
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+    chargerTrajets(1);
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -48,12 +61,17 @@ function TrajetsDisponibles() {
 
           <div className="container">
             <div className="trajets-search-card">
-              <form className="trajets-search-form">
+              <form className="trajets-search-form" onSubmit={handleSearch}>
                 <div className="trajets-search-group">
                   <label>Ville de départ</label>
                   <div className="trajets-input-wrapper">
                     <FiMapPin className="trajets-input-icon" />
-                    <input className="trajets-input-field" placeholder="Départ" />
+                    <input
+                      className="trajets-input-field"
+                      placeholder="Départ"
+                      value={villeDepart}
+                      onChange={(e) => setVilleDepart(e.target.value)}
+                    />
                   </div>
                 </div>
 
@@ -61,15 +79,12 @@ function TrajetsDisponibles() {
                   <label>Ville d'arrivée</label>
                   <div className="trajets-input-wrapper">
                     <FiMapPin className="trajets-input-icon" />
-                    <input className="trajets-input-field" placeholder="Arrivée" />
-                  </div>
-                </div>
-
-                <div className="trajets-search-group">
-                  <label>Date de départ</label>
-                  <div className="trajets-input-wrapper">
-                    <FiCalendar className="trajets-input-icon" />
-                    <input type="date" className="trajets-input-field" />
+                    <input
+                      className="trajets-input-field"
+                      placeholder="Arrivée"
+                      value={villeArrivee}
+                      onChange={(e) => setVilleArrivee(e.target.value)}
+                    />
                   </div>
                 </div>
 

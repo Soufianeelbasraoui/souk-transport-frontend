@@ -7,7 +7,6 @@ function PublicRoute({ children }) {
   if (token) {
     try {
       const user = jwtDecode(token);
-
       if (user.role === "ADMIN") {
         return <Navigate to="/admin/dashboard" replace />;
       }

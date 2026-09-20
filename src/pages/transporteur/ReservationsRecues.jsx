@@ -3,19 +3,32 @@ import Sidebar from "../../components/layout/Sidebar";
 import "../../styles/global.css";
 import api from "../../services/api";
 import "./style/transporteur.css";
+import PaginationComponent from "../../components/common/Pagination";
+import { toast } from "react-toastify";
 
 function ReservationsRecues() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const pageSize = 10;
 
   useEffect(() => {
     chargerReservations();
-  }, []);
+  }, [page]);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage - 1);
+  };
 
   const chargerReservations = async () => {
+    setLoading(true);
     try {
-      const res = await api.get("/api/reservations/transporteur/mes-reservations");
-      const liste = res.data || [];
+      const res = await api.get(`/api/reservations/transporteur/mes-reservations?page=${page}&size=${pageSize}`);
+      const liste = res.data?.content || (Array.isArray(res.data) ? res.data : []);
+      setTotalElements(res.data?.totalElements || 0);
+      setTotalPages(res.data?.totalPages || 0);
 
       const listeAvecPaiement = await Promise.all(
         liste.map(async (reservation) => {
@@ -24,9 +37,7 @@ function ReservationsRecues() {
           }
 
           try {
-            const paiementRes = await api.get(
-              `/api/paiements/cargaison/${reservation.cargaisonId}`
-            );
+            const paiementRes = await api.get( `/api/paiements/cargaison/${reservation.cargaisonId}`);
             return {
               ...reservation,
               statutPaiement: paiementRes.data?.statutPaiement || null,
@@ -43,6 +54,9 @@ function ReservationsRecues() {
       setReservations(listeAvecPaiement);
     } catch (error) {
       console.error("Erreur chargement réservations :", error);
+      setReservations([]);
+      setTotalElements(0);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
@@ -72,13 +86,11 @@ function ReservationsRecues() {
 
   const handleConfirmerPaiement = async (reservation) => {
     try {
-      const paiementRes = await api.get(
-        `/api/paiements/cargaison/${reservation.cargaisonId}`
-      );
+      const paiementRes = await api.get(`/api/paiements/cargaison/${reservation.cargaisonId}`);
       const paiement = paiementRes.data;
 
       if (!paiement) {
-        alert("Aucun paiement trouvé pour cette cargaison.");
+       toast.error("Aucun paiement trouvé pour cette cargaison.");
         return;
       }
 
@@ -87,16 +99,11 @@ function ReservationsRecues() {
       if (res.data.statutPaiement === "PAYE") {
         setReservations((prev) =>
           prev.map((item) =>
-            item.id === reservation.id
-              ? { ...item, statutPaiement: "PAYE" }
-              : item
-          )
+            item.id === reservation.id ? { ...item, statutPaiement: "PAYE" } : item)
         );
       }
     } catch (error) {
-      alert(
-        error.response?.data?.message || "Impossible de confirmer le paiement."
-      );
+      toast.error("Impossible de confirmer le paiement.");
     }
   };
 
@@ -114,7 +121,6 @@ function ReservationsRecues() {
   return (
     <div className="app">
       <Sidebar />
-
       <main className="main-content">
         <div className="page-header">
           <div>
@@ -192,29 +198,14 @@ function ReservationsRecues() {
                             )}
 
                             {reservation.statutPaiement === "EN_ATTENTE" && (
-                              <button
-                                className="btn btn-sm btn-primary"
-                                onClick={() => handleConfirmerPaiement(reservation)}
-                              >
-                                Confirmer paiement
-                              </button>
-                            )}
+                              <button  className="btn btn-sm btn-primary" onClick={() => handleConfirmerPaiement(reservation)}> Confirmer paiement </button> )}
 
-                            {reservation.statutPaiement === "PAYE" && (
-                              <span className="text-success fw-bold">
-                                Paiement confirmé
-                              </span>
-                            )}
+                            {reservation.statutPaiement === "PAYE" && ( <span className="text-success fw-bold">  Paiement confirmé </span>)}
                           </>
                         )}
 
-                        {reservation.statutReservation === "REFUSEE" && (
-                          <span className="text-muted">Refusée</span>
-                        )}
-
-                        {reservation.statutReservation === "ANNULEE" && (
-                          <span className="text-muted">Annulée</span>
-                        )}
+                        {reservation.statutReservation === "REFUSEE" && (<span className="text-muted">Refusée</span>)}
+                        {reservation.statutReservation === "ANNULEE" && (<span className="text-muted">Annulée</span> )}
                       </td>
                     </tr>
                   ))
@@ -228,6 +219,17 @@ function ReservationsRecues() {
               </tbody>
             </table>
           </div>
+
+          {totalElements > 0 && (
+            <PaginationComponent
+              page={page + 1}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+              itemLabel="réservations"
+            />
+          )}
         </div>
       </main>
     </div>

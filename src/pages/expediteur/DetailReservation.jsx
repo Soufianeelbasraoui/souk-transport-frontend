@@ -1,16 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { 
-  FiArrowLeft, 
-  FiMapPin, 
-  FiBox, 
-  FiDollarSign, 
-  FiCalendar, 
-  FiCheckCircle, 
-  FiAlertCircle, 
-  FiTrash2, 
-  FiSlash 
-} from "react-icons/fi";
+import {  FiArrowLeft, FiMapPin,  FiBox, FiDollarSign,  FiCalendar,  FiCheckCircle, FiAlertCircle, FiTrash2, FiSlash} from "react-icons/fi";
 
 import Sidebar from "../../components/layout/Sidebar";
 import Loader from "../../components/common/Loader";

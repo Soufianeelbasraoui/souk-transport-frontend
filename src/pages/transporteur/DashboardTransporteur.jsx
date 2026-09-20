@@ -10,11 +10,13 @@ function DashboardTransporteur() {
   const [mesCamions, setMesCamions] = useState([]);
   const[countMesTrajet,setCountMesTrajet]=useState(0);
   const[countMesReservation,setCountMesReservation]=useState(0);
+  const[page,setPage]=useState(0);
+
   useEffect(() => {
     try {
-      api.get("/api/trajets/mesTrajets").then((res) => {
-        console.log(res.data);
-        setMesTrajets(res.data);
+      api.get(`/api/trajets/mesTrajets?page=${page}&size=10`).then((res) => {
+        console.log(res.data.content);
+        setMesTrajets(res.data.content);
       });
     } catch (error) {
       console.log(error);
@@ -23,7 +25,7 @@ function DashboardTransporteur() {
 
   useEffect(() => {
     api .get("/api/camions/mesCamions") .then((res) => {
-        setMesCamions(res.data);
+        setMesCamions(res.data.content);
         console.log(res.data);
       })
       .catch((error) => {
@@ -62,7 +64,7 @@ function DashboardTransporteur() {
                 </div>
                 <div>
                   <small class="text-uppercase text-muted fw-semibold">
-                    Trajets publiés
+                  Totale Trajets 
                   </small>
                   <h3 class="mb-0 fw-bold">{countMesTrajet}</h3>
                 </div>

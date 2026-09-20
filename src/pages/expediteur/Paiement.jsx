@@ -137,12 +137,12 @@ function Paiement() {
           <h1>Paiement</h1>
           <p>Suivez le paiement de votre réservation.</p>
         </div>
-        
-      <div className="back-link-container">
-        <Link to="/expediteur/reservations" className="btn-secondary-action">
-          <FiArrowLeft /> Retour aux réservations
-        </Link>
-      </div>
+
+        <div className="back-link-container">
+          <Link to="/expediteur/reservations" className="btn-secondary-action">
+            <FiArrowLeft /> Retour aux réservations
+          </Link>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}

@@ -51,13 +51,12 @@ function CamionsPage() {
     fetchCamions();
   }, [page, search]);
 
-  // Recherche
+  
   const handleSearch = (e) => {
     setSearch(e.target.value);
     setPage(0);
   };
 
-  // Suppression
   const handelDelet = async () => {
     try {
       await api.delete(`/api/camions/${deleteId}`);
@@ -70,7 +69,6 @@ function CamionsPage() {
     }
   };
 
-  // Pagination
   const handlePageChange = (newPage) => {
     setPage(newPage - 1);
   };

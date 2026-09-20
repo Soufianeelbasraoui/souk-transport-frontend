@@ -87,7 +87,7 @@ function ModifierTrajet() {
       } else {
         const camionsRes = await api.get( "/api/camions/mesCamions" );
 
-        listeCamions = camionsRes.data || [];
+        listeCamions = camionsRes.data.content || [];
       }
 
       console.log("Camions disponibles :", listeCamions);
@@ -241,7 +241,11 @@ function ModifierTrajet() {
                     {...register("villeDepart")}
                   />
 
-                  {errors.villeDepart && ( <span className="field-error"> {errors.villeDepart.message} </span>)}
+                  {errors.villeDepart && (
+                    <span className="field-error">
+                      {errors.villeDepart.message}
+                    </span>
+                  )}
 
                 </div>
 

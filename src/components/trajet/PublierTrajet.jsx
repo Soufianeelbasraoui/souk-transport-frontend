@@ -38,20 +38,23 @@ function PublierTrajet() {
   });
 
   useEffect(() => {
-    api.get("/api/camions/mesCamions").then((res) => setCamions(res.data))
+    api.get("/api/camions/mesCamions").then((res) => setCamions(res.data.content))
       .catch(() => setCamions([]))
       .finally(() => setLoadingCamions(false));
   }, []);
+
+  const retourPath = user?.role === "ADMIN" ? "/admin/trajets" : "/transporteur/trajets";
 
   const onSubmit = async (data) => {
     setSubmitError("");
     setSubmitSuccess("");
     try {
-      await api.post("/api/trajets",data);
+      await api.post("/api/trajets", data);
       setSubmitSuccess("Trajet publié avec succès ! Redirection en cours…");
-      setTimeout(() => navigate("/transporteur/trajets"), 2000);
+      setTimeout(() => navigate(retourPath), 1500);
     } catch (error) {
-      setSubmitError( error.response?.data?.message || "Une erreur est survenue. Veuillez réessayer."
+      setSubmitError(
+        error.response?.data?.message || "Une erreur est survenue. Veuillez réessayer."
       );
     }
   };
@@ -65,8 +68,8 @@ function PublierTrajet() {
             <h1>Publier un trajet</h1>
             <p>Remplissez les informations pour publier votre trajet.</p>
           </div>
-          <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
-            ← Mes trajets
+          <Link to={retourPath} className="btn-cancel">
+            Mes trajets
           </Link>
         </div>
 
@@ -143,7 +146,7 @@ function PublierTrajet() {
                   {errors.poidsDisponible && (<span className="field-error">{errors.poidsDisponible.message}</span>)}
                 </div>
 
-                {/* Camion */}
+               
                 <div className="form-group">
                   <label>Camion</label>
                   {loadingCamions ? (
@@ -178,15 +181,15 @@ function PublierTrajet() {
 
               </div>
 
-              {submitError && <p className="field-error" style={{ marginTop: 16 }}>⚠ {submitError}</p>}
-              {submitSuccess && <p style={{ marginTop: 16, color: "#2a7d30", fontSize: 13 }}>✅ {submitSuccess}</p>}
+              {submitError && <p className="field-error" style={{ marginTop: 16 }}>{submitError}</p>}
+              {submitSuccess && <p style={{ marginTop: 16, color: "#2a7d30", fontSize: 13 }}>{submitSuccess}</p>}
             </div>
 
             <div className="form-card-footer">
-              <Link to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
+              <Link to={retourPath} className="btn-cancel">
                 Annuler
               </Link>
-              <button type="submit"  className="btn-submit" disabled={isSubmitting || loadingCamions} >
+              <button type="submit" className="btn-submit" disabled={isSubmitting || loadingCamions}>
                 {isSubmitting ? "Publication…" : "Publier le trajet"}
               </button>
             </div>
