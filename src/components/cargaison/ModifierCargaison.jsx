@@ -67,10 +67,7 @@ function ModifierCargaison() {
         console.error("Erreur chargement des données :", error);
         console.error("Réponse backend :", error.response?.data);
 
-        setSubmitError(
-          error.response?.data?.message ||
-            "Impossible de charger les données de la cargaison."
-        );
+        setSubmitError( "Impossible de charger les données de la cargaison." );
       } finally {
         setLoading(false);
       }

@@ -34,6 +34,7 @@ function MesCargaisons() {
       setCargaisons(res.data?.content || []);
       setTotalPages(res.data?.totalPages || 0);
       setTotalElements(res.data?.totalElements || 0);
+
     } catch (error) {
       console.error("Erreur chargement cargaisons:", error);
     } finally {
@@ -103,30 +104,21 @@ function MesCargaisons() {
             <button
               type="button"
               onClick={() => handleFilter("SOUMISE")}
-              className={`tab-btn ${
-                filter === "SOUMISE" ? "active" : ""
-              }`}
-            >
+              className={`tab-btn ${ filter === "SOUMISE" ? "active" : "" }`} >
               En attente
             </button>
 
             <button
               type="button"
               onClick={() => handleFilter("EN_TRANSIT")}
-              className={`tab-btn ${
-                filter === "EN_TRANSIT" ? "active" : ""
-              }`}
-            >
+              className={`tab-btn ${ filter === "EN_TRANSIT" ? "active" : "" }`} >
               En transit
             </button>
 
             <button
               type="button"
               onClick={() => handleFilter("LIVREE")}
-              className={`tab-btn ${
-                filter === "LIVREE" ? "active" : ""
-              }`}
-            >
+              className={`tab-btn ${ filter === "LIVREE" ? "active" : "" }`} >
               Livrées
             </button>
 

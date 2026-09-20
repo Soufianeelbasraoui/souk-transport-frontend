@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineEdit, MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
@@ -15,19 +15,24 @@ function MesCamions() {
   const [mesCamions, setMesCamions] = useState([]);
   const [deleteId, setDeleteId] = useState(null);
 
-  // Pagination
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+
+  const [searchTaype,setSearchTaype]=useState("");
   const pageSize = 9;
 
   useEffect(() => {
-    fetchCamions();
-  }, [page]);
+    if (searchTaype.trim() === "") {
+      fetchCamions();
+    } else {
+      handeleSearch();
+    }
+  }, [page, searchTaype]);
+
 
   const fetchCamions = () => {
-    api
-      .get(`/api/camions/mesCamions?page=${page}&size=${pageSize}`)
+    api.get(`/api/camions/mesCamions?page=${page}&size=${pageSize}`)
       .then((res) => {
         setMesCamions(res.data?.content || []);
         setTotalPages(res.data?.totalPages || 0);
@@ -55,6 +60,17 @@ function MesCamions() {
     }
   };
 
+  const handeleSearch = () => {
+    if (searchTaype.trim() === "") {
+      return;
+    }
+    api.get(`/api/camions/transporteur/searchByMarque?marque=${searchTaype}&page=${page}&size=10`).then((res) => {
+      setMesCamions(res.data.content);
+      setTotalPages(res.data.totalPages);
+      setTotalElements(res.data.totalElements);
+    });
+  };
+
   return (
     <div className="app">
       <Sidebar />
@@ -72,7 +88,15 @@ function MesCamions() {
         <div className="dashboard-card recent-trajets">
           <div className="card-header-custom">
             <div className="trasporteur-search">
-              <input type="text" placeholder="Rechercher un camion..." />
+              <input
+                type="text"
+                placeholder="Rechercher par marque..."
+                value={searchTaype}
+                onChange={(e) => {
+                  setSearchTaype(e.target.value);
+                  setPage(0);
+                }}
+              />
             </div>
           </div>
 
@@ -99,35 +123,19 @@ function MesCamions() {
                       <td>{item.capacite}</td>
                       <td>{item.type}</td>
                       <td>
-                        <span
-                          className={`badge ${
-                            item.disponible ? "bg-success" : "bg-danger"
-                          }`}
-                        >
+                        <span className={`badge ${item.disponible ? "bg-success" : "bg-danger" }`} >
                           {item.disponible ? "Disponible" : "Non disponible"}
                         </span>
                       </td>
                       <td>
                         <div className="action-btns">
-                          <Link
-                            to={`/transporteur/camions/${item.id}`}
-                            className="action-btn view"
-                            title="Voir"
-                          >
+                          <Link to={`/transporteur/camions/${item.id}`} className="action-btn view" title="Voir">
                             <BiShowAlt />
                           </Link>
-                          <Link
-                            to={`/transporteur/camions/edit/${item.id}`}
-                            className="action-btn edit"
-                            title="Modifier"
-                          >
+                          <Link to={`/transporteur/camions/edit/${item.id}`} className="action-btn edit" title="Modifier">
                             <MdOutlineEdit />
                           </Link>
-                          <button
-                            className="action-btn delete"
-                            title="Supprimer"
-                            onClick={() => setDeleteId(item.id)}
-                          >
+                          <button className="action-btn delete" title="Supprimer" onClick={() => setDeleteId(item.id)}>
                             <MdDelete />
                           </button>
                         </div>

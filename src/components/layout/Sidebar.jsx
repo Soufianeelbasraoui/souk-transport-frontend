@@ -51,16 +51,17 @@ const navConfig = {
     { to: '/expediteur/cargaisons', label: 'Mes Cargaisons', icon: FaBoxOpen },
     { to: '/expediteur/paiements', label: 'Paiements', icon: FaCreditCard },
     { to: '/expediteur/historique', label: 'Historique', icon: FaHistory },
-
+    { to: '/expediteur/profile', label: 'Mon Profil', icon: FaUser },
   ],
   ADMIN: [
     { to: '/admin/dashboard', label: 'Dashboard', icon: FaTachometerAlt },
     { to: '/admin/users', label: 'Utilisateurs', icon: FaUsers },
-    { to: '/admin/camions', label: 'Camions', icon: FaTruckMoving},
+    { to: '/admin/camions', label: 'Camions', icon: FaTruckMoving },
     { to: '/admin/trajets', label: 'Trajets', icon: FaRoute },
     { to: '/admin/cargaisons', label: 'Cargaisons', icon: FaBoxOpen },
     { to: '/admin/reservations', label: 'Réservations', icon: FaBuilding },
-    { to: '/admin/paiements', label: 'Paiements', icon: FaCreditCard }
+    { to: '/admin/paiements', label: 'Paiements', icon: FaCreditCard },
+    { to: '/admin/profile', label: 'Mon Profil', icon: FaUser },
   ]
 }
 

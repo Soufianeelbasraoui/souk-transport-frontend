@@ -25,8 +25,7 @@ const schema = yup.object({
     .number()
     .when("$isAdmin", {
       is: true,
-      then: (schema) =>
-        schema
+      then: (schema) => schema
           .typeError("Veuillez sélectionner un expéditeur")
           .required("Veuillez sélectionner un expéditeur"),
 
@@ -35,6 +34,7 @@ const schema = yup.object({
 });
 
 function CreerCargaison() {
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -72,15 +72,10 @@ function CreerCargaison() {
             role: "EXPEDITEUR",
           },
         });
-
-        setExpediteurs(
-          response.data.content || response.data || []
+        setExpediteurs(  response.data.content || response.data || []
         );
       } catch (error) {
-        setSubmitError(
-          error.response?.data?.message ||
-            "Erreur lors du chargement des expéditeurs."
-        );
+        setSubmitError( "Erreur lors du chargement des expéditeurs." );
       }
     };
 
@@ -102,7 +97,6 @@ function CreerCargaison() {
       }
 
       console.log("Payload envoyé :", payload);
-
       await api.post("/api/cargaisons", payload);
 
       setSubmitSuccess("Cargaison ajoutée avec succès !");
@@ -113,7 +107,7 @@ function CreerCargaison() {
       }, 1500);
     } catch (error) {
       console.error("Erreur création cargaison :", error);
-      setSubmitError( error.response?.data?.message || "Une erreur est survenue. Veuillez réessayer." );
+      setSubmitError( "Une erreur est survenue. Veuillez réessayer." );
     }
   };
 
@@ -134,7 +128,7 @@ function CreerCargaison() {
             </p>
           </div>
 
-          <Link to={  isAdmin? "/admin/cargaisons" : "/expediteur/cargaisons" } className="btn-cancel" >
+          <Link to={isAdmin? "/admin/cargaisons" : "/expediteur/cargaisons" } className="btn-cancel" >
            <FiArrowLeft /> Mes cargaisons
           </Link>
         </div>
@@ -143,10 +137,7 @@ function CreerCargaison() {
           <div className="form-card-header">
             <div>
               <h5>Nouvelle cargaison</h5>
-
-              <p>
-                Tous les champs sont obligatoires.
-              </p>
+              <p>Tous les champs sont obligatoires.  </p>
             </div>
           </div>
 
@@ -172,7 +163,6 @@ function CreerCargaison() {
                   )}
                 </div>
 
-                {/* POIDS */}
                 <div className="form-group">
                   <label>Poids (kg)</label>
 
@@ -195,7 +185,6 @@ function CreerCargaison() {
                   )}
                 </div>
 
-                {/* EXPEDITEUR UNIQUEMENT POUR ADMIN */}
                 {isAdmin && (
                   <div className="form-group">
                     <label>Expéditeur</label>
@@ -235,49 +224,26 @@ function CreerCargaison() {
 
               </div>
 
-              {/* ERREUR */}
               {submitError && (
-                <p
-                  className="field-error"
-                  style={{ marginTop: 16 }}
-                >
+                <p className="field-error" style={{ marginTop: 16 }} >
                   {submitError}
                 </p>
               )}
 
-              {/* SUCCÈS */}
               {submitSuccess && (
-                <p
-                  style={{
-                    marginTop: 16,
-                    color: "#2a7d30",
-                    fontSize: 13,
-                  }}
-                >
+                <p style={{ marginTop: 16,  color: "#2a7d30",fontSize: 13, }} >
                   {submitSuccess}
                 </p>
               )}
             </div>
 
             <div className="form-card-footer">
-              <Link
-                to={
-                  isAdmin
-                    ? "/admin/cargaisons"
-                    : "/expediteur/cargaisons"
-                }
-                className="btn-cancel"
-              >
+              <Link  to={ isAdmin ? "/admin/cargaisons" : "/expediteur/cargaisons" }className="btn-cancel" >
                 Annuler
               </Link>
 
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Enregistrement…"
-: "Ajouter la cargaison"}
+              <button type="submit" className="btn-submit"  disabled={isSubmitting} >
+                {isSubmitting ? "Enregistrement…": "Ajouter la cargaison"}
               </button>
             </div>
           </form>

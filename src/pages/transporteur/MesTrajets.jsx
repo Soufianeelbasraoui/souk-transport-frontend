@@ -8,37 +8,53 @@ import { MdOutlineEdit,MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
 import Loader from "../../components/common/Loader";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
-import { set } from "react-hook-form";
 
-function MesTrajets(){
+import PaginationComponent from "../../components/common/Pagination";
+
+function MesTrajets() {
   const [mesTrajets, setMesTrajets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const pageSize = 10;
 
-useEffect(() => {
+  const fetchTrajets = async () => {
+    setLoading(true);
     try {
-      api.get("/api/trajets/mesTrajets").then((res) => {
-        console.log(res.data);
-        setMesTrajets(res.data);
-      });
+      const res = await api.get(`/api/trajets/mesTrajets?page=${page}&size=${pageSize}`);
+      setMesTrajets(res.data?.content || []);
+      setTotalElements(res.data?.totalElements || 0);
+      setTotalPages(res.data?.totalPages || 0);
     } catch (error) {
-      console.log(error);
-    }finally{
-      setLoading(false)
+      console.error("Erreur récupération trajets :", error);
+      setMesTrajets([]);
+      setTotalElements(0);
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
- const handelDelet = async () => {
-  try {
-    await api.delete(`/api/trajets/${deleteId}`);
+  useEffect(() => {
+    fetchTrajets();
+  }, [page]);
 
-    setMesTrajets((prev) => prev.filter((item) => item.id !== deleteId));
+  const handlePageChange = (newPage) => {
+    setPage(newPage - 1);
+  };
 
-    setDeleteId(null);
-  } catch (error) {
-    console.error("Erreur suppression trajet :", error);
-  }
-};
+  const handelDelet = async () => {
+    try {
+      await api.delete(`/api/trajets/${deleteId}`);
+      setDeleteId(null);
+      fetchTrajets();
+    } catch (error) {
+      console.error("Erreur suppression trajet :", error);
+    }
+  };
+  
   if(loading){
     return<Loader/>
   }
@@ -86,7 +102,7 @@ useEffect(() => {
 
                   <tbody>
                     {mesTrajets.length > 0 ? (
-                      mesTrajets.slice(0, 5).map((item) => (
+                      mesTrajets.map((item) => (
                         <tr key={item.id}>
                           <td>
                             <span className="trajet-id">
@@ -150,7 +166,7 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="6">
+                        <td colSpan="8">
                           <div className="table-empty">
                             Aucun trajet trouvé.
                           </div>
@@ -160,6 +176,17 @@ useEffect(() => {
                   </tbody>
                 </table>
               </div>
+
+              {totalElements > 0 && (
+                <PaginationComponent
+                  page={page + 1}
+                  totalPages={totalPages}
+                  totalElements={totalElements}
+                  pageSize={pageSize}
+                  onPageChange={handlePageChange}
+                  itemLabel="trajets"
+                />
+              )}
             </div>
           </div>
 

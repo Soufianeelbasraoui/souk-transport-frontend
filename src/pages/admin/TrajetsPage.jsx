@@ -69,7 +69,7 @@ function TrajetsPage() {
     setPage(0);
   };
 
-  // Pagination
+  
   const handlePageChange = (newPage) => {
     setPage(newPage - 1);
   };
@@ -95,7 +95,6 @@ function TrajetsPage() {
 
         <div className="admin-card">
 
-          {/* Recherche */}
           <div className="admin-card-header">
             <div className="admin-search">
               <input
