@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import api from "../../services/api";
 import "./styles/TrajetsDisponibles.css";
-import { FiBox, FiCalendar, FiMapPin, FiSearch, FiTruck } from "react-icons/fi";
+import { FiBox, FiCalendar, FiMapPin, FiSearch, FiTruck, FiRotateCcw, FiPlus } from "react-icons/fi";
 import PaginationComponent from "../../components/common/Pagination";
 import { Link } from "react-router-dom";
 
@@ -41,6 +41,21 @@ function TrajetsDisponibles() {
     setPage(1);
     chargerTrajets(1);
   };
+
+  const handleResetSearch = () => {
+    setVilleDepart("");
+    setVilleArrivee("");
+    setPage(1);
+    api.get(`/api/trajets?page=0&size=${pageSize}`).then((res) => {
+      setTrajets(res.data.content || []);
+      setTotalPages(res.data.totalPages || 1);
+      setTotalElements(res.data.totalElements || 0);
+    }).catch((error) => {
+      console.error("Erreur réinitialisation :", error);
+    });
+  };
+
+  const hasSearch = villeDepart.trim() !== "" || villeArrivee.trim() !== "";
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -157,8 +172,34 @@ function TrajetsDisponibles() {
                 ))
               ) : (
                 <div className="col-12">
-                  <div className="trajets-empty">
-                    Aucun trajet disponible pour le moment.
+                  <div className="trajets-empty-card">
+                    <div className="empty-icon-box">
+                      <FiTruck />
+                    </div>
+                    <h3>Aucun trajet disponible</h3>
+                    <p>
+                      {hasSearch ? "Aucun trajet ne correspond à vos critères de recherche d'itinéraire." : "Aucun trajet n'est disponible pour le moment. Revenez un peu plus tard ou publiez votre cargaison."}
+                    </p>
+                    <div className="empty-actions">
+                      {hasSearch ? (
+                        <button
+                          type="button"
+                          className="btn-empty-outline"
+                          onClick={handleResetSearch}
+                        >
+                          <FiRotateCcw />
+                          <span>Réinitialiser la recherche</span>
+                        </button>
+                      ) : (
+                        <Link
+                          to="/expediteur/cargaisons/new"
+                          className="btn-empty-primary"
+                        >
+                          <FiPlus />
+                          <span>Créer une cargaison</span>
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

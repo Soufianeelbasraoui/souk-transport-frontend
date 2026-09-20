@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiMoreVertical } from "react-icons/fi";
+import { FiMoreVertical, FiPackage, FiPlus } from "react-icons/fi";
 
 import Sidebar from "../../components/layout/Sidebar";
 import PaginationComponent from "../../components/common/Pagination";
@@ -231,8 +231,35 @@ function MesCargaisons() {
 
           {!loading && cargaisons.length === 0 && (
             <div className="col-12">
-              <div className="empty-state">
-                <p>Aucune cargaison trouvée.</p>
+              <div className="cargaisons-empty-card">
+                <div className="empty-icon-box">
+                  <FiPackage />
+                </div>
+                <h3>Aucune cargaison trouvée</h3>
+                <p>
+                  {filter !== "TOUTES"
+                    ? "Aucune cargaison ne correspond au filtre actuellement sélectionné."
+                    : "Vous n'avez pas encore créé de cargaison à expédier."}
+                </p>
+                <div className="empty-actions">
+                  {filter !== "TOUTES" ? (
+                    <button
+                      type="button"
+                      className="btn-empty-outline"
+                      onClick={() => handleFilter("TOUTES")}
+                    >
+                      Afficher toutes les cargaisons
+                    </button>
+                  ) : (
+                    <Link
+                      to="/expediteur/cargaisons/new"
+                      className="btn-empty-primary"
+                    >
+                      <FiPlus />
+                      <span>Ajouter une cargaison</span>
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           )}
