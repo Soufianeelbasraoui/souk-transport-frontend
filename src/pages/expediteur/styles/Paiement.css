@@ -179,6 +179,33 @@
   margin-top: 16px;
 }
 
+.btn-download-pdf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 18px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-download-pdf:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.btn-download-pdf:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .paiement-grid {
     grid-template-columns: 1fr;

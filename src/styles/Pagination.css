@@ -51,15 +51,15 @@
 }
 
 .pagination-wrapper .MuiPaginationItem-root.Mui-selected {
-  background-color: #1e3a5f !important;
-  color: #ffffff !important;
-  border-color: #1e3a5f !important;
+  background-color: #1e3a5f;
+  color: #ffffff ;
+  border-color: #1e3a5f ;
   font-weight: 600;
 }
 
 .pagination-wrapper .MuiPaginationItem-root.Mui-selected:hover {
-  background-color: #162d4a !important;
-  border-color: #162d4a !important;
+  background-color: #162d4a ;
+  border-color: #162d4a ;
 }
 
 .pagination-wrapper .MuiPaginationItem-root.Mui-disabled {

@@ -137,7 +137,19 @@ function TrajetsDisponibles() {
                         <span className="trajet-cities">
                           {t.villeDepart} → {t.villeArrivee}
                         </span>
-                        <span className="badge-dispo">{t.statutTrajet}</span>
+                        <span
+                          className={`status-badge ${
+                            t.statutTrajet === "PUBLIE"
+                              ? "status-open"
+                              : t.statutTrajet === "EN_COURS"
+                              ? "status-progress"
+                              : t.statutTrajet === "TERMINE"
+                              ? "status-finished"
+                              : "status-other"
+                          }`}
+                        >
+                          {t.statutTrajet}
+                        </span>
                       </div>
 
                       <div className="trajet-card-body">

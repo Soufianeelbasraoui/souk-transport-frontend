@@ -185,6 +185,8 @@ function TrajetsPage() {
                               ? "status-open"
                               : item.statutTrajet === "EN_COURS"
                               ? "status-progress"
+                              : item.statutTrajet === "TERMINE"
+                              ? "status-finished"
                               : "status-other"
                           }`}
                         >
@@ -232,14 +234,16 @@ function TrajetsPage() {
                                     : ""
                                 }`}
                               >
-                                <Link
-                                  to={`/admin/trajets/edit/${item.id}`}
-                                  className="admin-dropdown-link"
-                                  onClick={() => setActiveDropdownId(null)}
-                                >
-                                  <MdOutlineEdit className="dropdown-icon" />
-                                  <span>Modifier</span>
-                                </Link>
+                                {item.statutTrajet !== "TERMINE" && (
+                                  <Link
+                                    to={`/admin/trajets/edit/${item.id}`}
+                                    className="admin-dropdown-link"
+                                    onClick={() => setActiveDropdownId(null)}
+                                  >
+                                    <MdOutlineEdit className="dropdown-icon" />
+                                    <span>Modifier</span>
+                                  </Link>
+                                )}
 
                                 <button
                                   type="button"
@@ -288,7 +292,7 @@ function TrajetsPage() {
         <ConfirmDialog
           show={deleteId !== null}
           title="Supprimer le trajet"
-          message="Êtes-vous sûr de vouloir supprimer ce trajet ?"
+          message="Êtes-vous sûr de vouloir supprimer ce trajet ? Le camion associé redeviendra disponible."
           onConfirm={handelDelet}
           onCancel={() => setDeleteId(null)}
         />

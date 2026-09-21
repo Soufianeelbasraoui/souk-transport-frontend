@@ -1,126 +1,133 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../../components/layout/Sidebar";
-import "../../styles/global.css";
-import api from "../../services/api";
-import "./style/transporteur.css";
-import PaginationComponent from "../../components/common/Pagination";
+import { FiCheck, FiShield } from "react-icons/fi";
 import { toast } from "react-toastify";
+
+import Sidebar from "../../components/layout/Sidebar";
+import Loader from "../../components/common/Loader";
+import api from "../../services/api";
+
+import "../../styles/global.css";
+import "./style/transporteur.css";
+import "./style/reservationsRecues.css";
 
 function ReservationsRecues() {
   const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
+  const [paiement, setPaiement] = useState(null);
+
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
-  const pageSize = 10;
+  const [loading, setLoading] = useState(true);
+
+  const pageSize = 5;
 
   useEffect(() => {
     chargerReservations();
   }, [page]);
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage - 1);
-  };
-
   const chargerReservations = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/api/reservations/transporteur/mes-reservations?page=${page}&size=${pageSize}`);
-      const liste = res.data?.content || (Array.isArray(res.data) ? res.data : []);
-      setTotalElements(res.data?.totalElements || 0);
-      setTotalPages(res.data?.totalPages || 0);
-
-      const listeAvecPaiement = await Promise.all(
-        liste.map(async (reservation) => {
-          if (reservation.statutReservation !== "ACCEPTEE") {
-            return { ...reservation, statutPaiement: null };
-          }
-
-          try {
-            const paiementRes = await api.get( `/api/paiements/cargaison/${reservation.cargaisonId}`);
-            return {
-              ...reservation,
-              statutPaiement: paiementRes.data?.statutPaiement || null,
-            };
-          } catch (error) {
-            return {
-              ...reservation,
-              statutPaiement: null,
-            };
-          }
-        })
+      const res = await api.get(
+        `/api/reservations/transporteur/mes-reservations?page=${page}&size=${pageSize}`
       );
-
-      setReservations(listeAvecPaiement);
+      const items = res.data.content || [];
+      setReservations(items);
+      setTotalPages(res.data.totalPages || 0);
+      setSelectedId(items.length > 0 ? items[0].id : null);
     } catch (error) {
       console.error("Erreur chargement réservations :", error);
       setReservations([]);
-      setTotalElements(0);
       setTotalPages(0);
     } finally {
       setLoading(false);
     }
   };
 
+  const chargerPaiement = async (cargaisonId) => {
+    setPaiement(null);
+    if (!cargaisonId) return;
+    try {
+      const res = await api.get(`/api/paiements/cargaison/${cargaisonId}`);
+      setPaiement(res.data);
+    } catch {
+      setPaiement(null);
+    }
+  };
+
+  const handleSelect = (item) => {
+    setSelectedId(item.id);
+    chargerPaiement(item.cargaisonId);
+  };
+
+  const updateReservationStatus = (id, newReservation) => {
+    setReservations((prev) =>
+      prev.map((item) => (item.id === id ? newReservation : item))
+    );
+    setSelectedId(id);
+    setPaiement(null);
+  };
+
   const handleAccepter = async (id) => {
     try {
       const res = await api.patch(`/api/reservations/${id}/accepter`);
-      setReservations((prev) =>
-        prev.map((item) => (item.id === id ? res.data : item))
-      );
+      updateReservationStatus(id, res.data);
     } catch (error) {
-      alert(error.response?.data?.message || "Erreur lors de l'acceptation.");
+      toast.error(error.response?.data?.message || "Erreur lors de l'acceptation.");
     }
   };
 
   const handleRefuser = async (id) => {
     try {
       const res = await api.patch(`/api/reservations/${id}/refuser`);
-      setReservations((prev) =>
-        prev.map((item) => (item.id === id ? res.data : item))
-      );
+      updateReservationStatus(id, res.data);
     } catch (error) {
-      alert(error.response?.data?.message || "Erreur lors du refus.");
+      toast.error(error.response?.data?.message || "Erreur lors du refus.");
     }
   };
 
-  const handleConfirmerPaiement = async (reservation) => {
+  const handleConfirmerPaiement = async (cargaisonId) => {
     try {
-      const paiementRes = await api.get(`/api/paiements/cargaison/${reservation.cargaisonId}`);
-      const paiement = paiementRes.data;
-
-      if (!paiement) {
-       toast.error("Aucun paiement trouvé pour cette cargaison.");
+      const paiementRes = await api.get(`/api/paiements/cargaison/${cargaisonId}`);
+      if (!paiementRes.data) {
+        toast.error("Aucun paiement trouvé.");
         return;
       }
-
-      const res = await api.patch(`/api/paiements/${paiement.id}/payer`);
-
+      const res = await api.patch(`/api/paiements/${paiementRes.data.id}/payer`);
       if (res.data.statutPaiement === "PAYE") {
-        setReservations((prev) =>
-          prev.map((item) =>
-            item.id === reservation.id ? { ...item, statutPaiement: "PAYE" } : item)
-        );
+        setPaiement(res.data);
+        toast.success("Paiement confirmé.");
       }
     } catch (error) {
-      toast.error("Impossible de confirmer le paiement.");
+      toast.error(error.response?.data?.message || "Erreur paiement.");
     }
   };
 
-  if (loading) {
-    return (
-      <div className="app">
-        <Sidebar />
-        <main className="main-content">
-          <p>Chargement...</p>
-        </main>
-      </div>
-    );
-  }
+  const selectedReservation = reservations.find((r) => r.id === selectedId);
+
+  const getNom = (res) =>
+    res?.nomEntreprise ||
+    `${res?.expediteurPrenom || ""} ${res?.expediteurNom || ""}`.trim() ||
+    "Expéditeur";
+
+  const getInitiales = (res) => {
+    const p = res?.expediteurPrenom || "";
+    const n = res?.expediteurNom || "";
+    return `${p.charAt(0)}${n.charAt(0)}`.toUpperCase() || "EX";
+  };
+
+  useEffect(() => {
+    if (selectedReservation) {
+      chargerPaiement(selectedReservation.cargaisonId);
+    }
+  }, [selectedId]);
+
+  if (loading) return <Loader />;
 
   return (
     <div className="app">
       <Sidebar />
+
       <main className="main-content">
         <div className="page-header">
           <div>
@@ -129,108 +136,202 @@ function ReservationsRecues() {
           </div>
         </div>
 
-        <div className="dashboard-card recent-trajets">
-          <div className="table-responsive">
-            <table className="dashboard-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>TRAJET</th>
-                  <th>CARGAISON</th>
-                  <th>POIDS</th>
-                  <th>PRIX</th>
-                  <th>DATE</th>
-                  <th>STATUT</th>
-                  <th>ACTIONS</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {reservations.length > 0 ? (
-                  reservations.map((reservation) => (
-                    <tr key={reservation.id}>
-                      <td>#{reservation.id}</td>
-                      <td>{reservation.trajetId}</td>
-                      <td>{reservation.cargaisonId}</td>
-                      <td>
-                        {reservation.poidsReserve != null
-                          ? `${reservation.poidsReserve} kg`
-                          : "-"}
-                      </td>
-                      <td>
-                        {reservation.prixConvenu != null
-                          ? `${reservation.prixConvenu} DH`
-                          : "-"}
-                      </td>
-                      <td>
-                        {reservation.dateReservation
-                          ? new Date(
-                              reservation.dateReservation
-                            ).toLocaleString("fr-FR")
-                          : "-"}
-                      </td>
-                      <td>{reservation.statutReservation}</td>
-
-                      <td>
-                        {reservation.statutReservation === "EN_ATTENTE" && (
-                          <div className="d-flex gap-2">
-                            <button
-                              className="btn btn-sm btn-success"
-                              onClick={() => handleAccepter(reservation.id)}
-                            >
-                              Accepter
-                            </button>
-                            <button
-                              className="btn btn-sm btn-danger"
-                              onClick={() => handleRefuser(reservation.id)}
-                            >
-                              Refuser
-                            </button>
-                          </div>
-                        )}
-
-                        {reservation.statutReservation === "ACCEPTEE" && (
-                          <>
-                            {!reservation.statutPaiement && (
-                              <span className="text-muted fs-7">
-                                En attente du paiement par l'expéditeur
-                              </span>
-                            )}
-
-                            {reservation.statutPaiement === "EN_ATTENTE" && (
-                              <button  className="btn btn-sm btn-primary" onClick={() => handleConfirmerPaiement(reservation)}> Confirmer paiement </button> )}
-
-                            {reservation.statutPaiement === "PAYE" && ( <span className="text-success fw-bold">  Paiement confirmé </span>)}
-                          </>
-                        )}
-
-                        {reservation.statutReservation === "REFUSEE" && (<span className="text-muted">Refusée</span>)}
-                        {reservation.statutReservation === "ANNULEE" && (<span className="text-muted">Annulée</span> )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="8" className="table-empty">
-                      Aucune réservation trouvée.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+        {reservations.length === 0 ? (
+          <div className="dashboard-card">
+            <div className="res-empty-state">Aucune réservation trouvée.</div>
           </div>
+        ) : (
+          <div className="res-recues-container">
+            <div className="res-list-panel">
+              <div className="res-list-header">
+                <h3>Offres reçues</h3>
+              </div>
 
-          {totalElements > 0 && (
-            <PaginationComponent
-              page={page + 1}
-              totalPages={totalPages}
-              totalElements={totalElements}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
-              itemLabel="réservations"
-            />
-          )}
-        </div>
+              <div className="res-items-list">
+                {reservations.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`res-item-card ${selectedId === item.id ? "active" : ""}`}
+                    onClick={() => handleSelect(item)}
+                  >
+                    <div className="res-item-avatar">{getInitiales(item)}</div>
+
+                    <div className="res-item-info">
+                      <div className="res-item-top">
+                        <span className="res-item-name">{getNom(item)}</span>
+                        <span className="res-item-date">
+                          {item.dateReservation
+                            ? new Date(item.dateReservation).toLocaleDateString("fr-FR")
+                            : ""}
+                        </span>
+                      </div>
+
+                      <div className="res-item-meta">
+                        {item.poidsReserve ? `${item.poidsReserve} kg` : "-"} •{" "}
+                        {item.villeDepart} → {item.villeArrivee}
+                      </div>
+
+                      <div className="res-item-price">
+                        {item.prixConvenu ? `${item.prixConvenu} DH` : "-"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="res-pagination-simple">
+                  <button
+                    className="res-page-btn"
+                    disabled={page === 0}
+                    onClick={() => setPage((p) => p - 1)}
+                  >
+                    Précédent
+                  </button>
+                  <span>
+                    {page + 1} / {totalPages}
+                  </span>
+                  <button
+                    className="res-page-btn"
+                    disabled={page + 1 >= totalPages}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    Suivant
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {selectedReservation && (
+              <div className="res-detail-panel">
+                <div className="res-detail-header">
+                  <div className="res-detail-user">
+                    <div className="res-detail-avatar">
+                      {getInitiales(selectedReservation)}
+                    </div>
+                    <div>
+                      <h2 className="res-detail-name">{getNom(selectedReservation)}</h2>
+                      <div className="res-detail-sub">
+                        Réservation #{selectedReservation.id}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="res-badge-status">
+                    <FiShield />
+                    <span>{selectedReservation.statutReservation}</span>
+                  </div>
+                </div>
+
+                <div className="res-section-title">Cargaison</div>
+                <div className="res-info-box">
+                  <div className="res-cargaison-grid">
+                    <div>
+                      Marchandise : <strong>{selectedReservation.description || "N/A"}</strong>
+                    </div>
+                    <div>
+                      Poids : <strong>{selectedReservation.poidsReserve ? `${selectedReservation.poidsReserve} kg` : "-"}</strong>
+                    </div>
+                    <div>
+                      Trajet : <strong>{selectedReservation.villeDepart} → {selectedReservation.villeArrivee}</strong>
+                    </div>
+                    <div>
+                      Statut Cargaison : <strong>{selectedReservation.statutCargaison || "-"}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="res-section-title">Finances</div>
+                <div className="res-info-box">
+                  <div className="res-finances-list">
+                    <div className="res-finance-row">
+                      <span>Prix convenu</span>
+                      <strong>{selectedReservation.prixConvenu ? `${selectedReservation.prixConvenu} DH` : "-"}</strong>
+                    </div>
+                    <div className="res-finance-row">
+                      <span>Date</span>
+                      <span>
+                        {selectedReservation.dateReservation
+                          ? new Date(selectedReservation.dateReservation).toLocaleString("fr-FR")
+                          : "-"}
+                      </span>
+                    </div>
+                    {paiement && (
+                      <div className="res-finance-row">
+                        <span>Paiement</span>
+                        <span>
+                          {paiement.statutPaiement === "PAYE" ? "✓ Confirmé" : "En attente"}
+                        </span>
+                      </div>
+                    )}
+                    <div className="res-finance-row total-row">
+                      <span>Total</span>
+                      <span>{selectedReservation.prixConvenu ? `${selectedReservation.prixConvenu} DH` : "-"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="res-detail-actions">
+                  {selectedReservation.statutReservation === "EN_ATTENTE" && (
+                    <>
+                      <button
+                        type="button"
+                        className="btn-res-accept"
+                        onClick={() => handleAccepter(selectedReservation.id)}
+                      >
+                        <FiCheck />
+                        Accepter ({selectedReservation.prixConvenu || 0} DH)
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-res-refuse"
+                        onClick={() => handleRefuser(selectedReservation.id)}
+                      >
+                        Refuser
+                      </button>
+                    </>
+                  )}
+
+                  {selectedReservation.statutReservation === "ACCEPTEE" && (
+                    <>
+                      {!paiement && (
+                        <span style={{ color: "#64748b", fontSize: "13px" }}>
+                          En attente du paiement par l'expéditeur
+                        </span>
+                      )}
+                      {paiement?.statutPaiement === "EN_ATTENTE" && (
+                        <button
+                          type="button"
+                          className="btn-res-confirm"
+                          onClick={() => handleConfirmerPaiement(selectedReservation.cargaisonId)}
+                        >
+                          Confirmer le paiement
+                        </button>
+                      )}
+                      {paiement?.statutPaiement === "PAYE" && (
+                        <span style={{ color: "#16a34a", fontWeight: "600" }}>
+                          ✓ Paiement confirmé
+                        </span>
+                      )}
+                    </>
+                  )}
+
+                  {selectedReservation.statutReservation === "REFUSEE" && (
+                    <span style={{ color: "#dc2626", fontWeight: "600" }}>
+                      Réservation refusée
+                    </span>
+                  )}
+
+                  {selectedReservation.statutReservation === "ANNULEE" && (
+                    <span style={{ color: "#64748b", fontSize: "13px" }}>
+                      Réservation annulée
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );

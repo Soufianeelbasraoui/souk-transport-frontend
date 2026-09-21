@@ -101,7 +101,17 @@ function DetailTrajet() {
                     <span className="trajet-label">Itinéraire</span>
                     <h2>{trajet.villeDepart} → {trajet.villeArrivee}</h2>
                   </div>
-                  <span className={`status-badge ${isTermine ? "badge-danger" : "badge-success"}`}>
+                  <span
+                    className={`status-badge ${
+                      trajet.statutTrajet === "PUBLIE"
+                        ? "status-open"
+                        : trajet.statutTrajet === "EN_COURS"
+                        ? "status-progress"
+                        : trajet.statutTrajet === "TERMINE"
+                        ? "status-finished"
+                        : "status-other"
+                    }`}
+                  >
                     {trajet.statutTrajet}
                   </span>
                 </div>
