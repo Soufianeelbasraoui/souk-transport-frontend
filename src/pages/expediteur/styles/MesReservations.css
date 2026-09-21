@@ -34,7 +34,6 @@
   color: #0f172a;
 }
 
-/* Table Container Design */
 .table-container {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -102,6 +101,7 @@
   background-color: #fef3c7;
   color: #b45309;
 }
+
 .actions-cell {
   display: flex;
   align-items: center;

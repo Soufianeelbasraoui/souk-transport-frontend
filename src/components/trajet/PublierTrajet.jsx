@@ -38,16 +38,27 @@ function PublierTrajet() {
   });
 
   useEffect(() => {
-    api.get("/api/camions/mesCamions").then((res) => setCamions(res.data.content))
+    const endpoint = user?.role === "ADMIN" ? "/api/camions/lister?page=0&size=100" : "/api/camions/mesCamions";
+    api.get(endpoint) .then((res) => {
+        const list = res.data?.content || (Array.isArray(res.data) ? res.data : []);
+        setCamions(list);
+      })
       .catch(() => setCamions([]))
       .finally(() => setLoadingCamions(false));
-  }, []);
+  }, [user?.role]);
 
   const retourPath = user?.role === "ADMIN" ? "/admin/trajets" : "/transporteur/trajets";
 
   const onSubmit = async (data) => {
     setSubmitError("");
     setSubmitSuccess("");
+
+    const selectedCamion = camions.find((c) => String(c.id) === String(data.camionId));
+    if (selectedCamion && !selectedCamion.disponible) {
+      setSubmitError("Le camion sélectionné n'est pas disponible pour un nouveau trajet.");
+      return;
+    }
+
     try {
       await api.post("/api/trajets", data);
       setSubmitSuccess("Trajet publié avec succès ! Redirection en cours…");
@@ -160,8 +171,8 @@ function PublierTrajet() {
                     >
                       <option value="">-- Sélectionner un camion --</option>
                       {camions.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.marque} {c.modele} — {c.immatriculation} ({c.capacite} T)
+                        <option key={c.id} value={c.id} disabled={!c.disponible}>
+                          {c.marque} {c.modele} — {c.immatriculation} ({c.capacite} T) — {c.disponible ? "Disponible" : "Non disponible"}
                         </option>
                       ))}
                     </select>
@@ -174,6 +185,14 @@ function PublierTrajet() {
                       Aucun camion trouvé.{" "}
                       <Link to="/transporteur/camions/new" style={{ color: "#f47b20" }}>
                         Ajouter un camion
+                      </Link>
+                    </span>
+                  )}
+                  {!loadingCamions && camions.length > 0 && camions.filter((c) => c.disponible).length === 0 && (
+                    <span className="field-error">
+                      Tous vos camions sont actuellement indisponibles.{" "}
+                      <Link to="/transporteur/camions/new" style={{ color: "#f47b20" }}>
+                        Ajouter un nouveau camion
                       </Link>
                     </span>
                   )}

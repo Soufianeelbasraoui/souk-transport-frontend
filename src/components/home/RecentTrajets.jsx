@@ -56,7 +56,19 @@ const RecentTrajets = () => {
                       <span className="trajet-cities">
                         {t.villeDepart} &rarr; {t.villeArrivee}
                       </span>
-                      <span className="badge-dispo">{t.statutTrajet}</span>
+                      <span
+                        className={`status-badge ${
+                          t.statutTrajet === "PUBLIE"
+                            ? "status-open"
+                            : t.statutTrajet === "EN_COURS"
+                            ? "status-progress"
+                            : t.statutTrajet === "TERMINE"
+                            ? "status-finished"
+                            : "status-other"
+                        }`}
+                      >
+                        {t.statutTrajet}
+                      </span>
                     </div>
                     <div className="d-flex flex-column gap-2 mb-4">
                       <div className="trajet-info-item">

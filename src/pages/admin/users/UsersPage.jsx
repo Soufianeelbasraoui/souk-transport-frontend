@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineEdit, MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 import Sidebar from "../../../components/layout/Sidebar";
 import Loader from "../../../components/common/Loader";
@@ -22,38 +23,49 @@ function UsersPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [deleteId, setDeleteId] = useState(null);
-  const pageSize=10;
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
+  const pageSize = 10;
 
-const loadUsers = async () => {
-  try {
-    setLoading(true);
-    let res;
-    if (search.trim() !== "") {
-      res = await api.get( `/api/users/search/nom?nom=${search}&page=${page}&size=${pageSize}`);
-    } else if (role !== "") {
-      res = await api.get(`/api/users/filter/role?role=${role}&page=${page}&size=${pageSize}`);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".admin-action-dropdown-wrapper")) {
+        setActiveDropdownId(null);
+      }
+    };
 
-    } else if (statut !== "") {
-      res = await api.get(`/api/users/filter/statut?statut=${statut}&page=${page}&size=${pageSize}` );
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-    } else {
-      res = await api.get( `/api/users?page=${page}&size=${pageSize}`);
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      let res;
+      if (search.trim() !== "") {
+        res = await api.get(`/api/users/search/nom?nom=${search}&page=${page}&size=${pageSize}`);
+      } else if (role !== "") {
+        res = await api.get(`/api/users/filter/role?role=${role}&page=${page}&size=${pageSize}`);
+      } else if (statut !== "") {
+        res = await api.get(`/api/users/filter/statut?statut=${statut}&page=${page}&size=${pageSize}`);
+      } else {
+        res = await api.get(`/api/users?page=${page}&size=${pageSize}`);
+      }
+
+      setUsers(res.data.content || []);
+      setTotalPages(res.data.totalPages || 0);
+      setTotalElements(res.data.totalElements || 0);
+    } catch (error) {
+      console.error("Erreur utilisateurs :", error);
+    } finally {
+      setLoading(false);
     }
-
-    setUsers(res.data.content || []);
-    setTotalPages(res.data.totalPages || 0);
-    setTotalElements(res.data.totalElements ||0);
-  } catch (error) {
-    console.error("Erreur utilisateurs :", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     loadUsers();
   }, [page, search, role, statut]);
-
 
   const handleDelete = async () => {
     try {
@@ -62,7 +74,6 @@ const loadUsers = async () => {
       loadUsers();
     } catch (error) {
       console.error("Erreur suppression :", error);
-
     }
   };
 
@@ -87,42 +98,48 @@ const loadUsers = async () => {
     setPage(0);
   };
 
-
-  const handlePageChange=(newPage)=>{
-     setPage(newPage-1);
-  }
+  const handlePageChange = (newPage) => {
+    setActiveDropdownId(null);
+    setPage(newPage - 1);
+  };
 
   return (
-
     <div className="app admin-page">
       <Sidebar />
       <main className="main-content">
         <div className="page-header">
           <div>
             <h1>Utilisateurs</h1>
-            <p>  Gérez les comptes utilisateurs, leurs rôles et leurs statuts.</p>
+            <p>Gérez les comptes utilisateurs, leurs rôles et leurs statuts.</p>
           </div>
-          <Link  to="/admin/users/new" className="btn-primary">  Ajouter un utilisateur</Link>
+          <Link to="/admin/users/new" className="btn-primary">
+            Ajouter un utilisateur
+          </Link>
         </div>
         <div className="admin-card">
           <div className="admin-card-header">
             <div className="admin-search">
-              <input  type="search" placeholder="Rechercher par nom..."  value={search} onChange={handleSearch}/>
+              <input
+                type="search"
+                placeholder="Rechercher par nom..."
+                value={search}
+                onChange={handleSearch}
+              />
             </div>
             <div className="admin-filters">
               <div className="admin-filter">
-                <select  value={role} onChange={handleRole}>
+                <select value={role} onChange={handleRole}>
                   <option value=""> Tous les rôles </option>
                   <option value="ADMIN"> Administrateur</option>
                   <option value="TRANSPORTEUR">Transporteur</option>
-                  <option value="EXPEDITEUR">  Expéditeur</option>
+                  <option value="EXPEDITEUR"> Expéditeur</option>
                 </select>
               </div>
 
               <div className="admin-filter">
-                <select value={statut}  onChange={handleStatut}>
+                <select value={statut} onChange={handleStatut}>
                   <option value=""> Tous les statuts </option>
-                  <option value="ACTIF"> Actif  </option>
+                  <option value="ACTIF"> Actif </option>
                   <option value="INACTIF">Inactif</option>
                 </select>
               </div>
@@ -146,56 +163,114 @@ const loadUsers = async () => {
                   </thead>
                   <tbody>
                     {users.length > 0 ? (
-                      users.map((user) => (
+                      users.map((user, index) => (
                         <tr key={user.id}>
                           <td className="admin-identity">
-                            <strong> {user.nom} {user.prenom}</strong>
+                            <strong>
+                              {user.nom} {user.prenom}
+                            </strong>
                             <span> {user.email}</span>
                           </td>
                           <td>
-                            <span className="admin-badge admin-badge-role">  {user.role}</span>
+                            <span className="admin-badge admin-badge-role">
+                              {user.role}
+                            </span>
                           </td>
                           <td>{user.telephone || "-"} </td>
                           <td>{user.ville || "-"}</td>
                           <td>
-                            <span className={`admin-badge ${ user.statutUser === "ACTIF" ? "admin-badge-success" : "admin-badge-danger"  }`} >
+                            <span
+                              className={`admin-badge ${
+                                user.statutUser === "ACTIF"
+                                  ? "admin-badge-success"
+                                  : "admin-badge-danger"
+                              }`}
+                            >
                               {user.statutUser || "-"}
                             </span>
                           </td>
                           <td>
                             <div className="admin-actions">
-                              <Link to={`/admin/users/${user.id}`} className="admin-action admin-action-view" title="Voir" >
+                              {/* 1. Bouton Consulter (Œil) */}
+                              <Link
+                                to={`/admin/users/${user.id}`}
+                                className="admin-action-btn"
+                                title="Voir"
+                              >
                                 <BiShowAlt />
                               </Link>
 
-                              <Link to={`/admin/users/edit/${user.id}`} className="admin-action admin-action-edit"title="Modifier" >
-                                <MdOutlineEdit />
-                              </Link>
-                              <button type="button"   className="admin-action admin-action-delete" title="Supprimer"   onClick={() => setDeleteId(user.id)} >
-                                <MdDelete />
-                              </button>
+                              {/* 2. Bouton 3 points avec menu déroulant */}
+                              <div className="admin-action-dropdown-wrapper">
+                                <button
+                                  type="button"
+                                  className={`admin-action-btn ${
+                                    activeDropdownId === user.id ? "active" : ""
+                                  }`}
+                                  title="Actions"
+                                  onClick={() =>
+                                    setActiveDropdownId(
+                                      activeDropdownId === user.id ? null : user.id
+                                    )
+                                  }
+                                >
+                                  <BsThreeDotsVertical />
+                                </button>
+
+                                {activeDropdownId === user.id && (
+                                  <div
+                                    className={`admin-action-dropdown ${
+                                      index >= users.length - 2 && users.length > 2
+                                        ? "open-up"
+                                        : ""
+                                    }`}
+                                  >
+                                    <Link
+                                      to={`/admin/users/edit/${user.id}`}
+                                      className="admin-dropdown-link"
+                                      onClick={() => setActiveDropdownId(null)}
+                                    >
+                                      <MdOutlineEdit className="dropdown-icon" />
+                                      <span>Modifier</span>
+                                    </Link>
+                                    <button
+                                      type="button"
+                                      className="admin-dropdown-link delete"
+                                      onClick={() => {
+                                        setActiveDropdownId(null);
+                                        setDeleteId(user.id);
+                                      }}
+                                    >
+                                      <MdDelete className="dropdown-icon" />
+                                      <span>Supprimer</span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </td>
                         </tr>
-                      ))) : (
+                      ))
+                    ) : (
                       <tr>
-                        <td colSpan="6"  className="admin-empty" > Aucun utilisateur trouvé.</td>
+                        <td colSpan="6" className="admin-empty">
+                          Aucun utilisateur trouvé.
+                        </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
                 {totalElements > 0 && (
-              <PaginationComponent
-                page={page + 1}
-                totalPages={totalPages}
-                totalElements={totalElements}
-                pageSize={pageSize}
-                onPageChange={handlePageChange}
-                itemLabel="utilisateurs"
-              />
-            )}
+                  <PaginationComponent
+                    page={page + 1}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    pageSize={pageSize}
+                    onPageChange={handlePageChange}
+                    itemLabel="utilisateurs"
+                  />
+                )}
               </div>
-           
             </>
           )}
         </div>

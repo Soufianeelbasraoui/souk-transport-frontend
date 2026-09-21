@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineEdit, MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 import Sidebar from "../../components/layout/Sidebar";
 import api from "../../services/api";
@@ -16,6 +17,7 @@ function CamionsPage() {
   const [camions, setCamions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
 
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
@@ -25,6 +27,19 @@ function CamionsPage() {
 
   const pageSize = 10;
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".admin-action-dropdown-wrapper")) {
+        setActiveDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const fetchCamions = async () => {
     try {
       setLoading(true);
@@ -32,9 +47,9 @@ function CamionsPage() {
       let res;
 
       if (search.trim() === "") {
-        res = await api.get(`/api/camions/lister?page=${page}&size=${pageSize}` );
+        res = await api.get(`/api/camions/lister?page=${page}&size=${pageSize}`);
       } else {
-        res = await api.get( `/api/camions/searchByMarque?marque=${search}&page=${page}&size=${pageSize}` );
+        res = await api.get(`/api/camions/searchByMarque?marque=${search}&page=${page}&size=${pageSize}`);
       }
 
       setCamions(res.data.content || []);
@@ -51,7 +66,6 @@ function CamionsPage() {
     fetchCamions();
   }, [page, search]);
 
-  
   const handleSearch = (e) => {
     setSearch(e.target.value);
     setPage(0);
@@ -70,9 +84,9 @@ function CamionsPage() {
   };
 
   const handlePageChange = (newPage) => {
+    setActiveDropdownId(null);
     setPage(newPage - 1);
   };
-
 
   return (
     <div className="app admin-page">
@@ -116,72 +130,108 @@ function CamionsPage() {
                 </tr>
               </thead>
 
-                 <tbody>
-  {loading ? (
-    <tr>
-      <td colSpan="7" className="admin-empty">
-        <Loader />
-      </td>
-    </tr>
-  ) : camions.length > 0 ? (
-     camions.map((camion) => (
-      <tr key={camion.id}>
-        <td className="admin-identity">
-          <strong>{camion.marque}</strong>
-        </td>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="admin-empty">
+                      <Loader />
+                    </td>
+                  </tr>
+                ) : camions.length > 0 ? (
+                  camions.map((camion, index) => (
+                    <tr key={camion.id}>
+                      <td className="admin-identity">
+                        <strong>{camion.marque}</strong>
+                      </td>
 
-        <td>{camion.immatriculation}</td>
-        <td>{camion.modele}</td>
-        <td>{camion.capacite}</td>
-        <td>{camion.type}</td>
+                      <td>{camion.immatriculation}</td>
+                      <td>{camion.modele}</td>
+                      <td>{camion.capacite}</td>
+                      <td>{camion.type}</td>
 
-        <td>
-          <span
-            className={`admin-badge ${
-              camion.disponible
-                ? "admin-badge-success"
-                : "admin-badge-danger"
-            }`}
-          >
-            {camion.disponible ? "Disponible" : "Non disponible"}
-          </span>
-        </td>
+                      <td>
+                        <span
+                          className={`admin-badge ${
+                            camion.disponible
+                              ? "admin-badge-success"
+                              : "admin-badge-danger"
+                          }`}
+                        >
+                          {camion.disponible ? "Disponible" : "Non disponible"}
+                        </span>
+                      </td>
 
-        <td>
-          <div className="admin-actions">
-            <Link
-              to={`/admin/camions/${camion.id}`}
-              className="admin-action admin-action-view"
-            >
-              <BiShowAlt />
-            </Link>
+                      <td>
+                        <div className="admin-actions">
+                          {/* 1. Bouton Consulter (Œil) */}
+                          <Link
+                            to={`/admin/camions/${camion.id}`}
+                            className="admin-action-btn"
+                            title="Voir"
+                          >
+                            <BiShowAlt />
+                          </Link>
 
-            <Link
-              to={`/admin/camions/edit/${camion.id}`}
-              className="admin-action admin-action-edit"
-            >
-              <MdOutlineEdit />
-            </Link>
+                          {/* 2. Bouton 3 points avec menu déroulant */}
+                          <div className="admin-action-dropdown-wrapper">
+                            <button
+                              type="button"
+                              className={`admin-action-btn ${
+                                activeDropdownId === camion.id ? "active" : ""
+                              }`}
+                              title="Actions"
+                              onClick={() =>
+                                setActiveDropdownId(
+                                  activeDropdownId === camion.id ? null : camion.id
+                                )
+                              }
+                            >
+                              <BsThreeDotsVertical />
+                            </button>
 
-            <button
-              type="button"
-              className="admin-action admin-action-delete"
-              onClick={() => setDeleteId(camion.id)}
-            >
-              <MdDelete />
-            </button>
-          </div>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="7" className="admin-empty">
-        Aucun camion trouvé.
-      </td>
-    </tr>
-  )}
-</tbody>
+                            {activeDropdownId === camion.id && (
+                              <div
+                                className={`admin-action-dropdown ${
+                                  index >= camions.length - 2 && camions.length > 2
+                                    ? "open-up"
+                                    : ""
+                                }`}
+                              >
+                                <Link
+                                  to={`/admin/camions/edit/${camion.id}`}
+                                  className="admin-dropdown-link"
+                                  onClick={() => setActiveDropdownId(null)}
+                                >
+                                  <MdOutlineEdit className="dropdown-icon" />
+                                  <span>Modifier</span>
+                                </Link>
+
+                                <button
+                                  type="button"
+                                  className="admin-dropdown-link delete"
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    setDeleteId(camion.id);
+                                  }}
+                                >
+                                  <MdDelete className="dropdown-icon" />
+                                  <span>Supprimer</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="admin-empty">
+                      Aucun camion trouvé.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
             </table>
 
             {totalElements > 0 && (

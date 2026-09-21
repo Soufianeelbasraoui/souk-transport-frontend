@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineEdit, MdDelete, MdUndo } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 import Sidebar from "../../components/layout/Sidebar";
 import Loader from "../../components/common/Loader";
@@ -16,6 +17,7 @@ function CargaisonsPage() {
   const [cargaisons, setCargaisons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -26,6 +28,19 @@ function CargaisonsPage() {
 
   const pageSize = 10;
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".admin-action-dropdown-wrapper")) {
+        setActiveDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const fetchCargaisons = async () => {
     try {
       setLoading(true);
@@ -33,7 +48,7 @@ function CargaisonsPage() {
       const query = search.trim();
 
       if (query !== "") {
-        res = await api.get(`/api/cargaisons/search?description=${query}&page=${page}&size=${pageSize}` );
+        res = await api.get(`/api/cargaisons/search?description=${query}&page=${page}&size=${pageSize}`);
       } else if (status !== "") {
         res = await api.get(
           `/api/cargaisons/filter/status?statut=${status}&page=${page}&size=${pageSize}`
@@ -135,10 +150,11 @@ function CargaisonsPage() {
                     </td>
                   </tr>
                 ) : cargaisons.length > 0 ? (
-                  cargaisons.map((item) => {
+                  cargaisons.map((item, index) => {
                     const isSoumise = item.statutCargaison === "SOUMISE";
                     const isEnTransit = item.statutCargaison === "EN_TRANSIT";
                     const isLivree = item.statutCargaison === "LIVREE";
+                    const hasMoreActions = isSoumise || (!isEnTransit && !isLivree);
 
                     return (
                       <tr key={item.id}>
@@ -154,51 +170,100 @@ function CargaisonsPage() {
 
                         <td>
                           <span
-                            className={`admin-status ${ isLivree ? "is-success" : item.statutCargaison === "ANNULEE" ? "is-danger" : isEnTransit ? "is-warning" : "is-pending" }`}>
+                            className={`admin-status ${
+                              isLivree
+                                ? "is-success"
+                                : item.statutCargaison === "ANNULEE"
+                                ? "is-danger"
+                                : isEnTransit
+                                ? "is-warning"
+                                : "is-pending"
+                            }`}
+                          >
                             {item.statutCargaison || "SOUMISE"}
                           </span>
                         </td>
 
                         <td>
                           <div className="admin-actions">
+                            {/* 1. Bouton Consulter (Œil) */}
                             <Link
                               to={`/admin/cargaisons/${item.id}`}
-                              className="admin-action admin-action-view"
+                              className="admin-action-btn"
                               title="Voir"
                             >
                               <BiShowAlt />
                             </Link>
 
-                            {isSoumise && (
-                              <>
-                                <Link
-                                  to={`/admin/cargaisons/edit/${item.id}`}
-                                  className="admin-action admin-action-edit"
-                                  title="Modifier"
-                                >
-                                  <MdOutlineEdit />
-                                </Link>
-
+                            {/* 2. Bouton 3 points avec menu déroulant */}
+                            {hasMoreActions && (
+                              <div className="admin-action-dropdown-wrapper">
                                 <button
                                   type="button"
-                                  className="admin-action admin-action-warning"
-                                  title="Annuler"
-                                  onClick={() => updateStatus(item.id, "annuler")}
+                                  className={`admin-action-btn ${
+                                    activeDropdownId === item.id ? "active" : ""
+                                  }`}
+                                  title="Actions"
+                                  onClick={() =>
+                                    setActiveDropdownId(
+                                      activeDropdownId === item.id ? null : item.id
+                                    )
+                                  }
                                 >
-                                  <MdUndo />
+                                  <BsThreeDotsVertical />
                                 </button>
-                              </>
-                            )}
 
-                            {!isEnTransit && !isLivree && (
-                              <button
-                                type="button"
-                                className="admin-action admin-action-delete"
-                                title="Supprimer"
-                                onClick={() => setDeleteId(item.id)}
-                              >
-                                <MdDelete />
-                              </button>
+                                {activeDropdownId === item.id && (
+                                  <div
+                                    className={`admin-action-dropdown ${
+                                      index >= cargaisons.length - 2 && cargaisons.length > 2
+                                        ? "open-up"
+                                        : ""
+                                    }`}
+                                  >
+                                    {isSoumise && (
+                                      <>
+                                        <Link
+                                          to={`/admin/cargaisons/edit/${item.id}`}
+                                          className="admin-dropdown-link"
+                                          onClick={() => setActiveDropdownId(null)}
+                                        >
+                                          <MdOutlineEdit className="dropdown-icon" />
+                                          <span>Modifier</span>
+                                        </Link>
+
+                                        {typeof updateStatus === "function" && (
+                                          <button
+                                            type="button"
+                                            className="admin-dropdown-link warning"
+                                            onClick={() => {
+                                              setActiveDropdownId(null);
+                                              updateStatus(item.id, "annuler");
+                                            }}
+                                          >
+                                            <MdUndo className="dropdown-icon" />
+                                            <span>Annuler</span>
+                                          </button>
+                                        )}
+                                      </>
+                                    )}
+
+                                    {!isEnTransit && !isLivree && (
+                                      <button
+                                        type="button"
+                                        className="admin-dropdown-link delete"
+                                        onClick={() => {
+                                          setActiveDropdownId(null);
+                                          setDeleteId(item.id);
+                                        }}
+                                      >
+                                        <MdDelete className="dropdown-icon" />
+                                        <span>Supprimer</span>
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                         </td>
@@ -221,7 +286,10 @@ function CargaisonsPage() {
                 totalPages={totalPages}
                 totalElements={totalElements}
                 pageSize={pageSize}
-                onPageChange={(newPage) => setPage(newPage - 1)}
+                onPageChange={(newPage) => {
+                  setActiveDropdownId(null);
+                  setPage(newPage - 1);
+                }}
                 itemLabel="Cargaisons"
               />
             )}

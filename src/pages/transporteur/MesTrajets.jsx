@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import '../../styles/global.css';
 import "./style/transporteur.css";
-import { useEffect,useState } from "react";
+import "../admin/styles/admin.css";
+import { useEffect, useState } from "react";
 import api from "../../services/api";
-import { MdOutlineEdit,MdDelete } from "react-icons/md";
+import { MdOutlineEdit, MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import Loader from "../../components/common/Loader";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 
@@ -15,10 +17,24 @@ function MesTrajets() {
   const [mesTrajets, setMesTrajets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const pageSize = 10;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".admin-action-dropdown-wrapper")) {
+        setActiveDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchTrajets = async () => {
     setLoading(true);
@@ -42,6 +58,7 @@ function MesTrajets() {
   }, [page]);
 
   const handlePageChange = (newPage) => {
+    setActiveDropdownId(null);
     setPage(newPage - 1);
   };
 
@@ -102,7 +119,7 @@ function MesTrajets() {
 
                   <tbody>
                     {mesTrajets.length > 0 ? (
-                      mesTrajets.map((item) => (
+                      mesTrajets.map((item, index) => (
                         <tr key={item.id}>
                           <td>
                             <span className="trajet-id">
@@ -139,7 +156,15 @@ function MesTrajets() {
                             <strong>{item.prix}</strong>
                           </td>
                           <td>
-                            <span  className={`status-badge ${item.statutTrajet === "PUBLIE" ? "status-open" : item.statutTrajet === "EN_COURS" ? "status-progress" : "status-other"}`}>
+                            <span className={`status-badge ${
+                              item.statutTrajet === "PUBLIE"
+                                ? "status-open"
+                                : item.statutTrajet === "EN_COURS"
+                                ? "status-progress"
+                                : item.statutTrajet === "TERMINE"
+                                ? "status-finished"
+                                : "status-other"
+                            }`}>
                               {item.statutTrajet}
                             </span>
                           </td>
@@ -150,16 +175,63 @@ function MesTrajets() {
                             </span>
                           </td>
                           <td>
-                            <div className="action-btns">
-                              <Link to={`/transporteur/trajets/${item.id}`} className="action-btn view">
+                            <div className="admin-actions">    
+                              <Link
+                                to={`/transporteur/trajets/${item.id}`}
+                                className="admin-action-btn"
+                                title="Voir"
+                              >
                                 <BiShowAlt />
                               </Link>
-                              <Link to={`/transporteur/trajets/edit/${item.id}`} className="action-btn edit">
-                                <MdOutlineEdit />
-                              </Link>
-                                <button className="action-btn delete" onClick={() => setDeleteId(item.id)}>
-                                  <MdDelete />
+                              <div className="admin-action-dropdown-wrapper">
+                                <button
+                                  type="button"
+                                  className={`admin-action-btn ${
+                                    activeDropdownId === item.id ? "active" : ""
+                                  }`}
+                                  title="Actions"
+                                  onClick={() =>
+                                    setActiveDropdownId(
+                                      activeDropdownId === item.id ? null : item.id
+                                    )
+                                  }
+                                >
+                                  <BsThreeDotsVertical />
                                 </button>
+
+                                {activeDropdownId === item.id && (
+                                  <div
+                                    className={`admin-action-dropdown ${
+                                      index >= mesTrajets.length - 2 && mesTrajets.length > 2
+                                        ? "open-up"
+                                        : ""
+                                    }`}
+                                  >
+                                    {item.statutTrajet !== "TERMINE" && (
+                                      <Link
+                                        to={`/transporteur/trajets/edit/${item.id}`}
+                                        className="admin-dropdown-link"
+                                        onClick={() => setActiveDropdownId(null)}
+                                      >
+                                        <MdOutlineEdit className="dropdown-icon" />
+                                        <span>Modifier</span>
+                                      </Link>
+                                    )}
+
+                                    <button
+                                      type="button"
+                                      className="admin-dropdown-link delete"
+                                      onClick={() => {
+                                        setActiveDropdownId(null);
+                                        setDeleteId(item.id);
+                                      }}
+                                    >
+                                      <MdDelete className="dropdown-icon" />
+                                      <span>Supprimer</span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </td>
                         </tr>
@@ -194,7 +266,7 @@ function MesTrajets() {
          <ConfirmDialog
             show={deleteId !== null}
             title="Supprimer le trajet"
-            message="Êtes-vous sûr de vouloir supprimer ce trajet ?"
+            message="Êtes-vous sûr de vouloir supprimer ce trajet ? Le camion associé redeviendra disponible."
             onConfirm={handelDelet}
             onCancel={() => setDeleteId(null)}
         />

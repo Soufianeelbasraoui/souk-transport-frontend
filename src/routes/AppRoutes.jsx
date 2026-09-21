@@ -42,6 +42,7 @@ import DetailReservation from '../pages/expediteur/DetailReservation';
 import PublicRoute from './PublicRoute';
 import Unauthorized from '../pages/unauthorized';
 import ModifierCargaison from '../components/cargaison/ModifierCargaison';
+import PaiementsPage from '../pages/admin/PaiementsPage';
 import ProfileAdmin from '../pages/admin/Profile';
 import ProfileExpediteur from '../pages/expediteur/Profile';
 
@@ -77,6 +78,7 @@ function AppRoutes() {
         <Route path='/admin/cargaisons/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterCargaison /></RoleRoute></ProtectedRoute>} />
         <Route path='/admin/cargaisons/edit/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ModifierCargaison /></RoleRoute></ProtectedRoute>} />
         <Route path='/admin/reservations' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ReservationsPage /></RoleRoute></ProtectedRoute>} />
+        <Route path='/admin/paiements' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><PaiementsPage /></RoleRoute></ProtectedRoute>} />
         <Route path='/admin/profile' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ProfileAdmin /></RoleRoute></ProtectedRoute>} />
 
         <Route path='/transporteur/dashboard' element={<ProtectedRoute> <RoleRoute roles={["TRANSPORTEUR"]}>   <DashboardTransporteur />  </RoleRoute> </ProtectedRoute>} />

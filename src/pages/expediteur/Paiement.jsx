@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { FiArrowLeft, FiClipboard, FiCreditCard } from "react-icons/fi";
+import { FiArrowLeft, FiClipboard, FiCreditCard, FiDownload } from "react-icons/fi";
 
 import Sidebar from "../../components/layout/Sidebar";
 import api from "../../services/api";
@@ -15,6 +15,7 @@ function Paiement() {
   const [montantTotal, setMontantTotal] = useState("");
   const [loading, setLoading] = useState(true);
   const [paiementLoading, setPaiementLoading] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -79,6 +80,34 @@ function Paiement() {
       setError(err.response?.data?.message || "Erreur lors de l'enregistrement du paiement.");
     } finally {
       setPaiementLoading(false);
+    }
+  };
+
+  const handleDownloadRecu = async () => {
+    if (!paiement?.id) return;
+
+    try {
+      setDownloadLoading(true);
+      setError("");
+
+      const response = await api.get(`/api/paiements/${paiement.id}/recu`, {
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", `recu-paiement-${paiement.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      console.error("Erreur téléchargement reçu PDF :", err);
+      setError("Impossible de télécharger le reçu de paiement.");
+    } finally {
+      setDownloadLoading(false);
     }
   };
 
@@ -217,6 +246,16 @@ function Paiement() {
               {paiement.statutPaiement === "PAYE" && (
                 <div className="alert alert-success">Paiement confirmé.</div>
               )}
+
+              <button
+                type="button"
+                className="btn-download-pdf"
+                onClick={handleDownloadRecu}
+                disabled={downloadLoading}
+              >
+                <FiDownload size={16} />
+                {downloadLoading ? "Téléchargement..." : "Télécharger le reçu PDF"}
+              </button>
             </div>
           ) : reservation.statutReservation !== "ACCEPTEE" ? (
             <div>

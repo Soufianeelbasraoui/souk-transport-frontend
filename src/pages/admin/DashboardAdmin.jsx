@@ -204,7 +204,15 @@ function DashboardAdmin() {
                             </div>
                           </td>
                           <td>
-                            <span className={`status-badge ${ item.statutTrajet === "PUBLIE" ? "status-open": item.statutTrajet === "EN_COURS"? "status-progress" : "status-other" }`} >
+                            <span className={`status-badge ${
+                              item.statutTrajet === "PUBLIE"
+                                ? "status-open"
+                                : item.statutTrajet === "EN_COURS"
+                                ? "status-progress"
+                                : item.statutTrajet === "TERMINE"
+                                ? "status-finished"
+                                : "status-other"
+                            }`} >
                               {item.statutTrajet}
                             </span>
                           </td>

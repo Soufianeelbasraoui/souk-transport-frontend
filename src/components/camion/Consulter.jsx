@@ -99,12 +99,21 @@ function ConsulterCamion() {
             </div>
 
             <div className="form-card-footer">
-              <Link
-                to={user.role=="ADMIN"?`/admin/camions/edit/${camion.id}`:`/transporteur/camions/edit/${camion.id}`}
-                className="btn-submit"
-              >
-                Modifier le camion
-              </Link>
+              {camion.statut === "TERMINE" || camion.statutCamion === "TERMINE" || camion.status === "TERMINE" ? (
+                <Link
+                  to={user.role === "ADMIN" ? "/admin/camions" : "/transporteur/camions"}
+                  className="btn-cancel"
+                >
+                  Retour
+                </Link>
+              ) : (
+                <Link
+                  to={user.role === "ADMIN" ? `/admin/camions/edit/${camion.id}` : `/transporteur/camions/edit/${camion.id}`}
+                  className="btn-submit"
+                >
+                  Modifier le camion
+                </Link>
+              )}
             </div>
           </div>
         )}

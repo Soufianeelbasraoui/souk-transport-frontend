@@ -63,17 +63,29 @@
   border-collapse: collapse;
 }
 
+.dashboard-card .table-responsive {
+  overflow: visible;
+}
+
+@media (max-width: 768px) {
+  .dashboard-card .table-responsive {
+    overflow-x: auto;
+  }
+}
+
 .dashboard-table th {
   padding: 12px 15px;
   background: #f8fafc;
   color: #68758a;
   font-size: 11px;
+  vertical-align: middle;
 }
 
 .dashboard-table td {
   padding: 14px 15px;
   color: #26364d;
   font-size: 12px;
+  vertical-align: middle;
 }
 .route-cell {
   display: flex;
@@ -104,6 +116,10 @@
 .status-other {
   background: #fff0e5;
   color: #e47726;
+}
+.status-finished {
+  background: #f1f5f9;
+  color: #475569;
 }
 .quick-action {
   margin: 10px 15px;
@@ -250,6 +266,14 @@
 }
 .action-btn.delete:hover {
   background: #fad4d4;
+}
+
+.action-btn.complete {
+  color: #16a34a;
+  background: #dcfce7;
+}
+.action-btn.complete:hover {
+  background: #bbf7d0;
 }
 
 .transporteur-filters {

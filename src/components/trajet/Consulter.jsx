@@ -20,7 +20,6 @@ function ConsulterTrajet() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-
   useEffect(() => {
     api.get(`/api/trajets/${id}`).then((res) => {
         setTrajet(res.data);
@@ -71,6 +70,8 @@ function ConsulterTrajet() {
                         ? "status-open"
                         : trajet.statutTrajet === "EN_COURS"
                         ? "status-progress"
+                        : trajet.statutTrajet === "TERMINE"
+                        ? "status-finished"
                         : "status-other"
                     }`}
                   >
@@ -81,6 +82,11 @@ function ConsulterTrajet() {
 
             </div>
             <div className="form-card-body">
+              {trajet.statutTrajet === "TERMINE" && (
+                <div style={{ background: "#f0fdf4", color: "#166534", padding: "12px 16px", borderRadius: "8px", border: "1px solid #bbf7d0", marginBottom: "20px", fontSize: "13px" }}>
+                  Ce trajet est <strong>terminé</strong>. Le camion associé est libéré et disponible pour de nouveaux trajets.
+                </div>
+              )}
               <div
                 className="route-preview"
                 style={{ marginBottom: "20px" }}
@@ -140,15 +146,21 @@ function ConsulterTrajet() {
             </div>
 
             <div className="form-card-footer">
-
-
-              <Link
-                to={user.role=="ADMIN" ? `/admin/trajets/edit/${trajet.id}`:`/transporteur/trajets/edit/${trajet.id}`}
-                className="btn-submit"
-              >
-                Modifier le trajet
-              </Link>
-
+              {trajet.statutTrajet === "TERMINE" ? (
+                <Link
+                  to={user.role === "ADMIN" ? "/admin/trajets" : "/transporteur/trajets"}
+                  className="btn-cancel"
+                >
+                  Retour
+                </Link>
+              ) : (
+                <Link
+                  to={user.role === "ADMIN" ? `/admin/trajets/edit/${trajet.id}` : `/transporteur/trajets/edit/${trajet.id}`}
+                  className="btn-submit"
+                >
+                  Modifier le trajet
+                </Link>
+              )}
             </div>
 
           </div>

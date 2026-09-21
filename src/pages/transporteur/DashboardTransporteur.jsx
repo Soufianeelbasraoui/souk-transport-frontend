@@ -175,7 +175,15 @@ function DashboardTransporteur() {
                           </td>
 
                           <td>
-                            <span  className={`status-badge ${item.statutTrajet === "PUBLIE" ? "status-open" : item.statutTrajet === "EN_COURS" ? "status-progress" : "status-other"}`}>
+                            <span className={`status-badge ${
+                              item.statutTrajet === "PUBLIE"
+                                ? "status-open"
+                                : item.statutTrajet === "EN_COURS"
+                                ? "status-progress"
+                                : item.statutTrajet === "TERMINE"
+                                ? "status-finished"
+                                : "status-other"
+                            }`}>
                               {item.statutTrajet}
                             </span>
                           </td>
@@ -254,7 +262,16 @@ function DashboardTransporteur() {
                       <span>{camion.immatriculation} </span>
                       <small> Capacité : {camion.capacite} Tonnes</small>
                     </div>
-                    <span className="truck-status"> Actif </span>
+                    <span
+                      className="truck-status"
+                      style={
+                        camion.disponible
+                          ? { background: "#eef8ef", color: "#3a9243", borderColor: "#cde8d0" }
+                          : { background: "#fef2f2", color: "#dc2626", borderColor: "#fecaca" }
+                      }
+                    >
+                      {camion.disponible ? "Disponible" : "Non disponible"}
+                    </span>
                   </div>
                 ))
               ) : (

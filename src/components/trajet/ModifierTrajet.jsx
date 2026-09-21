@@ -56,6 +56,8 @@ function ModifierTrajet() {
 
   const [loading, setLoading] = useState(true);
   const [camions, setCamions] = useState([]);
+  const [initialCamionId, setInitialCamionId] = useState(null);
+  const [statutTrajet, setStatutTrajet] = useState(null);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
 
@@ -90,17 +92,29 @@ function ModifierTrajet() {
         listeCamions = camionsRes.data.content || [];
       }
 
+      if (trajet.camionId && !listeCamions.some((c) => Number(c.id) === Number(trajet.camionId))) {
+        try {
+          const currentCamionRes = await api.get(`/api/camions/${trajet.camionId}`);
+          if (currentCamionRes.data) {
+            listeCamions = [currentCamionRes.data, ...listeCamions];
+          }
+        } catch (err) {
+          console.warn("Impossible de récupérer le camion actuel :", err);
+        }
+      }
+
       console.log("Camions disponibles :", listeCamions);
 
       setCamions(listeCamions);
 
       setValue( "villeDepart",trajet.villeDepart || "" );
-
       setValue("villeArrivee",trajet.villeArrivee || "");
       setValue( "dateDepart", trajet.dateDepart ? trajet.dateDepart.slice(0, 16) : ""  );
       setValue( "prix",trajet.prix ?? "" );
       setValue( "poidsDisponible", trajet.poidsDisponible ?? "" );
       setValue(  "camionId",  trajet.camionId ?? "");
+      setInitialCamionId(trajet.camionId != null ? Number(trajet.camionId) : null);
+      setStatutTrajet(trajet.statutTrajet || null);
 
     } catch (error) {
       console.error(
@@ -131,6 +145,15 @@ function ModifierTrajet() {
   const onSubmit = async (data) => {
     setSubmitError("");
     setSubmitSuccess("");
+
+    const nouveauCamionId = Number(data.camionId);
+    if (initialCamionId !== null && nouveauCamionId !== Number(initialCamionId)) {
+      const nouveauCamion = camions.find((c) => Number(c.id) === nouveauCamionId);
+      if (nouveauCamion && !nouveauCamion.disponible) {
+        setSubmitError("Le nouveau camion sélectionné n'est pas disponible.");
+        return;
+      }
+    }
 
     try {
       const trajetModifie = {
@@ -221,6 +244,11 @@ function ModifierTrajet() {
           <form onSubmit={handleSubmit(onSubmit)}>
 
             <div className="form-card-body">
+              {statutTrajet === "TERMINE" && (
+                <div style={{ background: "#f0fdf4", color: "#166534", padding: "12px 16px", borderRadius: "8px", border: "1px solid #bbf7d0", marginBottom: "20px", fontSize: "13px" }}>
+                  Ce trajet a le statut <strong>TERMINE</strong>. Le camion assigné est disponible.
+                </div>
+              )}
 
               <div className="form-grid">
 
@@ -350,7 +378,6 @@ function ModifierTrajet() {
 
                 </div>
 
-                {/* Camion */}
                 <div className="form-group">
 
                   <label>
@@ -370,16 +397,26 @@ function ModifierTrajet() {
                       -- Sélectionner un camion --
                     </option>
 
-                    {camions.map((camion) => (
-                      <option
-                        key={camion.id}
-                        value={camion.id}
-                      >
-                        {camion.marque}{" "}
-                        {camion.modele} -{" "}
-                        {camion.immatriculation}
-                      </option>
-                    ))}
+                    {camions.map((camion) => {
+                      const isCurrent = initialCamionId !== null && Number(camion.id) === Number(initialCamionId);
+                      const isDispo = Boolean(camion.disponible);
+                      const isDisabled = !isCurrent && !isDispo;
+
+                      return (
+                        <option
+                          key={camion.id}
+                          value={camion.id}
+                          disabled={isDisabled}
+                        >
+                          {camion.marque} {camion.modele} — {camion.immatriculation} ({camion.capacite} T)
+                          {isCurrent
+                            ? (isDispo ? " — Camion actuel (Disponible)" : " — Camion actuel")
+                            : isDispo
+                            ? " — Disponible"
+                            : " — Non disponible"}
+                        </option>
+                      );
+                    })}
 
                   </select>
 

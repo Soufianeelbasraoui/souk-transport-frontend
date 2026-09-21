@@ -1,7 +1,8 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineEdit, MdDelete } from "react-icons/md";
 import { BiShowAlt } from "react-icons/bi";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 import Sidebar from "../../components/layout/Sidebar";
 import PaginationComponent from "../../components/common/Pagination";
@@ -10,17 +11,32 @@ import api from "../../services/api";
 
 import "../../styles/global.css";
 import "./style/transporteur.css";
+import "../admin/styles/admin.css";
 
 function MesCamions() {
   const [mesCamions, setMesCamions] = useState([]);
   const [deleteId, setDeleteId] = useState(null);
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
 
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
-  const [searchTaype,setSearchTaype]=useState("");
+  const [searchTaype, setSearchTaype] = useState("");
   const pageSize = 9;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".admin-action-dropdown-wrapper")) {
+        setActiveDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if (searchTaype.trim() === "") {
@@ -47,6 +63,7 @@ function MesCamions() {
   };
 
   const handlePageChange = (newPage) => {
+    setActiveDropdownId(null);
     setPage(newPage - 1);
   };
 
@@ -85,37 +102,39 @@ function MesCamions() {
           </Link>
         </div>
 
-        <div className="dashboard-card recent-trajets">
-          <div className="card-header-custom">
-            <div className="trasporteur-search">
-              <input
-                type="text"
-                placeholder="Rechercher par marque..."
-                value={searchTaype}
-                onChange={(e) => {
-                  setSearchTaype(e.target.value);
-                  setPage(0);
-                }}
-              />
-            </div>
-          </div>
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="dashboard-card recent-trajets">
+              <div className="card-header-custom">
+                <div className="trasporteur-search">
+                  <input
+                    type="text"
+                    placeholder="Rechercher par marque..."
+                    value={searchTaype}
+                    onChange={(e) => {
+                      setSearchTaype(e.target.value);
+                      setPage(0);
+                    }}
+                  />
+                </div>
+              </div>
 
-          <div className="table-responsive">
-            <table className="dashboard-table">
-              <thead>
-                <tr>
-                  <th>CAMION</th>
-                  <th>IMMATRICULATION</th>
-                  <th>MODÈLE</th>
-                  <th>CAPACITÉ</th>
-                  <th>TYPE</th>
-                  <th>STATUT</th>
-                  <th>ACTIONS</th>
-                </tr>
-              </thead>
+              <div className="table-responsive">
+                <table className="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Camion</th>
+                      <th>Immatriculation</th>
+                      <th>Modèle</th>
+                      <th>Capacité</th>
+                      <th>Type</th>
+                      <th>Statut</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
               <tbody>
                 {mesCamions.length > 0 ? (
-                  mesCamions.map((item) => (
+                  mesCamions.map((item, index) => (
                     <tr key={item.id}>
                       <td>{item.marque}</td>
                       <td>{item.immatriculation}</td>
@@ -128,16 +147,61 @@ function MesCamions() {
                         </span>
                       </td>
                       <td>
-                        <div className="action-btns">
-                          <Link to={`/transporteur/camions/${item.id}`} className="action-btn view" title="Voir">
+                        <div className="admin-actions">
+                          <Link
+                            to={`/transporteur/camions/${item.id}`}
+                            className="admin-action-btn"
+                            title="Voir"
+                          >
                             <BiShowAlt />
                           </Link>
-                          <Link to={`/transporteur/camions/edit/${item.id}`} className="action-btn edit" title="Modifier">
-                            <MdOutlineEdit />
-                          </Link>
-                          <button className="action-btn delete" title="Supprimer" onClick={() => setDeleteId(item.id)}>
-                            <MdDelete />
-                          </button>
+                          <div className="admin-action-dropdown-wrapper">
+                            <button
+                              type="button"
+                              className={`admin-action-btn ${
+                                activeDropdownId === item.id ? "active" : ""
+                              }`}
+                              title="Actions"
+                              onClick={() =>
+                                setActiveDropdownId(
+                                  activeDropdownId === item.id ? null : item.id
+                                )
+                              }
+                            >
+                              <BsThreeDotsVertical />
+                            </button>
+
+                            {activeDropdownId === item.id && (
+                              <div
+                                className={`admin-action-dropdown ${
+                                  index >= mesCamions.length - 2 && mesCamions.length > 2
+                                    ? "open-up"
+                                    : ""
+                                }`}
+                              >
+                                <Link
+                                  to={`/transporteur/camions/edit/${item.id}`}
+                                  className="admin-dropdown-link"
+                                  onClick={() => setActiveDropdownId(null)}
+                                >
+                                  <MdOutlineEdit className="dropdown-icon" />
+                                  <span>Modifier</span>
+                                </Link>
+
+                                <button
+                                  type="button"
+                                  className="admin-dropdown-link delete"
+                                  onClick={() => {
+                                    setActiveDropdownId(null);
+                                    setDeleteId(item.id);
+                                  }}
+                                >
+                                  <MdDelete className="dropdown-icon" />
+                                  <span>Supprimer</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -163,6 +227,8 @@ function MesCamions() {
               itemLabel="camions"
             />
           )}
+            </div>
+          </div>
         </div>
 
         <ConfirmDialog
