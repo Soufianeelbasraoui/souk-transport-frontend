@@ -64,8 +64,7 @@ const RecentTrajets = () => {
                             ? "status-progress"
                             : t.statutTrajet === "TERMINE"
                             ? "status-finished"
-                            : "status-other"
-                        }`}
+                            : "status-other" }`}
                       >
                         {t.statutTrajet}
                       </span>

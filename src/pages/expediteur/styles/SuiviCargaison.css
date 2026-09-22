@@ -1,0 +1,330 @@
+
+.suivi-page-container {
+  padding: 24px 32px;
+  max-width: 1150px;
+  margin: 0 auto;
+}
+
+.suivi-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.suivi-back-btn:hover {
+  background: #f8fafc;
+  color: #0b2345;
+  border-color: #cbd5e1;
+  transform: translateX(-2px);
+}
+
+.suivi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  margin-bottom: 24px;
+}
+
+.suivi-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.suivi-ref {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.2px;
+}
+
+.suivi-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.suivi-badge.en-cours,
+.suivi-badge.en-transit {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.suivi-badge.livree {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.suivi-badge.soumise,
+.suivi-badge.en-attente {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.suivi-badge.annulee {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.suivi-route-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  color: #334155;
+  margin-bottom: 32px;
+}
+
+.suivi-route-info strong {
+  color: #0f172a;
+}
+
+.suivi-pin {
+  color: #0284c7;
+  font-size: 15px;
+}
+
+.suivi-pin-orange {
+  color: #ea580c;
+  font-size: 15px;
+}
+
+.suivi-arrow {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.suivi-divider {
+  color: #cbd5e1;
+  margin: 0 4px;
+}
+
+.suivi-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #eab308;
+  font-weight: 600;
+}
+
+
+.suivi-stepper-container {
+  position: relative;
+  margin: 35px 0 28px 0;
+  padding: 0 10px;
+}
+
+.suivi-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+
+.suivi-step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+  padding: 0 6px;
+}
+
+.suivi-step-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.suivi-step-circle.done {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.suivi-step-circle.active {
+  background: #ea580c;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.2);
+}
+
+.suivi-step-circle.pending {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #94a3b8;
+}
+
+.suivi-step-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.suivi-step-label.done {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.suivi-step-label.active {
+  color: #ea580c;
+  font-weight: 700;
+}
+
+.suivi-step-connector {
+  flex: 1;
+  height: 2px;
+  background: #e2e8f0;
+  margin: 0 4px;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.suivi-step-connector.done {
+  background: #16a34a;
+}
+
+.suivi-eta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.suivi-eta-pin {
+  color: #e11d48;
+  font-size: 16px;
+}
+
+.suivi-eta strong {
+  color: #0f172a;
+}
+
+.suivi-eta-restant {
+  color: #64748b;
+}
+
+.suivi-actions-bar {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-suivi-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #be123c;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-suivi-call:hover {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #9f1239;
+}
+
+.btn-suivi-details {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0b2345;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-suivi-details:hover {
+  background: #133a6f;
+  color: #ffffff;
+}
+
+.suivi-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.suivi-info-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.suivi-info-box small {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.suivi-info-box strong {
+  display: block;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+@media (max-width: 768px) {
+  .suivi-page-container {
+    padding: 16px;
+  }
+
+  .suivi-card {
+    padding: 18px 16px;
+  }
+
+  .suivi-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .suivi-step-connector {
+    display: none;
+  }
+}

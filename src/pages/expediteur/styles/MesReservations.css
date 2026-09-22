@@ -131,6 +131,18 @@
   color: #0f172a;
 }
 
+.btn-track {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.btn-track:hover {
+  background-color: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+  transform: translateY(-1px);
+}
+
 .btn-pay {
   background-color: #dcfce7;
   color: #15803d;

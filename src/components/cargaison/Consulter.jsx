@@ -13,6 +13,7 @@ import { FiArrowLeft } from "react-icons/fi";
 
 function ConsulterCargaison() {
   const { id } = useParams();
+
   const token = localStorage.getItem("token");
   const user = jwtDecode(token);
 
@@ -103,12 +104,21 @@ function ConsulterCargaison() {
 
             <div className="form-card-footer">
               {cargaison.statutCargaison !== "LIVREE" && cargaison.statutCargaison !== "EN_TRANSIT" ? (
+<<<<<<< HEAD
                 <Link  to={  user.role === "ADMIN" ? `/admin/cargaisons/edit/${cargaison.id}` : `/expediteur/cargaisons/edit/${cargaison.id}`  }  className="btn-submit" >
+=======
+                <Link
+                  to={ user.role === "ADMIN"  ? `/admin/cargaisons/edit/${cargaison.id}`: `/expediteur/cargaisons/edit/${cargaison.id}` } className="btn-submit" >
+>>>>>>> feature/edite
                   Modifier
                 </Link>
               ) : (
                 <span className="text-muted fst-italic" style={{ fontSize: "13px" }}>
+<<<<<<< HEAD
                    Cette cargaison est {cargaison.statutCargaison === "LIVREE" ? "livrée" : "en cours d'acheminement (en transit)"} et ne peut plus être modifiée.
+=======
+                  Cette cargaison est {cargaison.statutCargaison === "LIVREE" ? "livrée" : "en transit"} et ne peut plus être modifiée.
+>>>>>>> feature/edite
                 </span>
               )}
             </div>

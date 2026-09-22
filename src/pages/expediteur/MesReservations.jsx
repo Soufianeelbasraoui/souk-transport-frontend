@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiEye, FiCreditCard } from "react-icons/fi";
+import { FiEye, FiCreditCard, FiTruck } from "react-icons/fi";
 
 import Sidebar from "../../components/layout/Sidebar";
 import PaginationComponent from "../../components/common/Pagination";
@@ -142,13 +142,23 @@ function MesReservations() {
                           </Link>
 
                           {res.statutReservation === "ACCEPTEE" && (
-                            <Link
-                              to={`/expediteur/paiements?reservationId=${res.id}`}
-                              className="btn-action btn-pay"
-                              title="Payer à la livraison"
-                            >
-                              <FiCreditCard />
-                            </Link>
+                            <>
+                              <Link
+                                to={res.cargaisonId ? `/expediteur/cargaisons/${res.cargaisonId}/suivi` : `/expediteur/suivi/${res.id}`}
+                                className="btn-action btn-track"
+                                title="Suivre l'acheminement de la cargaison"
+                              >
+                                <FiTruck />
+                              </Link>
+
+                              <Link
+                                to={`/expediteur/paiements?reservationId=${res.id}`}
+                                className="btn-action btn-pay"
+                                title="Payer à la livraison"
+                              >
+                                <FiCreditCard />
+                              </Link>
+                            </>
                           )}
                         </div>
                       </td>
