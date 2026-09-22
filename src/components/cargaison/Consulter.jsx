@@ -13,6 +13,7 @@ import { FiArrowLeft } from "react-icons/fi";
 
 function ConsulterCargaison() {
   const { id } = useParams();
+
   const token = localStorage.getItem("token");
   const user = jwtDecode(token);
 
@@ -102,12 +103,16 @@ function ConsulterCargaison() {
             </div>
 
             <div className="form-card-footer">
-              <Link
-                to={  user.role === "ADMIN"  ? `/admin/cargaisons/edit/${cargaison.id}`  : `/expediteur/cargaisons/edit/${cargaison.id}` }
-                className="btn-submit"
-              >
-                Modifier
-              </Link>
+              {cargaison.statutCargaison !== "LIVREE" && cargaison.statutCargaison !== "EN_TRANSIT" ? (
+                <Link
+                  to={ user.role === "ADMIN"  ? `/admin/cargaisons/edit/${cargaison.id}`: `/expediteur/cargaisons/edit/${cargaison.id}` } className="btn-submit" >
+                  Modifier
+                </Link>
+              ) : (
+                <span className="text-muted fst-italic" style={{ fontSize: "13px" }}>
+                  Cette cargaison est {cargaison.statutCargaison === "LIVREE" ? "livrée" : "en transit"} et ne peut plus être modifiée.
+                </span>
+              )}
             </div>
           </div>
         )}

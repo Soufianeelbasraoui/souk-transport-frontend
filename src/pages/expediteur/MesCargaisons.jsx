@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiMoreVertical, FiPackage, FiPlus } from "react-icons/fi";
+import { 
+  FiMoreVertical, 
+  FiPackage, 
+  FiPlus, 
+  FiTrash2, 
+  FiEdit2, 
+  FiEye, 
+  FiTruck 
+} from "react-icons/fi";
+import { toast } from "react-toastify";
 
 import Sidebar from "../../components/layout/Sidebar";
 import PaginationComponent from "../../components/common/Pagination";
 import Loader from "../../components/common/Loader";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 import api from "../../services/api";
 
 import "./styles/MesCargaisons.css";
@@ -17,7 +27,23 @@ function MesCargaisons() {
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+
   const pageSize = 9;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".cargaison-action-wrapper")) {
+        setActiveDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchCargaisons();
@@ -28,15 +54,19 @@ function MesCargaisons() {
       setLoading(true);
 
       const res = await api.get("/api/cargaisons/mes-cargaisons", {
-        params: {  page, size: pageSize, ...(filter !== "TOUTES" && { statut: filter }),},
+        params: { 
+          page, 
+          size: pageSize, 
+          ...(filter !== "TOUTES" && { statut: filter }) 
+        },
       });
 
       setCargaisons(res.data?.content || []);
       setTotalPages(res.data?.totalPages || 0);
       setTotalElements(res.data?.totalElements || 0);
-
     } catch (error) {
       console.error("Erreur chargement cargaisons:", error);
+      toast.error("Erreur lors du chargement de vos cargaisons.");
     } finally {
       setLoading(false);
     }
@@ -45,10 +75,27 @@ function MesCargaisons() {
   const handleFilter = (value) => {
     setFilter(value);
     setPage(0);
+    setActiveDropdownId(null);
   };
 
   const handlePageChange = (newPage) => {
     setPage(newPage - 1);
+    setActiveDropdownId(null);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/api/cargaisons/${id}`);
+      toast.success("Cargaison supprimée avec succès !");
+      setDeleteId(null);
+      fetchCargaisons();
+    } catch (error) {
+      console.error("Erreur suppression cargaison :", error);
+      toast.error(
+        error.response?.data?.message || "Impossible de supprimer cette cargaison."
+      );
+      setDeleteId(null);
+    }
   };
 
   const getBadgeStyle = (statut) => {
@@ -71,7 +118,6 @@ function MesCargaisons() {
       <Sidebar />
 
       <main className="main-content">
-
         <div className="page-header d-flex justify-content-between align-items-center mb-4">
           <div>
             <h1>Mes Cargaisons</h1>
@@ -90,13 +136,10 @@ function MesCargaisons() {
 
         <div className="cargaisons-tabs-card mb-4">
           <div className="cargaisons-tabs">
-
             <button
               type="button"
               onClick={() => handleFilter("TOUTES")}
-              className={`tab-btn ${
-                filter === "TOUTES" ? "active" : ""
-              }`}
+              className={`tab-btn ${filter === "TOUTES" ? "active" : ""}`}
             >
               Toutes
             </button>
@@ -104,39 +147,38 @@ function MesCargaisons() {
             <button
               type="button"
               onClick={() => handleFilter("SOUMISE")}
-              className={`tab-btn ${ filter === "SOUMISE" ? "active" : "" }`} >
+              className={`tab-btn ${filter === "SOUMISE" ? "active" : ""}`}
+            >
               En attente
             </button>
 
             <button
               type="button"
               onClick={() => handleFilter("EN_TRANSIT")}
-              className={`tab-btn ${ filter === "EN_TRANSIT" ? "active" : "" }`} >
+              className={`tab-btn ${filter === "EN_TRANSIT" ? "active" : ""}`}
+            >
               En transit
             </button>
 
             <button
               type="button"
               onClick={() => handleFilter("LIVREE")}
-              className={`tab-btn ${ filter === "LIVREE" ? "active" : "" }`} >
+              className={`tab-btn ${filter === "LIVREE" ? "active" : ""}`}
+            >
               Livrées
             </button>
 
             <button
               type="button"
               onClick={() => handleFilter("ANNULEE")}
-              className={`tab-btn ${
-                filter === "ANNULEE" ? "active" : ""
-              }`}
+              className={`tab-btn ${filter === "ANNULEE" ? "active" : ""}`}
             >
               Annulées
             </button>
-
           </div>
         </div>
 
         <div className="row g-4">
-
           {loading && (
             <div className="col-12">
               <div className="empty-state">
@@ -147,9 +189,14 @@ function MesCargaisons() {
 
           {!loading && cargaisons.length > 0 &&
             cargaisons.map((cargaison) => {
-              const badge = getBadgeStyle(
-                cargaison.statutCargaison
-              );
+              const badge = getBadgeStyle(cargaison.statutCargaison);
+              const isEnTransit = cargaison.statutCargaison === "EN_TRANSIT";
+              const isLivree = cargaison.statutCargaison === "LIVREE";
+              const isSoumise = cargaison.statutCargaison === "SOUMISE";
+              const isAnnulee = cargaison.statutCargaison === "ANNULEE";
+              
+              const canEdit = isSoumise; 
+              const canDelete = !isEnTransit; 
 
               return (
                 <div
@@ -160,18 +207,65 @@ function MesCargaisons() {
                     <div className="card-body d-flex flex-column">
 
                       <div className="d-flex justify-content-between align-items-center mb-3">
-                        <span
-                          className={`status-badge ${badge.class}`}
-                        >
+                        <span className={`status-badge ${badge.class}`}>
                           {badge.label}
                         </span>
 
-                        <button
-                          type="button"
-                          className="btn-more"
-                        >
-                          <FiMoreVertical />
-                        </button>
+                        <div className="cargaison-action-wrapper">
+                          <button
+                            type="button"
+                            className={`btn-more ${activeDropdownId === cargaison.id ? "active" : ""}`}
+                            title="Options"
+                            onClick={() =>
+                              setActiveDropdownId(
+                                activeDropdownId === cargaison.id ? null : cargaison.id
+                              )
+                            }
+                          >
+                            <FiMoreVertical />
+                          </button>
+
+                          {activeDropdownId === cargaison.id && (
+                            <div className="cargaison-dropdown">
+                              <Link
+                                to={`/expediteur/cargaisons/${cargaison.id}`}
+                                className="cargaison-dropdown-item"
+                                onClick={() => setActiveDropdownId(null)}
+                              >
+                                <FiEye className="dropdown-item-icon icon-view" />
+                                <span>Voir détails</span>
+                              </Link>
+
+                              {canEdit && (
+                                <Link
+                                  to={`/expediteur/cargaisons/edit/${cargaison.id}`}
+                                  className="cargaison-dropdown-item"
+                                  onClick={() => setActiveDropdownId(null)}
+                                >
+                                  <FiEdit2 className="dropdown-item-icon icon-edit" />
+                                  <span>Modifier</span>
+                                </Link>
+                              )}
+
+                              {canDelete && (
+                                <>
+                                  <div className="cargaison-dropdown-divider" />
+                                  <button
+                                    type="button"
+                                    className="cargaison-dropdown-item delete"
+                                    onClick={() => {
+                                      setActiveDropdownId(null);
+                                      setDeleteId(cargaison.id);
+                                    }}
+                                  >
+                                    <FiTrash2 className="dropdown-item-icon icon-delete" />
+                                    <span>Supprimer</span>
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <h5 className="cargaison-title">
@@ -179,7 +273,6 @@ function MesCargaisons() {
                       </h5>
 
                       <div className="row text-center info-box">
-
                         <div className="col-6 border-end">
                           <small>Poids</small>
                           <strong>
@@ -197,11 +290,9 @@ function MesCargaisons() {
                               : "0 DH"}
                           </strong>
                         </div>
-
                       </div>
 
                       <div className="card-footer-custom mt-auto">
-
                         <div>
                           <strong className="price">
                             {cargaison.prix
@@ -214,13 +305,40 @@ function MesCargaisons() {
                           </small>
                         </div>
 
-                        <Link
-                          to={`/expediteur/cargaisons/${cargaison.id}`}
-                          className="btn-cargaison"
-                        >
-                          Voir détails
-                        </Link>
-
+                        {isEnTransit ? (
+                          <Link
+                            to={`/expediteur/cargaisons/${cargaison.id}/suivi`}
+                            className="btn-suivi"
+                            title="Suivre l'acheminement de la cargaison"
+                          >
+                            <FiTruck />
+                            <span>Suivi cargaison</span>
+                          </Link>
+                        ) : isSoumise ? (
+                          <div className="d-flex gap-2">
+                            <Link
+                              to={`/expediteur/cargaisons/edit/${cargaison.id}`}
+                              className="btn-cargaison-edit"
+                              title="Modifier la cargaison"
+                            >
+                              <FiEdit2 />
+                              <span>Modifier</span>
+                            </Link>
+                            <Link
+                              to={`/expediteur/cargaisons/${cargaison.id}`}
+                              className="btn-cargaison"
+                            >
+                              Détails
+                            </Link>
+                          </div>
+                        ) : (
+                          <Link
+                            to={`/expediteur/cargaisons/${cargaison.id}`}
+                            className="btn-cargaison"
+                          >
+                            Voir détails
+                          </Link>
+                        )}
                       </div>
 
                     </div>
@@ -263,7 +381,6 @@ function MesCargaisons() {
               </div>
             </div>
           )}
-
         </div>
 
         {!loading && totalElements > 0 && (
@@ -277,6 +394,13 @@ function MesCargaisons() {
           />
         )}
 
+        <ConfirmDialog
+          show={deleteId !== null}
+          title="Supprimer la cargaison"
+          message="Êtes-vous sûr de vouloir supprimer définitivement cette cargaison ?"
+          onConfirm={() => handleDelete(deleteId)}
+          onCancel={() => setDeleteId(null)}
+        />
       </main>
     </div>
   );

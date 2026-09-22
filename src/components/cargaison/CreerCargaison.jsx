@@ -11,19 +11,11 @@ import { jwtDecode } from "jwt-decode";
 import { FiArrowLeft } from "react-icons/fi";
 
 const schema = yup.object({
-  description: yup
-    .string()
-    .required("La description est obligatoire"),
+  description: yup.string().required("La description est obligatoire"),
 
-  poids: yup
-    .number()
-    .typeError("Le poids doit être un nombre")
-    .positive("Le poids doit être positif")
-    .required("Le poids est obligatoire"),
+  poids: yup.number().typeError("Le poids doit être un nombre").positive("Le poids doit être positif").required("Le poids est obligatoire"),
 
-  expediteurId: yup
-    .number()
-    .when("$isAdmin", {
+  expediteurId: yup.number().when("$isAdmin", {
       is: true,
       then: (schema) => schema
           .typeError("Veuillez sélectionner un expéditeur")
@@ -149,18 +141,12 @@ function CreerCargaison() {
 
                   <input
                     type="text"
-                    className={`form-control-custom ${
-                      errors.description ? "is-error" : ""
-                    }`}
+                    className={`form-control-custom ${ errors.description ? "is-error" : ""  }`}
                     placeholder="Ex : Cartons de vêtements"
                     {...register("description")}
                   />
 
-                  {errors.description && (
-                    <span className="field-error">
-                      {errors.description.message}
-                    </span>
-                  )}
+                  {errors.description && (<span className="field-error"> {errors.description.message}  </span>)}
                 </div>
 
                 <div className="form-group">

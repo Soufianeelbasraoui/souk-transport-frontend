@@ -11,24 +11,16 @@ import { jwtDecode } from "jwt-decode";
 import "../../styles/global.css";
 import "../../styles/formPage.css";
 import Loader from "../common/Loader";
+import { FiArrowLeft } from "react-icons/fi";
 
 const schema = yup.object({
   description: yup
     .string()
     .required("La description est obligatoire"),
 
-  poids: yup
-    .number()
-    .typeError("Le poids doit être un nombre")
-    .positive("Le poids doit être positif")
-    .required("Le poids est obligatoire"),
+  poids: yup.number().typeError("Le poids doit être un nombre").positive("Le poids doit être positif").required("Le poids est obligatoire"),
 
-  expediteurId: yup
-    .mixed()
-    .nullable()
-    .transform((value, originalValue) =>
-      originalValue === "" ? null : value
-    ),
+  expediteurId: yup .mixed() .nullable() .transform((value, originalValue) =>   originalValue === "" ? null : value ),
 });
 
 function ModifierCargaison() {
@@ -41,6 +33,8 @@ function ModifierCargaison() {
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
+  const [isLocked, setIsLocked] = useState(false);
+  const [statutCargaison, setStatutCargaison] = useState("");
 
   const {
     register,
@@ -60,14 +54,19 @@ function ModifierCargaison() {
         const cargaison = res.data;
         console.log("Cargaison chargée :", cargaison);
 
+        const statut = cargaison.statutCargaison || "";
+        setStatutCargaison(statut);
+
+        if (statut === "LIVREE" || statut === "EN_TRANSIT" || statut === "ANNULEE") {
+          setIsLocked(true);
+        }
+
         setValue("description", cargaison.description || "");
         setValue("poids", cargaison.poids ?? "");
         setValue("expediteurId", cargaison.expediteurId ?? "");
       } catch (error) {
         console.error("Erreur chargement des données :", error);
-        console.error("Réponse backend :", error.response?.data);
-
-        setSubmitError( "Impossible de charger les données de la cargaison." );
+        setSubmitError("Impossible de charger les données de la cargaison.");
       } finally {
         setLoading(false);
       }
@@ -77,6 +76,11 @@ function ModifierCargaison() {
   }, [id, setValue]);
 
   const onSubmit = async (data) => {
+    if (isLocked) {
+      setSubmitError("Cette cargaison est livrée ou en cours de route et ne peut plus être modifiée.");
+      return;
+    }
+
     setSubmitError("");
     setSubmitSuccess("");
 
@@ -87,12 +91,7 @@ function ModifierCargaison() {
         expediteurId: data.expediteurId ? Number(data.expediteurId) : null,
       };
 
-      console.log("Données envoyées :", cargaisonModifiee);
-
-      const res = await api.put(`/api/cargaisons/${id}`, cargaisonModifiee);
-
-      console.log("Cargaison modifiée :", res.data);
-
+      await api.put(`/api/cargaisons/${id}`, cargaisonModifiee);
       setSubmitSuccess("Cargaison modifiée avec succès ! Redirection en cours...");
 
       setTimeout(() => {
@@ -100,12 +99,7 @@ function ModifierCargaison() {
       }, 1500);
     } catch (error) {
       console.error("Erreur modification cargaison :", error);
-      console.error("Réponse backend :", error.response?.data);
-      setSubmitError(
-        error.response?.data?.message ||
-          "Une erreur est survenue lors de la modification."
-      );
-    }
+      setSubmitError( error.response?.data?.message ||  "Une erreur est survenue lors de la modification.");}
   };
 
   if (loading) {
@@ -131,26 +125,45 @@ function ModifierCargaison() {
           </div>
 
           <Link to={retourPath} className="btn-cancel">
-            Mes cargaisons
+            <FiArrowLeft /> Mes cargaisons
           </Link>
         </div>
 
         <div className="form-card">
           <div className="form-card-header">
-            <div>
-              <h5>Modifier la cargaison #{id}</h5>
-              <p>Modifiez les informations puis enregistrez.</p>
+            <div className="d-flex justify-content-between align-items-center w-100">
+              <div>
+                <h5>Modifier la cargaison #C-{String(id).padStart(4, "0")}</h5>
+                <p>
+                  {isLocked 
+                    ? "Consultation uniquement : cette cargaison ne peut pas être modifiée." 
+                    : "Modifiez les informations puis enregistrez."}
+                </p>
+              </div>
+
+              {statutCargaison && (
+                <span className={`status-badge ${
+                  statutCargaison === "LIVREE" 
+                    ? "badge-success" 
+                    : statutCargaison === "EN_TRANSIT" 
+                    ? "badge-warning" 
+                    : "badge-default"
+                }`}>
+                  {statutCargaison}
+                </span>
+              )}
             </div>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-card-body">
               <div className="form-grid">
-                {/* Description */}
+                
                 <div className="form-group" style={{ gridColumn: "1 / -1" }}>
                   <label>Description</label>
                   <textarea
                     rows="3"
+                    disabled={isLocked}
                     className={`form-control-custom ${
                       errors.description ? "is-error" : ""
                     }`}
@@ -164,13 +177,13 @@ function ModifierCargaison() {
                   )}
                 </div>
 
-                {/* Poids */}
                 <div className="form-group">
                   <label>Poids (kg)</label>
                   <input
                     type="number"
                     min="0.1"
                     step="0.01"
+                    disabled={isLocked}
                     className={`form-control-custom ${
                       errors.poids ? "is-error" : ""
                     }`}
@@ -184,23 +197,17 @@ function ModifierCargaison() {
                   )}
                 </div>
 
-                {/* ID Expéditeur (Visible uniquement pour ADMIN) */}
                 {user?.role === "ADMIN" && (
                   <div className="form-group">
                     <label>ID Expéditeur (Optionnel)</label>
                     <input
                       type="number"
+                      disabled={isLocked}
                       className={`form-control-custom ${
                         errors.expediteurId ? "is-error" : ""
                       }`}
-                      placeholder="Ex : 3"
-                      {...register("expediteurId")}
-                    />
-                    {errors.expediteurId && (
-                      <span className="field-error">
-                        {errors.expediteurId.message}
-                      </span>
-                    )}
+                      placeholder="Ex : 3" {...register("expediteurId")} />
+                    {errors.expediteurId && ( <span className="field-error"></span> )}
                   </div>
                 )}
               </div>
@@ -224,14 +231,24 @@ function ModifierCargaison() {
               )}
             </div>
 
-            <div className="form-card-footer">
+            <div className="form-card-footer d-flex justify-content-between align-items-center">
               <Link to={retourPath} className="btn-cancel">
-                Annuler
+                {isLocked ? "Retour" : "Annuler"}
               </Link>
 
-              <button  type="submit"className="btn-submit" disabled={isSubmitting} >
-                {isSubmitting? "Enregistrement...": "Enregistrer les modifications"}
-              </button>
+              {!isLocked ? (
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Enregistrement..." : "Enregistrer les modifications"}
+                </button>
+              ) : (
+                <span className="text-muted fst-italic" style={{ fontSize: "13px" }}>
+                  Cette cargaison est {statutCargaison === "LIVREE" ? "livrée" : "en cours d'acheminement"} et ne peut plus être modifiée.
+                </span>
+              )}
             </div>
           </form>
         </div>

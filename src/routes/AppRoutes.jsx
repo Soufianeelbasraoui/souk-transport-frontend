@@ -45,6 +45,7 @@ import ModifierCargaison from '../components/cargaison/ModifierCargaison';
 import PaiementsPage from '../pages/admin/PaiementsPage';
 import ProfileAdmin from '../pages/admin/Profile';
 import ProfileExpediteur from '../pages/expediteur/Profile';
+import SuiviCargaison from '../pages/expediteur/SuiviCargaison';
 
 
 
@@ -96,6 +97,8 @@ function AppRoutes() {
         <Route path='/expediteur/dashboard' element={<ProtectedRoute> <RoleRoute roles={["EXPEDITEUR"]}> <DashboardExpediteur /> </RoleRoute></ProtectedRoute>} />
         <Route path='/expediteur/trajets' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><TrajetsDisponibles /></RoleRoute></ProtectedRoute>} />
         <Route path='/expediteur/cargaisons/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ConsulterCargaison /></RoleRoute></ProtectedRoute>} />
+        <Route path='/expediteur/cargaisons/:id/suivi' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><SuiviCargaison /></RoleRoute></ProtectedRoute>} />
+        <Route path='/expediteur/suivi/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><SuiviCargaison /></RoleRoute></ProtectedRoute>} />
         <Route path='/expediteur/detailtrajet/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><DetailTrajet /></RoleRoute></ProtectedRoute>} />
         <Route path='/expediteur/cargaisons' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><MesCargaisons /></RoleRoute></ProtectedRoute>} />
         <Route path='/expediteur/cargaisons/edit/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ModifierCargaison /></RoleRoute></ProtectedRoute>} />
