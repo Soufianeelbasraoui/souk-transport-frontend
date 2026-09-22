@@ -28,9 +28,7 @@ function ReservationsRecues() {
   const chargerReservations = async () => {
     setLoading(true);
     try {
-      const res = await api.get(
-        `/api/reservations/transporteur/mes-reservations?page=${page}&size=${pageSize}`
-      );
+      const res = await api.get( `/api/reservations/transporteur/mes-reservations?page=${page}&size=${pageSize}`);
       const items = res.data.content || [];
       setReservations(items);
       setTotalPages(res.data.totalPages || 0);
@@ -260,7 +258,7 @@ function ReservationsRecues() {
                       <div className="res-finance-row">
                         <span>Paiement</span>
                         <span>
-                          {paiement.statutPaiement === "PAYE" ? "✓ Confirmé" : "En attente"}
+                          {paiement.statutPaiement === "PAYE" ? "Confirmé" : "En attente"}
                         </span>
                       </div>
                     )}
@@ -310,7 +308,7 @@ function ReservationsRecues() {
                       )}
                       {paiement?.statutPaiement === "PAYE" && (
                         <span style={{ color: "#16a34a", fontWeight: "600" }}>
-                          ✓ Paiement confirmé
+                          Paiement confirmé
                         </span>
                       )}
                     </>

@@ -13,22 +13,9 @@ import "../../styles/formPage.css";
 import Loader from "../common/Loader";
 
 const schema = yup.object({
-  description: yup
-    .string()
-    .required("La description est obligatoire"),
-
-  poids: yup
-    .number()
-    .typeError("Le poids doit être un nombre")
-    .positive("Le poids doit être positif")
-    .required("Le poids est obligatoire"),
-
-  expediteurId: yup
-    .mixed()
-    .nullable()
-    .transform((value, originalValue) =>
-      originalValue === "" ? null : value
-    ),
+  description: yup.string().required("La description est obligatoire"),
+  poids: yup.number().typeError("Le poids doit être un nombre").positive("Le poids doit être positif").required("Le poids est obligatoire"),
+  expediteurId: yup.mixed().nullable().transform((value, originalValue) =>  originalValue === "" ? null : value),
 });
 
 function ModifierCargaison() {
@@ -41,6 +28,8 @@ function ModifierCargaison() {
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
+  const [isLocked, setIsLocked] = useState(false);
+  const [statutCargaison, setStatutCargaison] = useState("");
 
   const {
     register,
@@ -60,6 +49,11 @@ function ModifierCargaison() {
         const cargaison = res.data;
         console.log("Cargaison chargée :", cargaison);
 
+        setStatutCargaison(cargaison.statutCargaison || "");
+        if (cargaison.statutCargaison === "LIVREE" || cargaison.statutCargaison === "EN_TRANSIT") {
+          setIsLocked(true);
+        }
+
         setValue("description", cargaison.description || "");
         setValue("poids", cargaison.poids ?? "");
         setValue("expediteurId", cargaison.expediteurId ?? "");
@@ -67,7 +61,7 @@ function ModifierCargaison() {
         console.error("Erreur chargement des données :", error);
         console.error("Réponse backend :", error.response?.data);
 
-        setSubmitError( "Impossible de charger les données de la cargaison." );
+        setSubmitError("Impossible de charger les données de la cargaison.");
       } finally {
         setLoading(false);
       }
@@ -77,6 +71,10 @@ function ModifierCargaison() {
   }, [id, setValue]);
 
   const onSubmit = async (data) => {
+    if (isLocked) {
+      setSubmitError("Cette cargaison est en transit ou livrée et ne peut plus être modifiée.");
+      return;
+    }
     setSubmitError("");
     setSubmitSuccess("");
 
@@ -143,6 +141,12 @@ function ModifierCargaison() {
             </div>
           </div>
 
+          {isLocked && (
+            <div className="alert alert-warning m-3" role="alert">
+              🔒 <strong>Modification impossible :</strong> Cette cargaison a le statut <strong>{statutCargaison}</strong> (en transit ou déjà livrée).
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-card-body">
               <div className="form-grid">
@@ -151,6 +155,7 @@ function ModifierCargaison() {
                   <label>Description</label>
                   <textarea
                     rows="3"
+                    disabled={isLocked}
                     className={`form-control-custom ${
                       errors.description ? "is-error" : ""
                     }`}
@@ -171,6 +176,7 @@ function ModifierCargaison() {
                     type="number"
                     min="0.1"
                     step="0.01"
+                    disabled={isLocked}
                     className={`form-control-custom ${
                       errors.poids ? "is-error" : ""
                     }`}
@@ -190,6 +196,7 @@ function ModifierCargaison() {
                     <label>ID Expéditeur (Optionnel)</label>
                     <input
                       type="number"
+                      disabled={isLocked}
                       className={`form-control-custom ${
                         errors.expediteurId ? "is-error" : ""
                       }`}
@@ -229,8 +236,12 @@ function ModifierCargaison() {
                 Annuler
               </Link>
 
-              <button  type="submit"className="btn-submit" disabled={isSubmitting} >
-                {isSubmitting? "Enregistrement...": "Enregistrer les modifications"}
+              <button
+                type="submit"
+                className="btn-submit"
+                disabled={isSubmitting || isLocked}
+              >
+                {isSubmitting ? "Enregistrement..." : "Enregistrer les modifications"}
               </button>
             </div>
           </form>

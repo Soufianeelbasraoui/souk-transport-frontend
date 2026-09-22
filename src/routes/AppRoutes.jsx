@@ -26,7 +26,7 @@ import Profile from '../pages/transporteur/Profile';
 import UsersPage from '../pages/admin/users/UsersPage';
 import ModifierUser from '../pages/admin/users/Modifier';
 import ConsulterUser from '../pages/admin/users/Consulter';
-import AjouterUser from '../pages/admin/users/ajouter';
+import AjouterUser from '../pages/admin/users/Ajouter';
 import TrajetsPage from '../pages/admin/TrajetsPage';
 import CargaisonsPage from '../pages/admin/CargaisonsPage';
 import ReservationsPage from '../pages/admin/Reservations';

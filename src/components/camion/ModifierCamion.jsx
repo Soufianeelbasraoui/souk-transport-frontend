@@ -70,27 +70,15 @@ function ModifierCamion() {
     },
   });
 
-  /*
-   * Page de retour selon le rôle
-   */
-  const retourPath =
-    user?.role === "ADMIN"
-      ? "/admin/camions"
-      : "/transporteur/camions";
 
-  /*
-   * Charger le camion + les types
-   */
+  const retourPath =user?.role === "ADMIN"? "/admin/camions": "/transporteur/camions";
+
+ 
   useEffect(() => {
     const chargerDonnees = async () => {
       try {
-        /*
-         * Récupérer le camion
-         */
-        const camionResponse = await api.get(
-          `/api/camions/${id}`
-        );
-
+    
+        const camionResponse = await api.get(`/api/camions/${id}`);
         const camion = camionResponse.data;
 
         console.log("Camion chargé :", camion);
@@ -110,9 +98,7 @@ function ModifierCamion() {
           "disponible",
           camion.disponible ?? true
         );
-        const typesResponse = await api.get(
-          "/api/camions/types"
-        );
+        const typesResponse = await api.get("/api/camions/types");
 
         console.log(
           "Types camion :",
@@ -159,10 +145,7 @@ function ModifierCamion() {
         camionModifie
       );
 
-      const response = await api.put(
-        `/api/camions/${id}`,
-        camionModifie
-      );
+      const response = await api.put(`/api/camions/${id}`, camionModifie);
 
       console.log(
         "Camion modifié :",
