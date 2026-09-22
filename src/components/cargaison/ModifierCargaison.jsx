@@ -14,19 +14,10 @@ import Loader from "../common/Loader";
 import { FiArrowLeft } from "react-icons/fi";
 
 const schema = yup.object({
-<<<<<<< HEAD
   description: yup.string().required("La description est obligatoire"),
   poids: yup.number().typeError("Le poids doit être un nombre").positive("Le poids doit être positif").required("Le poids est obligatoire"),
   expediteurId: yup.mixed().nullable().transform((value, originalValue) =>  originalValue === "" ? null : value),
-=======
-  description: yup
-    .string()
-    .required("La description est obligatoire"),
 
-  poids: yup.number().typeError("Le poids doit être un nombre").positive("Le poids doit être positif").required("Le poids est obligatoire"),
-
-  expediteurId: yup .mixed() .nullable() .transform((value, originalValue) =>   originalValue === "" ? null : value ),
->>>>>>> feature/edite
 });
 
 function ModifierCargaison() {
@@ -60,15 +51,12 @@ function ModifierCargaison() {
         const cargaison = res.data;
         console.log("Cargaison chargée :", cargaison);
 
-<<<<<<< HEAD
-        setStatutCargaison(cargaison.statutCargaison || "");
-        if (cargaison.statutCargaison === "LIVREE" || cargaison.statutCargaison === "EN_TRANSIT") {
-=======
+
         const statut = cargaison.statutCargaison || "";
         setStatutCargaison(statut);
 
         if (statut === "LIVREE" || statut === "EN_TRANSIT" || statut === "ANNULEE") {
->>>>>>> feature/edite
+
           setIsLocked(true);
         }
 
@@ -77,11 +65,7 @@ function ModifierCargaison() {
         setValue("expediteurId", cargaison.expediteurId ?? "");
       } catch (error) {
         console.error("Erreur chargement des données :", error);
-<<<<<<< HEAD
-        console.error("Réponse backend :", error.response?.data);
 
-=======
->>>>>>> feature/edite
         setSubmitError("Impossible de charger les données de la cargaison.");
       } finally {
         setLoading(false);
@@ -93,16 +77,11 @@ function ModifierCargaison() {
 
   const onSubmit = async (data) => {
     if (isLocked) {
-<<<<<<< HEAD
-      setSubmitError("Cette cargaison est en transit ou livrée et ne peut plus être modifiée.");
-      return;
-    }
-=======
+
       setSubmitError("Cette cargaison est livrée ou en cours de route et ne peut plus être modifiée.");
       return;
     }
 
->>>>>>> feature/edite
     setSubmitError("");
     setSubmitSuccess("");
 
@@ -264,15 +243,7 @@ function ModifierCargaison() {
                 {isLocked ? "Retour" : "Annuler"}
               </Link>
 
-<<<<<<< HEAD
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={isSubmitting || isLocked}
-              >
-                {isSubmitting ? "Enregistrement..." : "Enregistrer les modifications"}
-              </button>
-=======
+
               {!isLocked ? (
                 <button
                   type="submit"
@@ -286,7 +257,7 @@ function ModifierCargaison() {
                   Cette cargaison est {statutCargaison === "LIVREE" ? "livrée" : "en cours d'acheminement"} et ne peut plus être modifiée.
                 </span>
               )}
->>>>>>> feature/edite
+
             </div>
           </form>
         </div>
