@@ -27,21 +27,9 @@ function MesCargaisons() {
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(true);
 
-<<<<<<< HEAD
-  // Gestion des actions, de la suppression et de la modification rapide
   const [activeDropdownId, setActiveDropdownId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
-  // État pour la modification rapide (PUT /api/cargaisons/{id})
-  const [editCargaison, setEditCargaison] = useState(null);
-  const [editForm, setEditForm] = useState({ description: "", poids: "" });
-  const [isSavingEdit, setIsSavingEdit] = useState(false);
-
-=======
-  const [activeDropdownId, setActiveDropdownId] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-
->>>>>>> feature/edite
   const pageSize = 9;
 
   useEffect(() => {
@@ -95,10 +83,6 @@ function MesCargaisons() {
     setActiveDropdownId(null);
   };
 
-<<<<<<< HEAD
-  // Suppression (DELETE /api/cargaisons/{id})
-=======
->>>>>>> feature/edite
   const handleDelete = async (id) => {
     try {
       await api.delete(`/api/cargaisons/${id}`);
@@ -106,62 +90,12 @@ function MesCargaisons() {
       setDeleteId(null);
       fetchCargaisons();
     } catch (error) {
-<<<<<<< HEAD
-      console.error("Erreur suppression :", error);
-=======
       console.error("Erreur suppression cargaison :", error);
->>>>>>> feature/edite
       toast.error(
         error.response?.data?.message || "Impossible de supprimer cette cargaison."
       );
       setDeleteId(null);
     }
-<<<<<<< HEAD
-  };
-
-  // Ouverture de la modale de modification rapide pour cargaison SOUMISE
-  const openEditModal = (cargaison) => {
-    setEditCargaison(cargaison);
-    setEditForm({
-      description: cargaison.description || "",
-      poids: cargaison.poids || "",
-    });
-    setActiveDropdownId(null);
-  };
-
-  // Sauvegarde de la modification (PUT /api/cargaisons/{id})
-  const handleSaveEdit = async (e) => {
-    e.preventDefault();
-    if (!editForm.description.trim()) {
-      toast.error("La description est obligatoire.");
-      return;
-    }
-    if (!editForm.poids || Number(editForm.poids) <= 0) {
-      toast.error("Le poids doit être un nombre positif.");
-      return;
-    }
-
-    try {
-      setIsSavingEdit(true);
-      const payload = {
-        description: editForm.description.trim(),
-        poids: Number(editForm.poids),
-      };
-
-      await api.put(`/api/cargaisons/${editCargaison.id}`, payload);
-      toast.success("Cargaison modifiée avec succès !");
-      setEditCargaison(null);
-      fetchCargaisons();
-    } catch (error) {
-      console.error("Erreur modification cargaison :", error);
-      toast.error(
-        error.response?.data?.message || "Erreur lors de la modification de la cargaison."
-      );
-    } finally {
-      setIsSavingEdit(false);
-    }
-=======
->>>>>>> feature/edite
   };
 
   const getBadgeStyle = (statut) => {
@@ -260,14 +194,9 @@ function MesCargaisons() {
               const isLivree = cargaison.statutCargaison === "LIVREE";
               const isSoumise = cargaison.statutCargaison === "SOUMISE";
               const isAnnulee = cargaison.statutCargaison === "ANNULEE";
-<<<<<<< HEAD
-              const canEdit = isSoumise; // Uniquement pour SOUMISE
-              const canDelete = isLivree || isAnnulee || isSoumise; // Supprimer autorisée si non en transit
-=======
               
               const canEdit = isSoumise; 
               const canDelete = !isEnTransit; 
->>>>>>> feature/edite
 
               return (
                 <div
@@ -285,11 +214,7 @@ function MesCargaisons() {
                         <div className="cargaison-action-wrapper">
                           <button
                             type="button"
-<<<<<<< HEAD
-                            className="btn-more"
-=======
                             className={`btn-more ${activeDropdownId === cargaison.id ? "active" : ""}`}
->>>>>>> feature/edite
                             title="Options"
                             onClick={() =>
                               setActiveDropdownId(
@@ -307,47 +232,22 @@ function MesCargaisons() {
                                 className="cargaison-dropdown-item"
                                 onClick={() => setActiveDropdownId(null)}
                               >
-<<<<<<< HEAD
-                                <FiEye />
-=======
                                 <FiEye className="dropdown-item-icon icon-view" />
->>>>>>> feature/edite
                                 <span>Voir détails</span>
                               </Link>
 
                               {canEdit && (
                                 <Link
-<<<<<<< HEAD
-                                  type="button"
-                                  className="cargaison-dropdown-item"
-                                   to={`/expediteur/cargaisons/${cargaison.id}`}
-                                >
-                                  <FiEdit2 />
-=======
                                   to={`/expediteur/cargaisons/edit/${cargaison.id}`}
                                   className="cargaison-dropdown-item"
                                   onClick={() => setActiveDropdownId(null)}
                                 >
                                   <FiEdit2 className="dropdown-item-icon icon-edit" />
->>>>>>> feature/edite
                                   <span>Modifier</span>
                                 </Link>
                               )}
 
                               {canDelete && (
-<<<<<<< HEAD
-                                <button
-                                  type="button"
-                                  className="cargaison-dropdown-item delete"
-                                  onClick={() => {
-                                    setActiveDropdownId(null);
-                                    setDeleteId(cargaison.id);
-                                  }}
-                                >
-                                  <FiTrash2 />
-                                  <span>Supprimer</span>
-                                </button>
-=======
                                 <>
                                   <div className="cargaison-dropdown-divider" />
                                   <button
@@ -362,7 +262,6 @@ function MesCargaisons() {
                                     <span>Supprimer</span>
                                   </button>
                                 </>
->>>>>>> feature/edite
                               )}
                             </div>
                           )}
@@ -408,19 +307,13 @@ function MesCargaisons() {
 
                         {isEnTransit ? (
                           <Link
-<<<<<<< HEAD
-                            to={`/expediteur/cargaisons/${cargaison.id}`}
-=======
                             to={`/expediteur/cargaisons/${cargaison.id}/suivi`}
->>>>>>> feature/edite
                             className="btn-suivi"
                             title="Suivre l'acheminement de la cargaison"
                           >
                             <FiTruck />
                             <span>Suivi cargaison</span>
                           </Link>
-<<<<<<< HEAD
-=======
                         ) : isSoumise ? (
                           <div className="d-flex gap-2">
                             <Link
@@ -438,7 +331,6 @@ function MesCargaisons() {
                               Détails
                             </Link>
                           </div>
->>>>>>> feature/edite
                         ) : (
                           <Link
                             to={`/expediteur/cargaisons/${cargaison.id}`}
@@ -509,11 +401,6 @@ function MesCargaisons() {
           onConfirm={() => handleDelete(deleteId)}
           onCancel={() => setDeleteId(null)}
         />
-<<<<<<< HEAD
-
-        
-=======
->>>>>>> feature/edite
       </main>
     </div>
   );
