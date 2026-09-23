@@ -17,7 +17,7 @@ const HeroSection = () => {
             </h1>
 
             <p className="hero-subtitle">
-              La première plateforme B2B de transport collaboratif au Maroc
+              La première plateforme de transport collaboratif au Maroc
             </p>
 
             <div className="d-flex flex-column flex-sm-row gap-3 mb-4">

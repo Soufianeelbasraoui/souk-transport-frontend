@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaTruckMoving } from "react-icons/fa";
+import { FaShippingFast } from "react-icons/fa";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FiChevronDown } from "react-icons/fi";
 import { jwtDecode } from "jwt-decode";
@@ -84,13 +84,9 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-custom sticky-top bg-white">
       <div className="container">
 
-        <Link
-          to="/"
-          className="navbar-brand d-flex align-items-center gap-2 me-4"
-          onClick={closeMenu}
-        >
+        <Link to="/" className="navbar-brand d-flex align-items-center gap-2 me-4" onClick={closeMenu}>
           <div className="logo-icon-box">
-            <FaTruckMoving size={20} />
+            <FaShippingFast size={20} />
           </div>
 
           <span className="brand-title">

@@ -79,11 +79,7 @@ function Sidebar() {
   return (
     <>
      
-      <div
-        className={`sidebar-overlay ${isOpen ? "active" : ""}`}
-        onClick={closeSidebar}
-      />
-
+      <div className={`sidebar-overlay ${isOpen ? "active" : ""}`}onClick={closeSidebar}/>
       <aside className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="sidebar-logo">
           <div className="logo-icon">
@@ -97,12 +93,7 @@ function Sidebar() {
           </div>
 
   
-          <button
-            type="button"
-            className="sidebar-close-btn"
-            onClick={closeSidebar}
-            aria-label="Fermer le menu"
-          >
+          <button type="button"  className="sidebar-close-btn"onClick={closeSidebar} aria-label="Fermer le menu" >
             <FaTimes />
           </button>
         </div>
