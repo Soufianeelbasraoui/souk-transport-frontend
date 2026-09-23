@@ -17,6 +17,7 @@ function DetailTrajet() {
   const [cargaisons, setCargaisons] = useState([]);
   const [cargaisonId, setCargaisonId] = useState("");
   const [prixConvenu, setPrixConvenu] = useState("");
+  const [dejaReserve, setDejaReserve] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,9 +28,10 @@ function DetailTrajet() {
       setLoading(true);
       setError("");
       try {
-        const [trajetRes, cargaisonsRes] = await Promise.allSettled([
+        const [trajetRes, cargaisonsRes, reservationsRes] = await Promise.allSettled([
           api.get(`/api/trajets/${id}`),
           api.get("/api/cargaisons/mes-cargaisons-disponibles"),
+          api.get(`/api/reservations/expediteur/mes-reservations?page=0&size=100`),
         ]);
 
         if (trajetRes.status === "fulfilled") {
@@ -40,6 +42,16 @@ function DetailTrajet() {
 
         if (cargaisonsRes.status === "fulfilled") {
           setCargaisons(cargaisonsRes.value.data || []);
+        }
+
+        if (reservationsRes.status === "fulfilled") {
+          const mesReservations = reservationsRes.value.data?.content || [];
+          const reservationActive = mesReservations.find(
+            (r) =>
+              r.trajetId === Number(id) &&
+              (r.statutReservation === "EN_ATTENTE" || r.statutReservation === "ACCEPTEE")
+          );
+          setDejaReserve(!!reservationActive);
         }
       } catch (err) {
         setError(err.response?.data?.message || err.message);
@@ -80,6 +92,8 @@ function DetailTrajet() {
   if (loading) return <Loader />;
 
   const isTermine = trajet?.statutTrajet === "TERMINE";
+  const isEnCours = trajet?.statutTrajet === "EN_COURS";
+  const isNotReservable = isTermine || isEnCours || dejaReserve;
 
   return (
     <div className="app">
@@ -151,7 +165,22 @@ function DetailTrajet() {
                     <h4>Trajet Terminé</h4>
                     <p>Ce trajet est déjà terminé. Aucune nouvelle réservation n'est possible.</p>
                   </div>
-                  ) : cargaisons.length === 0 ? (
+                ) : isEnCours ? (
+                  <div className="trajet-empty">
+                    <FiSlash className="empty-icon text-danger" />
+                    <h4>Trajet en cours</h4>
+                    <p>Ce trajet est actuellement en cours de route. Il n'est plus possible de réserver une place.</p>
+                  </div>
+                ) : dejaReserve ? (
+                  <div className="trajet-empty">
+                    <FiSlash className="empty-icon text-warning" />
+                    <h4>Réservation existante</h4>
+                    <p>Vous avez déjà une réservation en attente ou acceptée pour ce trajet. Consultez vos réservations.</p>
+                    <button className="btn-primary" onClick={() => navigate("/expediteur/reservations")}>
+                      Voir mes réservations
+                    </button>
+                  </div>
+                ) : cargaisons.length === 0 ? (
                   <div className="trajet-empty">
                     <FiBox className="empty-icon" />
                     <h4>Aucune cargaison disponible</h4>

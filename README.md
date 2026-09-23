@@ -1,161 +1,161 @@
-#  SoukTransport - Frontend
+# 1. Nom du projet
 
-Application web moderne de gestion et de mise en relation pour le transport de marchandises et de fret, reliant les **Expéditeurs**, les **Transporteurs** et les **Administrateurs**.
-
----
-
-##  Aperçu du Projet
-
-**SoukTransport** est une plateforme SaaS facilitant la logistique et l'optimisation des flux de transport :
-- Permet aux **transporteurs** de rentabiliser leurs trajets en publiant leurs capacités de transport et camions disponibles.
-- Permet aux **expéditeurs** de rechercher des trajets disponibles, d'enregistrer leurs cargaisons et de réserver du volume de transport au meilleur coût.
-- Offre aux **administrateurs** un tableau de bord centralisé pour superviser les utilisateurs, les flottes, les trajets, les réservations et les transactions financières.
+**Nom du projet :** SoukTransport - Frontend
 
 ---
 
-##  Fonctionnalités Clés
+# 2. Présentation du projet
 
-###  Espace Administrateur
-- **Dashboard analytique** : Vue d'ensemble des statistiques de la plateforme.
-- **Gestion des Utilisateurs** : Visualisation, ajout, modification et suppression des comptes (Expéditeurs, Transporteurs, Admins).
-- **Gestion de la Flotte** : Supervision globale de tous les camions enregistrés.
-- **Gestion des Trajets & Cargaisons** : Contrôle et modération des trajets et des cargaisons créées.
-- **Gestion des Réservations & Paiements** : Suivi des réservations et historique des transactions.
+SoukTransport est une application web qui permet de mettre en relation les expéditeurs et les transporteurs pour faciliter le transport de marchandises.
 
-###  Espace Transporteur
-- **Gestion de la flotte personnelle (Mes Camions)** : Ajout, modification et consultation des camions.
-- **Publication des Trajets (Mes Trajets)** : Création et planification des itinéraires avec points de départ/arrivée, dates et capacités disponibles.
-- **Gestion des Réservations Reçues** : Acceptation/refus et suivi des demandes de transport des expéditeurs.
-- **Gestion du profil** : Informations personnelles et professionnelles.
+Elle s'adresse principalement aux **expéditeurs**, aux **transporteurs** et aux **administrateurs** de la plateforme.
 
-###  Espace Expéditeur
-- **Recherche de Trajets** : Consultation des trajets disponibles correspondant aux besoins d'expédition.
-- **Gestion des Cargaisons (Mes Cargaisons)** : Déclaration des marchandises (poids, dimensions, type).
-- **Réservations & Suivi** : Création de réservations sur un trajet et suivi de leur statut.
-- **Module de Paiement** : Règlement sécurisé des réservations de fret.
-- **Gestion du profil** : Paramètres du compte expéditeur.
+Son objectif principal est de faciliter la recherche de trajets, la gestion des cargaisons, des camions et des réservations de transport.
 
-###  Authentification & Sécurité
-- Inscription et Connexion avec attribution de rôles (`ADMIN`, `TRANSPORTEUR`, `EXPEDITEUR`).
-- Gestion de session par **JWT (JSON Web Token)** avec intercepteur Axios automatique (`Bearer Token`).
-- **Route Guards** : Protection des routes selon le statut d'authentification et le rôle de l'utilisateur (`ProtectedRoute`, `RoleRoute`, `PublicRoute`).
+L'application permet également aux administrateurs de superviser les utilisateurs et les différentes opérations de la plateforme.
 
 ---
 
-##  Stack Technique
+# 3. Problématique
 
-- **Framework** : [React 19](https://react.dev/)
-- **Outil de Build & Serveur de Dev** : [Vite 8](https://vitejs.dev/)
-- **Routage** : [React Router v7](https://reactrouter.com/)
-- **Formulaires & Validation** : [React Hook Form](https://react-hook-form.com/) & [Yup](https://github.com/jquense/yup)
-- **UI & Composants** : 
-  - [Bootstrap 5](https://getbootstrap.com/) & [React-Bootstrap](https://react-bootstrap.github.io/)
-  - [Material UI (MUI)](https://mui.com/) & Emotion
-  - [React Icons](https://react-icons.github.io/react-icons/)
-- **Communication API** : [Axios](https://axios-http.com/)
-- **Notifications Toast** : [React-Toastify](https://fkhadra.github.io/react-toastify/)
+Le problème identifié est que la gestion du transport de marchandises peut être difficile lorsque les expéditeurs doivent trouver des trajets disponibles et que les transporteurs souhaitent optimiser leurs capacités de transport.
+
+La solution proposée permet de centraliser la recherche de trajets, la gestion des cargaisons, la publication des trajets et les réservations dans une seule plateforme web.
 
 ---
 
-##  Architecture du Projet
+# 4. Fonctionnalités principales
 
-```text
-souktransport-frontend/
-├── public/                 # Fichiers statiques
-├── src/
-│   ├── assets/             # Images, logos et médias
-│   ├── components/         # Composants réutilisables
-│   │   ├── camion/         # CRUD & formulaires Camions
-│   │   ├── cargaison/      # CRUD & formulaires Cargaisons
-│   │   ├── common/         # Composants UI transversaux (Modals, Buttons, etc.)
-│   │   ├── home/           # Composants de la Landing Page
-│   │   ├── layout/         # Navbar, Sidebar, Footer
-│   │   ├── reservations/   # Composants de gestion des réservations
-│   │   └── trajet/         # CRUD & formulaires Trajets
-│   ├── pages/              # Pages organisées par domaine / rôle
-│   │   ├── admin/          # Pages réservées à l'administrateur
-│   │   ├── auth/           # Login, Register
-│   │   ├── expediteur/     # Pages de l'espace Expéditeur
-│   │   ├── transporteur/   # Pages de l'espace Transporteur
-│   │   ├── HomePage.jsx    # Page d'accueil publique
-│   │   ├── NotFoundPage.jsx
-│   │   └── unauthorized.jsx
-│   ├── routes/             # Configuration des routes et gardes d'accès
-│   │   ├── AppRoutes.jsx
-│   │   ├── ProtectedRoute.jsx
-│   │   ├── PublicRoute.jsx
-│   │   └── RoleRoute.jsx
-│   ├── services/           # Configuration Axios et appels API
-│   │   ├── api.js
-│   │   └── authService.js
-│   ├── styles/             # Feuilles de styles globales et modules CSS
-│   ├── App.jsx             # Composant racine
-│   ├── main.jsx            # Point d'entrée React
-│   └── index.css           # Styles globaux
-├── package.json            # Dépendances et scripts
-├── vite.config.js          # Configuration Vite
-└── README.md               # Documentation du projet
+* Créer et gérer un compte utilisateur selon son rôle.
+* Rechercher et consulter les trajets disponibles.
+* Gérer les camions et les capacités de transport.
+* Créer et gérer les cargaisons.
+* Créer et suivre les réservations de transport.
+* Superviser les utilisateurs, trajets, cargaisons et réservations depuis l'espace administrateur.
+
+---
+
+# 5. Technologies utilisées
+
+| Technologie           | Utilisation dans le projet                     |
+| --------------------- | ---------------------------------------------- |
+| **React 19**          | Développement de l'interface utilisateur       |
+| **Vite 8**            | Développement et génération du build frontend  |
+| **React Router v7**   | Gestion de la navigation et des routes         |
+| **Axios**             | Communication avec l'API REST du backend       |
+| **React Hook Form**   | Gestion des formulaires                        |
+| **Yup**               | Validation des données des formulaires         |
+| **Bootstrap 5**       | Mise en forme de l'interface utilisateur       |
+| **React-Bootstrap**   | Utilisation de composants Bootstrap avec React |
+| **Material UI (MUI)** | Création de composants d'interface             |
+| **React Icons**       | Utilisation des icônes dans l'application      |
+| **React Toastify**    | Affichage des notifications                    |
+| **Git / GitHub**      | Gestion et versionnement du code               |
+
+---
+
+# 6. Installation et lancement
+
+## 6.1 Prérequis
+
+Pour utiliser ce projet, vous devez disposer de :
+
+* Node.js 18 ou une version supérieure
+* npm
+* Git
+* Un navigateur web moderne
+* Le backend SoukTransport démarré
+
+---
+
+## 6.2 Cloner le dépôt
+
+```bash
+git clone https://github.com/Soufianeelbasraoui/souk-transport-frontend.git
 ```
 
 ---
 
-##  Installation et Démarrage
+## 6.3 Ouvrir le dossier
 
-### Prérequis
-- [Node.js](https://nodejs.org/) (version 18+ recommandée)
-- [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/) / [pnpm](https://pnpm.io/)
-- Le backend SoukTransport actif (par défaut accessible sur `http://localhost:8080`)
+```bash
+cd souk-transport-frontend
+```
 
-### Installation
+---
 
-1. Cloner le dépôt :
-   ```bash
-   git clone <URL_DU_REPO>
-   cd souktransport-frontend
-   ```
+## 6.4 Installer les dépendances
 
-2. Installer les dépendances :
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-### Lancer en mode développement
+---
 
-Démarrez le serveur de développement local avec rechargement à chaud (HMR) :
+## 6.5 Lancer le projet
+
+Lancer le serveur de développement :
+
 ```bash
 npm run dev
 ```
-L'application sera accessible sur [http://localhost:5173](http://localhost:5173) (ou le port indiqué par Vite).
 
-### Build pour la production
+Pour générer le build de production :
 
-Pour compiler et optimiser l'application pour le déploiement :
 ```bash
 npm run build
 ```
 
-Pour prévisualiser localement le build de production :
+Pour prévisualiser le build :
+
 ```bash
 npm run preview
 ```
 
----
+Pour vérifier le code avec le linter :
 
-##  Scripts Disponibles
-
-| Commande | Action |
-| :--- | :--- |
-| `npm run dev` | Démarre le serveur de développement Vite |
-| `npm run build` | Compile l'application pour la production dans le dossier `dist/` |
-| `npm run preview` | Prévisualise la version compilée en local |
-| `npm run lint` | Exécute l'analyse statique du code avec Oxlint |
-
----
-
-##  Configuration API & Backend
-
-Par défaut, l'application est configurée pour communiquer avec le backend à l'adresse suivante dans [src/services/api.js](file:///c:/Users/soufiane/Desktop/souktransport-frontend/src/services/api.js) :
-```javascript
-baseURL: "http://localhost:8080"
+```bash
+npm run lint
 ```
-Pour la mise en production ou le changement d'URL, vous pouvez adapter cette valeur ou utiliser des variables d'environnement (`VITE_API_URL`).
+
+---
+
+## 6.6 Ouvrir le projet
+
+Après le lancement :
+
+```text
+http://localhost:5173
+```
+
+Le backend doit être disponible sur :
+
+```text
+http://localhost:8080
+```
+
+---
+
+# 7. Contribution personnelle
+
+Ma contribution principale a porté sur le développement de l'application frontend avec **React**, notamment la création des interfaces utilisateur et l'organisation des pages selon les différents rôles.
+
+J'ai également travaillé sur l'intégration de l'API REST avec **Axios**, la gestion de l'authentification **JWT** et la protection des routes selon les rôles des utilisateurs.
+
+J'ai été responsable de plusieurs fonctionnalités liées à la gestion des **camions, trajets, cargaisons et réservations**, ainsi que de leur intégration avec le backend Spring Boot.
+
+---
+
+# 8. Améliorations possibles
+
+Dans une prochaine version, je pourrais :
+
+* Ajouter davantage de tests automatisés pour les composants et les fonctionnalités principales.
+* Améliorer la gestion des erreurs et des messages retournés par l'API.
+* Améliorer davantage l'expérience utilisateur et le responsive design.
+* Déployer l'application frontend et le backend sur un environnement de production.
+
+### Conclusion
+
+Ces améliorations permettraient de rendre l'application plus robuste, plus facile à maintenir et mieux adaptée à une utilisation en production.
+

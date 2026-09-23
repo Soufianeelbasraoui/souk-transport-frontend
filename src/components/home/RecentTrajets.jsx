@@ -90,7 +90,7 @@ const RecentTrajets = () => {
                       </div>
                       <div className="trajet-info-item">
                         <FiBox size={16} />
-                        <span>{t.poidsDisponible} Tonnes</span>
+                        <span>{t.poidsDisponible} KG</span>
                       </div>
                     </div>
                   </div>

@@ -175,7 +175,7 @@ function TrajetsDisponibles() {
 
                         <div className="trajet-info-item">
                           <FiBox />
-                          <span>{t.poidsDisponible} Tonnes</span>
+                          <span>{t.poidsDisponible} Kg</span>
                         </div>
                       </div>
                        <Link to={`/expediteur/detailtrajet/${t.id}`} className="btn-card-action text-center">Voir le trajet</Link>
