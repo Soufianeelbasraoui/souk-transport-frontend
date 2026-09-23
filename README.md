@@ -4,27 +4,6 @@ Application web moderne de gestion et de mise en relation pour le transport de m
 
 ---
 
-## Sommaire
-
-- [Aperçu du Projet](#-aperçu-du-projet)
-- [Fonctionnalités Clés](#-fonctionnalités-clés)
-  - [ Espace Administrateur](#-espace-administrateur)
-  - [ Espace Transporteur](#-espace-transporteur)
-  - [ Espace Expéditeur](#-espace-expéditeur)
-  - [ Authentification & Sécurité](#-authentification--sécurité)
-- [Stack Technique](#-stack-technique)
-- [Architecture du Projet](#-architecture-du-projet)
-- [Installation et Démarrage](#-installation-et-démarrage)
-  - [Prérequis](#prérequis)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-  - [Lancer en mode développement](#lancer-en-mode-développement)
-  - [Build pour la production](#build-pour-la-production)
-- [Scripts Disponibles](#-scripts-disponibles)
-- [Variables d'Environnement](#-variables-denvironnement)
-
----
-
 ##  Aperçu du Projet
 
 **SoukTransport** est une plateforme SaaS facilitant la logistique et l'optimisation des flux de transport :
@@ -75,7 +54,6 @@ Application web moderne de gestion et de mise en relation pour le transport de m
   - [React Icons](https://react-icons.github.io/react-icons/)
 - **Communication API** : [Axios](https://axios-http.com/)
 - **Notifications Toast** : [React-Toastify](https://fkhadra.github.io/react-toastify/)
-- **Linter / Qualité de code** : [Oxlint](https://oxc.rs/)
 
 ---
 
