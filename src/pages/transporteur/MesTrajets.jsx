@@ -97,9 +97,7 @@ function MesTrajets() {
                   <h5>Trajets récents</h5>
                   <p>Vos derniers trajets publiés</p>
                 </div>
-                <Link to="/transporteur/trajets" className="view-all-link">
-                  Voir tous les trajets
-                </Link>
+                
               </div>
 
               <div className="table-responsive">

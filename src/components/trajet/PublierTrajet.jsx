@@ -145,7 +145,7 @@ function PublierTrajet() {
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Poids disponible (Tonnes)</label>
+                  <label>Poids disponible (Kg)</label>
                   <input
                     type="number"
                     min="0.1"

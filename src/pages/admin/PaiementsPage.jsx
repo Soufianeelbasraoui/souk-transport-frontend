@@ -40,6 +40,7 @@ function PaiementsPage() {
     api
       .get(`/api/paiements?page=${page - 1}&size=${pageSize}`)
       .then((res) => {
+        console.log(res.data?.content)
         setPaiements(res.data?.content || []);
         setTotalPages(res.data?.totalPages || 1);
         setTotalElements(res.data?.totalElements || 0);
@@ -125,10 +126,8 @@ function PaiementsPage() {
                 <tr>
                   <th>ID</th>
                   <th>RÉSERVATION</th>
-                  <th>CARGAISON</th>
                   <th>MONTANT</th>
                   <th>MÉTHODE</th>
-                  <th>DATE</th>
                   <th>STATUT</th>
                   <th>ACTIONS</th>
                 </tr>
@@ -153,12 +152,6 @@ function PaiementsPage() {
                         </td>
 
                         <td>
-                          {item.cargaisonId
-                            ? `Cargaison #${item.cargaisonId}`
-                            : "-"}
-                        </td>
-
-                        <td>
                           <strong>{item.montantTotal != null ? `${item.montantTotal} DH` : "-"}</strong>
                         </td>
 
@@ -166,12 +159,6 @@ function PaiementsPage() {
                           <span className="admin-badge admin-badge-info">
                             {item.methodePaiement || "CASH"}
                           </span>
-                        </td>
-
-                        <td>
-                          {item.datePaiement || item.dateCreation
-                            ? new Date(item.datePaiement || item.dateCreation).toLocaleDateString("fr-FR")
-                            : "-"}
                         </td>
 
                         <td>

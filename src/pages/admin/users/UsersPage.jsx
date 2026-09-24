@@ -140,7 +140,8 @@ function UsersPage() {
                 <select value={statut} onChange={handleStatut}>
                   <option value=""> Tous les statuts </option>
                   <option value="ACTIF"> Actif </option>
-                  <option value="INACTIF">Inactif</option>
+                  <option value="EN_ATTENTE">En Attents</option>
+                  <option value="SUSPENDU">Suspendu</option>
                 </select>
               </div>
             </div>

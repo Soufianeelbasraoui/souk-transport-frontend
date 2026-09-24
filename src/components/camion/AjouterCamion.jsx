@@ -178,7 +178,7 @@ function AjouterCamion() {
                 </div>
 
                 <div className="form-group">
-                  <label>Capacité (Tonnes)</label>
+                  <label>Capacité (Kg)</label>
                   <input
                     type="number"
                     min="0.1"
