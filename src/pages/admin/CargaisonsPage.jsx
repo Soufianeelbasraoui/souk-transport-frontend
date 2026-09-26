@@ -186,7 +186,7 @@ function CargaisonsPage() {
 
                         <td>
                           <div className="admin-actions">
-                            {/* 1. Bouton Consulter (Œil) */}
+                          
                             <Link
                               to={`/admin/cargaisons/${item.id}`}
                               className="admin-action-btn"
@@ -195,7 +195,6 @@ function CargaisonsPage() {
                               <BiShowAlt />
                             </Link>
 
-                            {/* 2. Bouton 3 points avec menu déroulant */}
                             {hasMoreActions && (
                               <div className="admin-action-dropdown-wrapper">
                                 <button

@@ -23,7 +23,6 @@ function ReservationsPage() {
   const [totalElements, setTotalElements] = useState(0);
   const pageSize = 10;
 
-  // Fermer le menu déroulant lors d'un clic à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest(".admin-action-dropdown-wrapper")) {
@@ -41,10 +40,10 @@ function ReservationsPage() {
     setLoading(true);
 
     api.get(`/api/reservations/page?page=${page - 1}&size=${pageSize}`).then((res) => {
-        setReservations(res.data?.content || []);
-        setTotalPages(res.data?.totalPages || 1);
-        setTotalElements(res.data?.totalElements || 0);
-      })
+      setReservations(res.data?.content || []);
+      setTotalPages(res.data?.totalPages || 1);
+      setTotalElements(res.data?.totalElements || 0);
+    })
       .catch((err) => {
         console.error("Erreur lors de la récupération :", err);
       })
@@ -139,14 +138,13 @@ function ReservationsPage() {
 
                         <td>
                           <span
-                            className={`admin-status ${
-                              item.statutReservation === "ACCEPTEE"
+                            className={`admin-status ${item.statutReservation === "ACCEPTEE"
                                 ? "is-success"
                                 : item.statutReservation === "REFUSEE" ||
                                   item.statutReservation === "ANNULEE"
-                                ? "is-danger"
-                                : "is-pending"
-                            }`}
+                                  ? "is-danger"
+                                  : "is-pending"
+                              }`}
                           >
                             {item.statutReservation || "EN_ATTENTE"}
                           </span>
@@ -154,7 +152,6 @@ function ReservationsPage() {
 
                         <td>
                           <div className="admin-actions">
-                            {/* 1. Bouton Consulter (Œil) */}
                             <Link
                               to={`/admin/reservations/${item.id}`}
                               className="admin-action-btn"
@@ -167,9 +164,8 @@ function ReservationsPage() {
                               <div className="admin-action-dropdown-wrapper">
                                 <button
                                   type="button"
-                                  className={`admin-action-btn ${
-                                    activeDropdownId === item.id ? "active" : ""
-                                  }`}
+                                  className={`admin-action-btn ${activeDropdownId === item.id ? "active" : ""
+                                    }`}
                                   title="Actions"
                                   onClick={() =>
                                     setActiveDropdownId(
@@ -182,12 +178,11 @@ function ReservationsPage() {
 
                                 {activeDropdownId === item.id && (
                                   <div
-                                    className={`admin-action-dropdown ${
-                                      index >= reservations.length - 2 &&
-                                      reservations.length > 2
+                                    className={`admin-action-dropdown ${index >= reservations.length - 2 &&
+                                        reservations.length > 2
                                         ? "open-up"
                                         : ""
-                                    }`}
+                                      }`}
                                   >
                                     {isEnAttente && (
                                       <>

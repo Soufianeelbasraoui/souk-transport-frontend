@@ -11,10 +11,7 @@ function NotFoundPage() {
           <FiAlertTriangle size={60} />
         </div>
 
-        <h1 
-          className="fw-bold text-dark mb-2" 
-          style={{ fontSize: "4rem", letterSpacing: "-1px", lineHeight: "1" }}
-        >
+        <h1 className="fw-bold text-dark mb-2"  style={{ fontSize: "4rem", letterSpacing: "-1px", lineHeight: "1" }} >
           404
         </h1>
 

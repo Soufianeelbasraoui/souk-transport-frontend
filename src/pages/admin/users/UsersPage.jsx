@@ -191,8 +191,7 @@ function UsersPage() {
                             </span>
                           </td>
                           <td>
-                            <div className="admin-actions">
-                              {/* 1. Bouton Consulter (Œil) */}
+                            <div className="admin-actions"> 
                               <Link
                                 to={`/admin/users/${user.id}`}
                                 className="admin-action-btn"
@@ -201,7 +200,6 @@ function UsersPage() {
                                 <BiShowAlt />
                               </Link>
 
-                              {/* 2. Bouton 3 points avec menu déroulant */}
                               <div className="admin-action-dropdown-wrapper">
                                 <button
                                   type="button"

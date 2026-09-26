@@ -200,7 +200,7 @@ function TrajetsPage() {
 
                       <td>
                         <div className="admin-actions">
-                          {/* 1. Bouton Consulter (Œil) */}
+                        
                           <Link
                             to={`/admin/trajets/${item.id}`}
                             className="admin-action-btn"
@@ -208,8 +208,6 @@ function TrajetsPage() {
                           >
                             <BiShowAlt />
                           </Link>
-
-                          {/* 2. Bouton 3 points avec menu déroulant */}
                           <div className="admin-action-dropdown-wrapper">
                             <button
                               type="button"

@@ -10,6 +10,7 @@ function DashboardTransporteur() {
   const [mesCamions, setMesCamions] = useState([]);
   const[countMesTrajet,setCountMesTrajet]=useState(0);
   const[countMesReservation,setCountMesReservation]=useState(0);
+  const[countRevenu,setCountRevenu]=useState(0);
   const[page,setPage]=useState(0);
 
   useEffect(() => {
@@ -41,6 +42,10 @@ function DashboardTransporteur() {
 
     api.get("api/reservations/transporteur/count").then((res)=>{
       setCountMesReservation(res.data);
+    })
+    api.get("/api/paiements/revenu").then((res)=>{
+       setCountRevenu(res.data);
+       console.log(res.data);
     })
   
   },[])
@@ -93,7 +98,7 @@ function DashboardTransporteur() {
                   <small class="text-uppercase text-muted fw-semibold">
                     Revenus 
                   </small>
-                  <h3 class="mb-0 fw-bold">12</h3>
+                  <h3 class="mb-0 fw-bold">{countRevenu}</h3>
                 </div>
               </div>
             </div>

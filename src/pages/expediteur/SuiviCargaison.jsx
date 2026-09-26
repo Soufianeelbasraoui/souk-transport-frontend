@@ -42,9 +42,7 @@ function SuiviCargaison() {
         const resReservations = await api.get("/api/reservations/expediteur/mes-reservations?size=50");
         const reservationsList = resReservations.data?.content || resReservations.data || [];
         
-        const matchRes = reservationsList.find(
-          (r) => Number(r.cargaisonId) === Number(id) || Number(r.id) === Number(id)
-        );
+        const matchRes = reservationsList.find(  (r) => Number(r.cargaisonId) === Number(id) || Number(r.id) === Number(id));
         if (matchRes) {
           setReservation(matchRes);
         }
@@ -181,13 +179,6 @@ function SuiviCargaison() {
                 </div>
               </div>
 
-              <div className="suivi-eta">
-                <span className="suivi-eta-pin"><FiMapPin /></span>
-                <span>
-                  Arrivée estimée: <strong>Aujourd'hui 14:30</strong>{" "}
-                  <span className="suivi-eta-restant">(2h restantes)</span>
-                </span>
-              </div>
 
               <div className="suivi-actions-bar">
                 <a href={`tel:${telephone}`} className="btn-suivi-call">

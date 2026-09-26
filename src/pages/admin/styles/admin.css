@@ -216,10 +216,10 @@
 }
 
 .admin-empty {
-  padding: 30px 20px !important;
+  padding: 30px 20px ;
   text-align: center;
-  color: #8a94a6 !important;
-  font-size: 12px !important;
+  color: #8a94a6 ;
+  font-size: 12px ;
 }
 
 .admin-reservations-card {
@@ -449,6 +449,7 @@
     opacity: 0;
     transform: translateY(-3px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -531,7 +532,7 @@
   color: #b45309;
 }
 
-/* --- Styles pour la gestion des paiements & Modals Admin --- */
+
 .admin-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -619,6 +620,7 @@
     opacity: 0;
     transform: translateY(15px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -793,5 +795,3 @@
 .admin-btn-success:hover {
   background: #15803d;
 }
-
-

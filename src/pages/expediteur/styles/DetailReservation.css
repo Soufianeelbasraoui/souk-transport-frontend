@@ -23,7 +23,7 @@
   color: #0f172a;
 }
 
-/* Card Principal */
+
 .detail-res-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -32,7 +32,7 @@
   overflow: hidden;
 }
 
-/* Header */
+
 .detail-res-header {
   display: flex;
   justify-content: space-between;
@@ -57,7 +57,7 @@
   gap: 6px;
 }
 
-/* Status Badges */
+
 .status-badge {
   display: inline-block;
   padding: 6px 12px;
@@ -81,12 +81,12 @@
   color: #b45309;
 }
 
-/* Body Content */
+
 .detail-res-body {
   padding: 24px;
 }
 
-/* Grid Layout */
+
 .detail-res-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -188,7 +188,7 @@
   border: 1px solid #bbf7d0;
 }
 
-/* Actions Footer */
+
 .detail-res-actions {
   display: flex;
   align-items: center;

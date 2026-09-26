@@ -77,12 +77,10 @@ function Register() {
           }, 1000);
         }
       } else {
-        // Enregistrement Transporteur (Statut EN_ATTENTE au backend, pas de token retourné)
+
         await api.post("/auth/register/transporteur", data);
         
-        setSuccessMessage(
-          "Votre compte a été créé avec succès ! Il est actuellement en attente de validation par l'administrateur."
-        );
+        setSuccessMessage( "Votre compte a été créé avec succès ! Il est actuellement en attente de validation par l'administrateur." );
 
         setTimeout(() => {
           navigate("/login");

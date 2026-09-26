@@ -86,7 +86,7 @@ function AjouterCamion() {
             to={isAdmin ? "/admin/camions" : "/transporteur/camions"}
             className="btn-cancel"
           >
-            ← Mes camions
+            Mes camions
           </Link>
         </div>
 

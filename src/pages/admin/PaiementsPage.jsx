@@ -163,13 +163,12 @@ function PaiementsPage() {
 
                         <td>
                           <span
-                            className={`admin-status ${
-                              isPaye
+                            className={`admin-status ${isPaye
                                 ? "is-success"
                                 : item.statutPaiement === "ANNULE"
-                                ? "is-danger"
-                                : "is-pending"
-                            }`}
+                                  ? "is-danger"
+                                  : "is-pending"
+                              }`}
                           >
                             {item.statutPaiement || "EN_ATTENTE"}
                           </span>
@@ -189,9 +188,8 @@ function PaiementsPage() {
                             <div className="admin-action-dropdown-wrapper">
                               <button
                                 type="button"
-                                className={`admin-action-btn ${
-                                  activeDropdownId === item.id ? "active" : ""
-                                }`}
+                                className={`admin-action-btn ${activeDropdownId === item.id ? "active" : ""
+                                  }`}
                                 title="Actions"
                                 onClick={() =>
                                   setActiveDropdownId(
@@ -203,13 +201,7 @@ function PaiementsPage() {
                               </button>
 
                               {activeDropdownId === item.id && (
-                                <div
-                                  className={`admin-action-dropdown ${
-                                    index >= paiements.length - 2 && paiements.length > 2
-                                      ? "open-up"
-                                      : ""
-                                  }`}
-                                >
+                                <div  className={`admin-action-dropdown ${index >= paiements.length - 2 && paiements.length > 2? "open-up"    : "" }`}  >
                                   {isEnAttente && (
                                     <button
                                       type="button"

@@ -324,18 +324,12 @@ function MesCargaisons() {
                               <FiEdit2 />
                               <span>Modifier</span>
                             </Link>
-                            <Link
-                              to={`/expediteur/cargaisons/${cargaison.id}`}
-                              className="btn-cargaison"
-                            >
+                            <Link to={`/expediteur/cargaisons/${cargaison.id}`} className="btn-cargaison nav-link" >
                               Détails
                             </Link>
                           </div>
                         ) : (
-                          <Link
-                            to={`/expediteur/cargaisons/${cargaison.id}`}
-                            className="btn-cargaison"
-                          >
+                          <Link to={`/expediteur/cargaisons/${cargaison.id}`} className="btn-cargaison" >
                             Voir détails
                           </Link>
                         )}

@@ -12,6 +12,7 @@ import { jwtDecode } from "jwt-decode";
 
 import "../../styles/global.css";
 import "../../styles/formPage.css";
+import { FiArrowLeft } from "react-icons/fi";
 
 const schema = yup.object({
   marque: yup
@@ -86,37 +87,19 @@ function ModifierCamion() {
         setValue("marque", camion.marque || "");
         setValue("modele", camion.modele || "");
         setValue("type", camion.type || "");
-        setValue(
-          "immatriculation",
-          camion.immatriculation || ""
-        );
-        setValue(
-          "capacite",
-          camion.capacite ?? ""
-        );
-        setValue(
-          "disponible",
-          camion.disponible ?? true
-        );
+        setValue( "immatriculation",camion.immatriculation || "");
+        setValue("capacite",camion.capacite ?? "");
+        setValue( "disponible", camion.disponible ?? true);
         const typesResponse = await api.get("/api/camions/types");
 
-        console.log(
-          "Types camion :",
-          typesResponse.data
-        );
+        console.log("Types camion :",  typesResponse.data);
 
         setTypesCamion(typesResponse.data || []);
 
       } catch (error) {
-        console.error(
-          "Erreur chargement camion/types :",
-          error
-        );
+        console.error( "Erreur chargement camion/types");
 
-        setSubmitError(
-          error.response?.data?.message ||
-            "Impossible de charger les données du camion."
-        );
+        setSubmitError( "Impossible de charger les données du camion.");
       } finally {
         setLoading(false);
       }
@@ -202,7 +185,7 @@ function ModifierCamion() {
             to={retourPath}
             className="btn-cancel"
           >
-            ← Camions
+             <FiArrowLeft /> Camions
           </Link>
 
         </div>

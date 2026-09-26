@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { FaTachometerAlt, FaTruck,  FaRoute, FaInbox, FaBoxOpen, FaHistory,FaUser,  FaSearch,  FaClipboardList,  FaUsers,  FaBuilding,  FaCreditCard, FaCog, FaSignOutAlt,FaShippingFast,  FaTruckMoving, FaBars,  FaTimes,} from "react-icons/fa";
+import { FaTachometerAlt, FaTruck,  FaRoute, FaInbox, FaBoxOpen,FaUser,  FaSearch,  FaClipboardList,  FaUsers,  FaBuilding,  FaCreditCard, FaCog, FaSignOutAlt,FaShippingFast,  FaTruckMoving, FaBars,  FaTimes,} from "react-icons/fa";
 import "../../styles/sidebar.css";
 import { logout } from "../../services/authService";
 
@@ -51,7 +51,6 @@ function Sidebar() {
       { to: "/expediteur/reservations", label: "Mes Réservations", icon: FaClipboardList },
       { to: "/expediteur/cargaisons", label: "Mes Cargaisons", icon: FaBoxOpen },
       { to: "/expediteur/paiements", label: "Paiements", icon: FaCreditCard },
-      { to: "/expediteur/historique", label: "Historique", icon: FaHistory },
       { to: "/expediteur/profile", label: "Mon Profil", icon: FaUser },
     ],
     ADMIN: [
@@ -123,19 +122,7 @@ function Sidebar() {
               );
             })}
           </nav>
-
-          <div className="sidebar-section-title account-title">COMPTE</div>
           <nav className="sidebar-menu">
-            <NavLink
-              to="/settings"
-              onClick={closeSidebar}
-              className={({ isActive }) =>
-                `sidebar-link ${isActive ? "active" : ""}`
-              }
-            >
-              <FaCog className="sidebar-link-icon" />
-              <span>Paramètres</span>
-            </NavLink>
 
             <button
               type="button"

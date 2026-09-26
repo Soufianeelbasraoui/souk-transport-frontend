@@ -5,6 +5,7 @@ import api from "../../services/api";
 import "../../styles/global.css";
 import "../../styles/formPage.css";
 import { jwtDecode } from "jwt-decode";
+import { FiArrowLeft } from "react-icons/fi";
 
 function ConsulterCamion() {
   const { id } = useParams();
@@ -39,7 +40,7 @@ function ConsulterCamion() {
             <p>Consultez les informations détaillées du camion.</p>
           </div>
           <Link  to={user.role==="ADMIN" ?"/admin/camions":"/transporteur/camions"} className="btn-cancel">
-            ← Mes camions
+             <FiArrowLeft />  Mes camions
           </Link>
         </div>
 

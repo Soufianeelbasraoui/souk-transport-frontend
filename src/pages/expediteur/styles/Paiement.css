@@ -56,7 +56,7 @@
   margin-bottom: 18px;
 }
 
-/* Key-Value Information Styling */
+
 .info-group {
   margin-bottom: 16px;
 }
@@ -84,7 +84,7 @@
   font-weight: 700;
 }
 
-/* Badges */
+
 .paiement-id-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -107,7 +107,7 @@
   border-radius: 6px;
 }
 
-/* Form controls & Buttons */
+
 .form-group {
   margin-bottom: 16px;
 }

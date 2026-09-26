@@ -163,7 +163,6 @@ function CamionsPage() {
 
                       <td>
                         <div className="admin-actions">
-                          {/* 1. Bouton Consulter (Œil) */}
                           <Link
                             to={`/admin/camions/${camion.id}`}
                             className="admin-action-btn"
@@ -172,7 +171,7 @@ function CamionsPage() {
                             <BiShowAlt />
                           </Link>
 
-                          {/* 2. Bouton 3 points avec menu déroulant */}
+            
                           <div className="admin-action-dropdown-wrapper">
                             <button
                               type="button"

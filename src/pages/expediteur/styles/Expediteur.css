@@ -3,7 +3,7 @@
   margin: 0 auto;
 }
 
-/* En-tête */
+
 .expediteur-header {
   margin-bottom: 20px;
 }
@@ -22,7 +22,7 @@
   margin: 0;
 }
 
-/* Grille de statistiques */
+
 .expediteur-stats-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -73,7 +73,7 @@
   line-height: 1;
 }
 
-/* Couleurs spécifiques par type de stat */
+
 .expediteur-stat-card.is-success .stat-icon-wrapper {
   background-color: #dcfce7;
   color: #16a34a;
@@ -99,7 +99,7 @@
   color: #2563eb;
 }
 
-/* Cartes de contenu */
+
 .expediteur-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -258,7 +258,7 @@
   color: #ffffff;
 }
 
-/* Timeline "Comment ça marche" */
+
 .how-it-works-card {
   padding: 20px 24px;
 }
@@ -319,7 +319,7 @@
   margin-top: 20px;
 }
 
-/* Responsive */
+
 @media (max-width: 1024px) {
   .expediteur-stats-grid {
     grid-template-columns: repeat(3, 1fr);
