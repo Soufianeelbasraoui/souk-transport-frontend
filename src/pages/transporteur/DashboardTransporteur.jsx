@@ -5,6 +5,7 @@ import "./style/transporteur.css";
 import { FaTruck, FaBox, FaMoneyBillWave, FaUsers } from "react-icons/fa";
 import api from "../../services/api";
 import { Link } from "react-router-dom";
+import { FiArrowRight } from "react-icons/fi";
 function DashboardTransporteur() {
   const [mesTrajets, setMesTrajets] = useState([]);
   const [mesCamions, setMesCamions] = useState([]);
@@ -136,7 +137,7 @@ function DashboardTransporteur() {
                   <thead>
                     <tr>
                       <th>ID Trajet</th>
-                      <th>Départ &rarr; Arrivée</th>
+                      <th><span>Départ</span> <FiArrowRight /> <span>Arrivée</span></th>
                       <th>Date</th>
                       <th>Camion</th>
                       <th>Statut</th>
@@ -156,7 +157,7 @@ function DashboardTransporteur() {
                           <td>
                             <div className="route-cell">
                               <span>{item.villeDepart}</span>
-                              <span className="route-arrow">&rarr;</span>
+                              <span className="route-arrow"><FiArrowRight /></span>
                               <span>{item.villeArrivee}</span>
                             </div>
                           </td>

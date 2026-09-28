@@ -12,6 +12,7 @@ import api from "../../services/api";
 import "../../styles/global.css";
 import "./styles/admin.css";
 import PaginationComponent from "../../components/common/Pagination";
+import { FiArrowRight } from "react-icons/fi";
 
 function ReservationsPage() {
   const [reservations, setReservations] = useState([]);
@@ -43,6 +44,7 @@ function ReservationsPage() {
       setReservations(res.data?.content || []);
       setTotalPages(res.data?.totalPages || 1);
       setTotalElements(res.data?.totalElements || 0);
+      console.log(res.data?.content)
     })
       .catch((err) => {
         console.error("Erreur lors de la récupération :", err);
@@ -131,10 +133,10 @@ function ReservationsPage() {
                             ? new Date(item.dateReservation).toLocaleDateString("fr-FR")
                             : "-"}
                         </td>
-                        <td>{item.trajetId ? `Trajet #${item.trajetId}` : "-"}</td>
-                        <td>{item.cargaisonId ? `Cargaison #${item.cargaisonId}` : "-"}</td>
-                        <td>{item.poidsReserve != null ? `${item.poidsReserve} kg` : "-"}</td>
-                        <td>{item.prixConvenu != null ? `${item.prixConvenu} DH` : "-"}</td>
+                        <td>{item.villeDepart} <FiArrowRight/> {item.villeArrivee}</td>
+                        <td>{item.description}</td>
+                        <td>{item.poidsReserve} kg</td>
+                        <td>{item.prixConvenu} DH</td>
 
                         <td>
                           <span

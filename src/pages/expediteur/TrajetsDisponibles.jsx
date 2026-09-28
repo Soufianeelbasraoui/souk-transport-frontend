@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import api from "../../services/api";
 import "./styles/TrajetsDisponibles.css";
-import { FiBox, FiCalendar, FiMapPin, FiSearch, FiTruck, FiRotateCcw, FiPlus } from "react-icons/fi";
+import { FiBox, FiCalendar, FiMapPin, FiSearch, FiTruck, FiRotateCcw, FiPlus, FiArrowRight } from "react-icons/fi";
 import PaginationComponent from "../../components/common/Pagination";
 import { Link } from "react-router-dom";
 
@@ -110,24 +110,8 @@ function TrajetsDisponibles() {
             </div>
           </div>
 
-          <div className="container">
-            <div className="trajets-results-bar">
-              <span className="trajets-count">
-                <strong>{totalElements}</strong> trajets trouvés
-              </span>
 
-              <div className="trajets-sort-group">
-                <label>Trier par :</label>
-                <select className="trajets-sort-select">
-                  <option value="recent">Plus récents</option>
-                  <option value="poids">Poids disponible</option>
-                  <option value="prix">Prix</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="container">
+          <div className="container mt-5">
             <div className="row g-4 mb-4">
               {trajets.length > 0 ? (
                 trajets.map((t) => (
@@ -135,7 +119,7 @@ function TrajetsDisponibles() {
                     <div className="trajet-card">
                       <div className="trajet-card-header">
                         <span className="trajet-cities">
-                          {t.villeDepart} → {t.villeArrivee}
+                          {t.villeDepart} <FiArrowRight/> {t.villeArrivee}
                         </span>
                         <span
                           className={`status-badge ${

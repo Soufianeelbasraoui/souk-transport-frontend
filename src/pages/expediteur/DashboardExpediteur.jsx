@@ -6,6 +6,7 @@ import Sidebar from "../../components/layout/Sidebar";
 import api from "../../services/api";
 import "./styles/Expediteur.css";
 import "../../styles/global.css";
+import { FiArrowRight } from "react-icons/fi";
 
 function DashboardExpediteur() {
   const [trajets, setTrajets] = useState([]);
@@ -111,7 +112,7 @@ function DashboardExpediteur() {
                   <div className="trajet-col-route">
                     <div className="trajet-route-title">
                       <span>{item.villeDepart}</span>
-                      <span className="trajet-route-arrow">→</span>
+                      <span className="trajet-route-arrow"><FiArrowRight /></span>
                       <span>{item.villeArrivee}</span>
                     </div>
                     <div className="trajet-date">{item.displayDate}</div>

@@ -8,6 +8,7 @@ import api from "../../services/api";
 import "../../styles/global.css";
 import "../../styles/formPage.css";
 import { jwtDecode } from "jwt-decode";
+import { FiArrowLeft } from "react-icons/fi";
 
 const schema = yup.object({
   marque: yup.string().required("La marque est obligatoire"),
@@ -82,11 +83,8 @@ function AjouterCamion() {
             <p>Remplissez les informations pour enregistrer votre camion.</p>
           </div>
 
-          <Link
-            to={isAdmin ? "/admin/camions" : "/transporteur/camions"}
-            className="btn-cancel"
-          >
-            Mes camions
+          <Link to={isAdmin ? "/admin/camions" : "/transporteur/camions"} className="btn-cancel">
+             <FiArrowLeft />Mes camions
           </Link>
         </div>
 

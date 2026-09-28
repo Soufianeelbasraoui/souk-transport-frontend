@@ -34,9 +34,7 @@ function DetailReservation() {
       setReservation(reservationData);
 
       try {
-        const paiementRes = await api.get(
-          `/api/paiements/cargaison/${reservationData.cargaisonId}`
-        );
+        const paiementRes = await api.get( `/api/paiements/cargaison/${reservationData.cargaisonId}` );
         setPaiement(paiementRes.data);
       } catch (err) {
         setPaiement(null);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiEye, FiCreditCard, FiTruck } from "react-icons/fi";
+import { FiEye, FiCreditCard, FiTruck, FiArrowRight } from "react-icons/fi";
 
 import Sidebar from "../../components/layout/Sidebar";
 import PaginationComponent from "../../components/common/Pagination";
@@ -120,12 +120,11 @@ function MesReservations() {
                           : "-"}
                       </td>
                       <td>
-                        <strong>{res.villeDepart || `Trajet #${res.trajetId}`}</strong>
-                        {res.villeArrivee && ` → ${res.villeArrivee}`}
+                        <strong>{res.villeDepart} <FiArrowRight /> {res.villeArrivee}</strong>
                       </td>
-                      <td>{res.description || `Cargaison #${res.cargaisonId}`}</td>
-                      <td>{res.poidsReserve != null ? `${res.poidsReserve} kg` : "-"}</td>
-                      <td className="fw-bold">{res.prixConvenu != null ? `${res.prixConvenu} DH` : "-"}</td>
+                      <td>{res.description }</td>
+                      <td>{res.poidsReserve} Kg</td>
+                      <td className="fw-bold">{res.prixConvenu} DH</td>
                       <td>
                         <span className={`status-badge ${getStatusClass(res.statutReservation)}`}>
                           {getStatusLabel(res.statutReservation)}

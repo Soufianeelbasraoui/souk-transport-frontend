@@ -3,8 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   FiArrowLeft, 
   FiCheck, 
-  FiMapPin, 
-  FiPhone, 
+  FiMapPin,  
   FiTruck,
   FiInfo
 } from "react-icons/fi";
@@ -181,15 +180,7 @@ function SuiviCargaison() {
 
 
               <div className="suivi-actions-bar">
-                <a href={`tel:${telephone}`} className="btn-suivi-call">
-                  <FiPhone />
-                  <span>Appeler</span>
-                </a>
-
-                <Link
-                  to={`/expediteur/cargaisons/${cargaison.id}`}
-                  className="btn-suivi-details"
-                >
+                <Link  to={`/expediteur/cargaisons/${cargaison.id}`}  className="btn-suivi-details">
                   <FiInfo />
                   <span>Voir détails</span>
                 </Link>

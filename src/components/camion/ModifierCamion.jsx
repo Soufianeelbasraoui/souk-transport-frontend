@@ -15,31 +15,17 @@ import "../../styles/formPage.css";
 import { FiArrowLeft } from "react-icons/fi";
 
 const schema = yup.object({
-  marque: yup
-    .string()
-    .required("La marque est obligatoire"),
+  marque: yup.string() .required("La marque est obligatoire"),
 
-  modele: yup
-    .string()
-    .required("Le modèle est obligatoire"),
+  modele: yup.string().required("Le modèle est obligatoire"),
 
-  type: yup
-    .string()
-    .required("Le type est obligatoire"),
+  type: yup.string().required("Le type est obligatoire"),
 
-  immatriculation: yup
-    .string()
-    .required("L'immatriculation est obligatoire"),
+  immatriculation: yup.string().required("L'immatriculation est obligatoire"),
 
-  capacite: yup
-    .number()
-    .typeError("La capacité doit être un nombre")
-    .positive("La capacité doit être positive")
-    .required("La capacité est obligatoire"),
+  capacite: yup.number().typeError("La capacité doit être un nombre").positive("La capacité doit être positive").required("La capacité est obligatoire"),
 
-  disponible: yup
-    .boolean()
-    .required("La disponibilité est obligatoire"),
+  disponible: yup.boolean().required("La disponibilité est obligatoire"),
 });
 
 function ModifierCamion() {
@@ -92,7 +78,6 @@ function ModifierCamion() {
         setValue( "disponible", camion.disponible ?? true);
         const typesResponse = await api.get("/api/camions/types");
 
-        console.log("Types camion :",  typesResponse.data);
 
         setTypesCamion(typesResponse.data || []);
 
@@ -123,41 +108,21 @@ function ModifierCamion() {
         disponible: data.disponible,
       };
 
-      console.log(
-        "Données envoyées :",
-        camionModifie
-      );
+      console.log("Données envoyées :", camionModifie );
 
       const response = await api.put(`/api/camions/${id}`, camionModifie);
 
-      console.log(
-        "Camion modifié :",
-        response.data
-      );
+      console.log( "Camion modifié :", response.data);
 
-      setSubmitSuccess(
-        "Camion modifié avec succès ! Redirection en cours..."
-      );
+      setSubmitSuccess( "Camion modifié avec succès ! Redirection en cours..." );
 
       setTimeout(() => {
         navigate(retourPath);
       }, 1500);
 
     } catch (error) {
-      console.error(
-        "Erreur modification camion :",
-        error
-      );
-
-      console.error(
-        "Response backend :",
-        error.response?.data
-      );
-
-      setSubmitError(
-        error.response?.data?.message ||
-          "Une erreur est survenue. Veuillez réessayer."
-      );
+      console.error( "Erreur modification camion :", );
+      setSubmitError( "Une erreur est survenue. Veuillez réessayer." );
     }
   };
 
@@ -280,7 +245,6 @@ function ModifierCamion() {
 
                 </div>
 
-                {/* TYPE */}
                 <div className="form-group">
 
                   <label>Type</label>
@@ -322,7 +286,7 @@ function ModifierCamion() {
 
                 </div>
 
-                {/* CAPACITE */}
+                
                 <div className="form-group">
 
                   <label>
@@ -349,8 +313,6 @@ function ModifierCamion() {
                   )}
 
                 </div>
-
-                {/* DISPONIBILITE */}
                 <div className="form-group">
 
                   <label>
@@ -388,8 +350,6 @@ function ModifierCamion() {
                 </div>
 
               </div>
-
-              {/* ERROR */}
               {submitError && (
                 <p
                   className="field-error"
@@ -399,22 +359,14 @@ function ModifierCamion() {
                 </p>
               )}
 
-              {/* SUCCESS */}
               {submitSuccess && (
-                <p
-                  style={{
-                    marginTop: 16,
-                    color: "#2a7d30",
-                    fontSize: 13,
-                  }}
-                >
+                <p style={{ marginTop: 16, color: "#2a7d30", fontSize: 13,}}  >
                   {submitSuccess}
                 </p>
               )}
 
             </div>
 
-            {/* FOOTER */}
             <div className="form-card-footer">
 
               <Link

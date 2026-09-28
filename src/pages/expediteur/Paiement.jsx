@@ -49,7 +49,7 @@ function Paiement() {
       }
     } catch (err) {
       console.error("Erreur chargement :", err);
-      setError(err.response?.data?.message || "Impossible de charger les informations.");
+      setError("Impossible de charger les informations.");
     } finally {
       setLoading(false);
     }
@@ -196,7 +196,7 @@ function Paiement() {
 
           <div className="info-group">
             <span className="info-label">Cargaison</span>
-            <strong>{reservation.description || `Cargaison #${reservation.cargaisonId}`}</strong>
+            <strong>{reservation.description}</strong>
           </div>
 
           <div className="info-group">

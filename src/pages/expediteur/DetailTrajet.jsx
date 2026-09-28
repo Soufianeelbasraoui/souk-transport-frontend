@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiBox, FiCalendar, FiMapPin, FiTruck, FiSlash } from "react-icons/fi";
+import { FiArrowLeft, FiBox, FiCalendar, FiMapPin, FiTruck, FiSlash, FiArrowRight } from "react-icons/fi";
 
 import Sidebar from "../../components/layout/Sidebar";
 import Loader from "../../components/common/Loader";
@@ -133,7 +133,7 @@ function DetailTrajet() {
                 <div className="trajet-info-grid">
                   <div className="info-item">
                     <FiMapPin className="info-icon" />
-                    <div><span>Départ / Arrivée</span><strong>{trajet.villeDepart} → {trajet.villeArrivee}</strong></div>
+                    <div><span>Départ / Arrivée</span><strong>{trajet.villeDepart} <FiArrowRight /> {trajet.villeArrivee}</strong></div>
                   </div>
                   <div className="info-item">
                     <FiCalendar className="info-icon" />

@@ -61,7 +61,7 @@ function ConsulterCargaison() {
           <div className="form-card">
             <div className="form-card-header">
               <div className="d-flex justify-content-between align-items-center">
-                <h5>Cargaison #{String(cargaison.id).padStart(4, "0")}</h5>
+                <h5>Cargaison #{cargaison.id}</h5>
                 <p>
                   <span
                     className={`status-badge ${ cargaison.statutCargaison === "LIVREE" ? "status-open" : cargaison.statutCargaison === "EN_TRANSIT" ? "status-progress" : "status-other" }`} > {cargaison.statutCargaison}
@@ -89,7 +89,7 @@ function ConsulterCargaison() {
                 <div className="form-group form-group-full">
                   <label>Description du chargement</label>
                   <p className="form-control-custom">
-                    {cargaison.description || "N/A"}
+                    {cargaison.description}
                   </p>
                 </div>
 
@@ -105,8 +105,7 @@ function ConsulterCargaison() {
             <div className="form-card-footer">
               {cargaison.statutCargaison !== "LIVREE" && cargaison.statutCargaison !== "EN_TRANSIT" ? (
 
-                <Link
-                  to={ user.role === "ADMIN"  ? `/admin/cargaisons/edit/${cargaison.id}`: `/expediteur/cargaisons/edit/${cargaison.id}` } className="btn-submit" >
+                <Link to={ user.role === "ADMIN"  ? `/admin/cargaisons/edit/${cargaison.id}`: `/expediteur/cargaisons/edit/${cargaison.id}` } className="btn-submit" >
                   Modifier
                 </Link>
               ) : (

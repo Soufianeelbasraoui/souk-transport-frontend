@@ -18,13 +18,11 @@ function ConsulterCamion() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get(`/api/camions/${id}`)
-      .then((res) => {
+    api.get(`/api/camions/${id}`).then((res) => {
         setCamion(res.data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Erreur lors de la récupération du camion:", err);
         setError("Impossible de charger les informations de ce camion.");
         setLoading(false);
       });

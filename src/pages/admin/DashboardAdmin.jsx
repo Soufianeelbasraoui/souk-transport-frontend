@@ -6,6 +6,7 @@ import "./styles/admin.css";
 import { FaTruck, FaBox, FaMoneyBillWave, FaUsers, FaEllipsisV,} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
+import { FiArrowRight } from "react-icons/fi";
 
 function DashboardAdmin() {
 
@@ -150,7 +151,7 @@ function DashboardAdmin() {
                   <thead>
                     <tr>
                       <th>ID Trajet</th>
-                      <th>Départ → Arrivée</th>
+                      <th><span>Départ</span><FiArrowRight /> <span>Arrivée </span></th>
                       <th>Date</th>
                       <th>Camion</th>
                       <th>Statut</th>
@@ -164,16 +165,15 @@ function DashboardAdmin() {
                         <tr key={item.id}>
                           <td>
                             <span className="trajet-id">
-                              T-{String(item.id).padStart(4, "0")}
+                              T-{item.id}
                             </span>
                           </td>
 
 
                           <td>
-
                             <div className="route-cell">
                               <span>  {item.villeDepart} </span>
-                              <span className="route-arrow">  → </span>
+                              <span className="route-arrow">  <FiArrowRight/> </span>
                               <span> {item.villeArrivee} </span>
                             </div>
                           </td>
@@ -246,7 +246,7 @@ function DashboardAdmin() {
                       <div className="admin-reservation-content">
                         <strong>
                           {item.villeDepart || "Départ"}
-                          {" → "}
+                          <FiArrowRight />
                           {item.villeArrivee || "Arrivée"}
                         </strong>
             

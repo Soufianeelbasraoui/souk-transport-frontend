@@ -12,6 +12,7 @@ import Loader from "../../components/common/Loader";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 import PaginationComponent from "../../components/common/Pagination";
+import { FiArrowRight } from "react-icons/fi";
 
 function MesTrajets() {
   const [mesTrajets, setMesTrajets] = useState([]);
@@ -105,7 +106,7 @@ function MesTrajets() {
                   <thead>
                     <tr>
                       <th>ID Trajet</th>
-                      <th>Départ &rarr; Arrivée</th>
+                      <th><span>Départ</span> <FiArrowRight /> <span>Arrivée</span></th>
                       <th>Date</th>
                       <th>Capacite</th>
                       <th>Prix</th>
@@ -127,7 +128,7 @@ function MesTrajets() {
                           <td>
                             <div className="route-cell">
                               <span>{item.villeDepart}</span>
-                              <span className="route-arrow">&rarr;</span>
+                              <span className="route-arrow"><FiArrowRight/></span>
                               <span>{item.villeArrivee}</span>
                             </div>
                           </td>

@@ -14,8 +14,7 @@ function ProfileAdmin() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get("/api/admins/profile")
-      .then((res) => {
+    api.get("/api/admins/profile").then((res) => {
         setProfile(res.data);
       })
       .catch((err) => {
@@ -74,35 +73,35 @@ function ProfileAdmin() {
                     <label className="profile-label">
                       <FaUser className="me-1 text-muted" /> Prénom
                     </label>
-                    <div className="profile-value">{profile.prenom || "N/A"}</div>
+                    <div className="profile-value">{profile.prenom}</div>
                   </div>
 
                   <div className="col-md-6">
                     <label className="profile-label">
                       <FaUser className="me-1 text-muted" /> Nom
                     </label>
-                    <div className="profile-value">{profile.nom || "N/A"}</div>
+                    <div className="profile-value">{profile.nom}</div>
                   </div>
 
                   <div className="col-md-6">
                     <label className="profile-label">
                       <FaEnvelope className="me-1 text-muted" /> Email
                     </label>
-                    <div className="profile-value">{profile.email || "N/A"}</div>
+                    <div className="profile-value">{profile.email}</div>
                   </div>
 
                   <div className="col-md-6">
                     <label className="profile-label">
                       <FaPhone className="me-1 text-muted" /> Téléphone
                     </label>
-                    <div className="profile-value">{profile.telephone || "N/A"}</div>
+                    <div className="profile-value">{profile.telephone }</div>
                   </div>
 
                   <div className="col-md-6">
                     <label className="profile-label">
                       <FaMapMarkerAlt className="me-1 text-muted" /> Ville
                     </label>
-                    <div className="profile-value">{profile.ville || "N/A"}</div>
+                    <div className="profile-value">{profile.ville}</div>
                   </div>
 
                   {profile.cin && (
