@@ -64,9 +64,7 @@ function PublierTrajet() {
       setSubmitSuccess("Trajet publié avec succès ! Redirection en cours…");
       setTimeout(() => navigate(retourPath), 1500);
     } catch (error) {
-      setSubmitError(
-        error.response?.data?.message || "Une erreur est survenue. Veuillez réessayer."
-      );
+      setSubmitError( "Une erreur est survenue. Veuillez réessayer.");
     }
   };
 

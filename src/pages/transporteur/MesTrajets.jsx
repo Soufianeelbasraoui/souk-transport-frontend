@@ -148,7 +148,7 @@ function MesTrajets() {
                           </td>
                           <td>
                             <div className="truck-cell">
-                              <strong>{item.poidsDisponible || "CAPACITÉ"} Tonnes</strong>
+                              <strong>{item.poidsDisponible || "CAPACITÉ"} Kg</strong>
                             </div>
                           </td>
                           <td className="truck-greane">

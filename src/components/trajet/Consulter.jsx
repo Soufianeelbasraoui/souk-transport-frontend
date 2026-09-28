@@ -128,7 +128,7 @@ function ConsulterTrajet() {
                   <label>Poids disponible</label>
 
                   <p className="form-control-custom">
-                    {trajet.poidsDisponible ?? 0} Tonnes
+                    {trajet.poidsDisponible ?? 0} Kg
                   </p>
                 </div>
 

@@ -135,7 +135,6 @@ function DashboardExpediteur() {
                     <span className="trajet-price-value">
                       {item.prix} DH
                     </span>
-                    <span className="trajet-price-unit">par tonne</span>
                   </div>
 
                   <div>

@@ -354,7 +354,7 @@ function ModifierTrajet() {
                 <div className="form-group">
 
                   <label>
-                    Poids disponible (Tonnes)
+                    Poids disponible (Kg)
                   </label>
 
                   <input
