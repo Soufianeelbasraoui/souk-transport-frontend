@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FiUsers,
   FiSearch,
   FiDownload,
   FiPlus,
   FiSlash,
   FiCheckCircle,
-  FiXCircle,
-  FiUserCheck,
   FiMail,
   FiPhone,
   FiMapPin,

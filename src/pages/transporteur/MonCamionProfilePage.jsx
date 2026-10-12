@@ -1,30 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import {
   FiTruck,
   FiUser,
-  FiShield,
   FiSave,
   FiCheck,
   FiMapPin,
-  FiPhone,
-  FiMail,
   FiLock,
-  FiBriefcase,
-  FiFileText,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import transporteurService from '../../api/services/transporteurService';
 import client from '../../api/client';
 import { parseApiError } from '../../utils/parseApiError';
-import { formatNumber } from '../../utils/format';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import Tabs from '../../components/common/Tabs';
-import Badge from '../../components/common/Badge';
 import DemoBadge from '../../components/common/DemoBadge';
 
 export const MonCamionProfilePage = () => {
@@ -32,7 +24,6 @@ export const MonCamionProfilePage = () => {
   const [activeTab, setActiveTab] = useState('camion');
   const [camions, setCamions] = useState([]);
   const [selectedCamion, setSelectedCamion] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   // États pour les sauvegardes par section
   const [isSavingGeneral, setIsSavingGeneral] = useState(false);
@@ -78,8 +69,8 @@ export const MonCamionProfilePage = () => {
   const [telephone, setTelephone] = useState('0661234567');
   const [ville, setVille] = useState('Casablanca');
   const [nomEntreprise, setNomEntreprise] = useState('Atlas Express Logistique SARL');
-  const [ice, setIce] = useState('002345678000092');
-  const [cin, setCin] = useState('BK123456');
+  const [ice] = useState('002345678000092');
+  const [cin] = useState('BK123456');
 
   // Formulaire Mot de passe
   const [ancienMdp, setAncienMdp] = useState('');

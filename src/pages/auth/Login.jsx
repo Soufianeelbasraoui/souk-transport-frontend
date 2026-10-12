@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiX, FiMail } from "react-icons/fi";
+import { FiArrowLeft, FiX } from "react-icons/fi";
 import { FaGoogle } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";

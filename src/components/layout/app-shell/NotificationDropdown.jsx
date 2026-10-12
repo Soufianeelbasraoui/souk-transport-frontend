@@ -5,14 +5,11 @@ import {
   FiBell,
   FiCheck,
   FiCheckCircle,
-  FiPackage,
   FiDollarSign,
   FiStar,
   FiAlertTriangle,
-  FiShield,
   FiMessageSquare,
   FiInbox,
-  FiExternalLink,
 } from 'react-icons/fi';
 import { useNotifications } from '../../../context/NotificationContext';
 import { formatDate } from '../../../utils/format';
@@ -60,7 +57,7 @@ const getTypeConfig = (type) => {
 
 export const NotificationDropdown = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const isRtl = i18n.language === 'ar';
 

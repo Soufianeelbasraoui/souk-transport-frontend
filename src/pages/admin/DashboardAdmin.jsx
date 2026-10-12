@@ -7,10 +7,6 @@ import {
   FiAlertTriangle,
   FiCheckSquare,
   FiArrowRight,
-  FiActivity,
-  FiTruck,
-  FiShield,
-  FiMapPin,
   FiPercent,
 } from 'react-icons/fi';
 import {
@@ -26,7 +22,6 @@ import adminService from '../../api/services/adminService';
 import { formatCurrency, formatNumber } from '../../utils/format';
 import KpiCard from '../../components/common/KpiCard';
 import Card from '../../components/common/Card';
-import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import Skeleton from '../../components/common/Skeleton';
 import DemoBadge from '../../components/common/DemoBadge';

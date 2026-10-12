@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  FiDollarSign,
   FiCreditCard,
   FiArrowUpRight,
   FiArrowDownLeft,
-  FiClock,
-  FiDownload,
-  FiCheckCircle,
-  FiAlertCircle,
-  FiPlus,
 } from 'react-icons/fi';
 import {
   ResponsiveContainer,
@@ -22,14 +16,13 @@ import {
 import { toast } from 'react-toastify';
 import transporteurService from '../../api/services/transporteurService';
 import { parseApiError } from '../../utils/parseApiError';
-import { formatCurrency, formatNumber, formatDate } from '../../utils/format';
+import { formatCurrency, formatDate } from '../../utils/format';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import DataTable from '../../components/common/DataTable';
 import Badge from '../../components/common/Badge';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
-import Skeleton from '../../components/common/Skeleton';
 import DemoBadge from '../../components/common/DemoBadge';
 
 export const RevenusPage = () => {

@@ -29,7 +29,6 @@ export const KpiCard = ({
   const hasTrend = trend !== undefined && trend !== null;
   const isPositive = hasTrend && Number(trend) > 0;
   const isNegative = hasTrend && Number(trend) < 0;
-  const isNeutral = hasTrend && Number(trend) === 0;
 
   return (
     <div

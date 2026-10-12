@@ -34,7 +34,6 @@ function CreerCargaison() {
   const user = token ? jwtDecode(token) : null;
 
   const isAdmin = user?.role === "ADMIN";
-  const isExpediteur = user?.role === "EXPEDITEUR";
 
   const [expediteurs, setExpediteurs] = useState([]);
   const [submitError, setSubmitError] = useState("");

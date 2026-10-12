@@ -1,16 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  FiCheckSquare,
   FiFileText,
   FiCheckCircle,
   FiXCircle,
   FiClock,
-  FiUser,
-  FiPhone,
-  FiMail,
   FiEye,
-  FiShield,
-  FiAlertCircle,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import adminService from '../../api/services/adminService';

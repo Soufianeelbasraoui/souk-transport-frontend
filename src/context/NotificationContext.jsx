@@ -6,10 +6,10 @@ import { useAuth } from './AuthContext';
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   // Rafraîchir le compteur et la liste récente
   const refreshNotifications = useCallback(async () => {

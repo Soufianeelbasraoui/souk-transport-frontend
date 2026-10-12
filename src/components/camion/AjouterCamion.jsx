@@ -27,7 +27,6 @@ function AjouterCamion() {
   const user = jwtDecode(token);
 
   const isAdmin = user.role === "ADMIN";
-  const isTransporteur = user.role === "TRANSPORTEUR";
 
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");

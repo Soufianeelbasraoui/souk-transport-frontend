@@ -2,15 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   FiTrendingUp,
   FiDollarSign,
-  FiPieChart,
-  FiUsers,
   FiDownload,
-  FiTruck,
   FiMapPin,
-  FiActivity,
   FiAward,
   FiCheckCircle,
-  FiCalendar,
 } from 'react-icons/fi';
 import {
   ResponsiveContainer,
@@ -28,7 +23,7 @@ import {
 } from 'recharts';
 import { toast } from 'react-toastify';
 import adminService from '../../api/services/adminService';
-import { formatCurrency, formatNumber } from '../../utils/format';
+import { formatCurrency } from '../../utils/format';
 import KpiCard from '../../components/common/KpiCard';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';

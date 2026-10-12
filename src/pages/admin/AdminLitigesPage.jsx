@@ -1,14 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  FiAlertTriangle,
   FiCheckCircle,
-  FiDollarSign,
   FiFileText,
-  FiClock,
-  FiMessageSquare,
   FiShield,
   FiEye,
-  FiHelpCircle,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import adminService from '../../api/services/adminService';

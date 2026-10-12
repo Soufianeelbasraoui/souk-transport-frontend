@@ -4,13 +4,8 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  FiMapPin,
-  FiNavigation,
-  FiClock,
-  FiActivity,
   FiArrowLeft,
   FiRefreshCw,
-  FiTruck,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import transporteurService from '../../api/services/transporteurService';

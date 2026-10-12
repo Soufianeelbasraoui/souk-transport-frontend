@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import {
   FiMenu,
   FiSearch,
-  FiBell,
   FiGlobe,
   FiChevronDown,
   FiUser,

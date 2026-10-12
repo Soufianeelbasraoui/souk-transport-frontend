@@ -3,20 +3,15 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   FiArrowLeft,
   FiMapPin,
-  FiCalendar,
   FiTruck,
   FiShield,
   FiStar,
-  FiBox,
   FiCheckCircle,
-  FiInfo,
-  FiDollarSign,
-  FiPlus,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import expediteurService from '../../api/services/expediteurService';
 import { parseApiError } from '../../utils/parseApiError';
-import { formatCurrency, formatNumber, formatDate, formatPercent } from '../../utils/format';
+import { formatCurrency, formatNumber, formatDate } from '../../utils/format';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Card from '../../components/common/Card';

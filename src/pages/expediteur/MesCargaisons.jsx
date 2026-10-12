@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FiBox,
   FiPlus,
   FiSearch,
   FiMapPin,
   FiCheckCircle,
-  FiTruck,
-  FiDollarSign,
-  FiClock,
   FiPhone,
   FiUser,
 } from 'react-icons/fi';

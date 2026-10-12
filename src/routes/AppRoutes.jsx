@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 
 // Pages Publiques & Landing

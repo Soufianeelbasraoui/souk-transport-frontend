@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FiCommand, FiSearch, FiHelpCircle, FiGrid, FiTruck, FiPackage, FiDollarSign, FiUsers, FiX } from 'react-icons/fi';
+import { FiSearch, FiHelpCircle, FiGrid, FiTruck, FiPackage, FiDollarSign, FiUsers, FiX } from 'react-icons/fi';
 import Modal from '../../common/Modal';
 
 export const ShortcutsHelpModal = ({ isOpen, onClose }) => {
