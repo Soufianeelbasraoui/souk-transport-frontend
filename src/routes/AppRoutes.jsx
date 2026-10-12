@@ -13,7 +13,6 @@ import ProtectedRoute from './ProtectedRoute';
 import RoleRoute from './RoleRoute';
 import PublicRoute from './PublicRoute';
 import AppLayout from '../components/layout/app-shell/AppLayout';
-import Skeleton from '../components/common/Skeleton';
 
 // Page de développement Design System
 import DesignSystemPage from '../pages/dev/DesignSystemPage';
@@ -64,12 +63,6 @@ import Paiement from '../pages/expediteur/Paiement';
 import ProfileExpediteur from '../pages/expediteur/Profile';
 import SuiviCargaison from '../pages/expediteur/SuiviCargaison';
 
-const PageFallback = () => (
-  <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-    <Skeleton height={32} width="40%" />
-    <Skeleton height={200} />
-  </div>
-);
 
 function AppRoutes() {
   return (
