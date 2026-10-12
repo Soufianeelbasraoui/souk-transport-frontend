@@ -87,7 +87,6 @@ function CreerCargaison() {
         payload.expediteurId = data.expediteurId;
       }
 
-      console.log("Payload envoyé :", payload);
       await api.post("/api/cargaisons", payload);
 
       setSubmitSuccess("Cargaison ajoutée avec succès !");

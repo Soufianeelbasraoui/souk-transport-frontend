@@ -77,7 +77,6 @@ function ModifierTrajet() {
     try {
       const trajetRes = await api.get(`/api/trajets/${id}`);
       const trajet = trajetRes.data;
-      console.log("Trajet chargé :", trajet);
 
       let listeCamions = [];
 
@@ -102,8 +101,6 @@ function ModifierTrajet() {
           console.warn("Impossible de récupérer le camion actuel :", err);
         }
       }
-
-      console.log("Camions disponibles :", listeCamions);
 
       setCamions(listeCamions);
 
@@ -165,16 +162,9 @@ function ModifierTrajet() {
         camionId: Number(data.camionId),
       };
 
-      console.log(
-        "Données envoyées :",
+      await api.put( `/api/trajets/${id}`,
         trajetModifie
       );
-
-      const res = await api.put( `/api/trajets/${id}`,
-        trajetModifie
-      );
-
-      console.log(  "Trajet modifié :", res.data);
 
       setSubmitSuccess( "Trajet modifié avec succès ! Redirection en cours...");
 
