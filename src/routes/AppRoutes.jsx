@@ -1,119 +1,187 @@
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 
-
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Login from '../pages/auth/Login';
+// Pages Publiques & Landing
 import HomePage from '../pages/HomePage';
+import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
-import DashboardAdmin from '../pages/admin/DashboardAdmin';
-import CamionsPage from '../pages/admin/CamionsPage';
-import DashboardTransporteur from '../pages/transporteur/DashboardTransporteur';
-import DashboardExpediteur from '../pages/expediteur/DashboardExpediteur';
+import Unauthorized from '../pages/unauthorized';
+import NotFoundPage from '../pages/NotFoundPage';
+
+// Routes de protection & Layout
 import ProtectedRoute from './ProtectedRoute';
 import RoleRoute from './RoleRoute';
-import NotFoundPgae from '../pages/NotFoundPage';
-import ReservationsRecues from '../pages/transporteur/ReservationsRecues';
+import PublicRoute from './PublicRoute';
+import AppLayout from '../components/layout/app-shell/AppLayout';
+import Skeleton from '../components/common/Skeleton';
 
+// Page de développement Design System
+import DesignSystemPage from '../pages/dev/DesignSystemPage';
 
-import ConsulterCamion from '../components/camion/Consulter';
-import ModifierCamion from '../components/camion/ModifierCamion';
+// Pages Admin
+import DashboardAdmin from '../pages/admin/DashboardAdmin';
+import CamionsPage from '../pages/admin/CamionsPage';
+import UsersPage from '../pages/admin/users/UsersPage';
+import AjouterUser from '../pages/admin/users/Ajouter';
+import ModifierUser from '../pages/admin/users/Modifier';
+import ConsulterUser from '../pages/admin/users/Consulter';
 import AjouterCamion from '../components/camion/AjouterCamion';
-import MesTrajets from '../pages/transporteur/MesTrajets';
-import MesCamions from '../pages/transporteur/MesCamions';
+import ModifierCamion from '../components/camion/ModifierCamion';
+import ConsulterCamion from '../components/camion/Consulter';
+import TrajetsPage from '../pages/admin/TrajetsPage';
 import PublierTrajet from '../components/trajet/PublierTrajet';
 import ModifierTrajet from '../components/trajet/ModifierTrajet';
 import ConsulterTrajet from '../components/trajet/Consulter';
-import Profile from '../pages/transporteur/Profile';
-import UsersPage from '../pages/admin/users/UsersPage';
-import ModifierUser from '../pages/admin/users/Modifier';
-import ConsulterUser from '../pages/admin/users/Consulter';
-import AjouterUser from '../pages/admin/users/Ajouter';
-import TrajetsPage from '../pages/admin/TrajetsPage';
 import CargaisonsPage from '../pages/admin/CargaisonsPage';
-import ReservationsPage from '../pages/admin/Reservations';
 import CreerCargaison from '../components/cargaison/CreerCargaison';
 import ConsulterCargaison from '../components/cargaison/Consulter';
+import ModifierCargaison from '../components/cargaison/ModifierCargaison';
+import ReservationsPage from '../pages/admin/Reservations';
+import ConsulterReservation from '../pages/admin/ConsulterReservation';
+import PaiementsPage from '../pages/admin/PaiementsPage';
+import ProfileAdmin from '../pages/admin/Profile';
+import AdminVerificationsPage from '../pages/admin/AdminVerificationsPage';
+import AdminLitigesPage from '../pages/admin/AdminLitigesPage';
+import AdminAnalyticsPage from '../pages/admin/AdminAnalyticsPage';
+
+// Pages Transporteur
+import DashboardTransporteur from '../pages/transporteur/DashboardTransporteur';
+import MesTrajets from '../pages/transporteur/MesTrajets';
+import PublierTrajetPage from '../pages/transporteur/PublierTrajetPage';
+import OffresRecuesPage from '../pages/transporteur/OffresRecuesPage';
+import SuiviGpsPage from '../pages/transporteur/SuiviGpsPage';
+import RevenusPage from '../pages/transporteur/RevenusPage';
+import MonCamionProfilePage from '../pages/transporteur/MonCamionProfilePage';
+
+// Pages Expéditeur
+import DashboardExpediteur from '../pages/expediteur/DashboardExpediteur';
 import TrajetsDisponibles from '../pages/expediteur/TrajetsDisponibles';
 import DetailTrajet from '../pages/expediteur/DetailTrajet';
 import MesCargaisons from '../pages/expediteur/MesCargaisons';
 import MesReservations from '../pages/expediteur/MesReservations';
-import Paiement from '../pages/expediteur/Paiement';
 import DetailReservation from '../pages/expediteur/DetailReservation';
-
-import PublicRoute from './PublicRoute';
-import Unauthorized from '../pages/unauthorized';
-import ModifierCargaison from '../components/cargaison/ModifierCargaison';
-import PaiementsPage from '../pages/admin/PaiementsPage';
-import ProfileAdmin from '../pages/admin/Profile';
+import Paiement from '../pages/expediteur/Paiement';
 import ProfileExpediteur from '../pages/expediteur/Profile';
 import SuiviCargaison from '../pages/expediteur/SuiviCargaison';
-import ConsulterReservation from '../pages/admin/ConsulterReservation';
 
-
+const PageFallback = () => (
+  <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <Skeleton height={32} width="40%" />
+    <Skeleton height={200} />
+  </div>
+);
 
 function AppRoutes() {
-
   return (
     <BrowserRouter>
       <Routes>
+        {/* LANDING PAGE : TOTALEMENT GELÉE ET HORS APPLAYOUT */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* AUTH PUBLIQUE */}
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Route>
-        <Route path='/' element={<HomePage />} />
+
         <Route path="/unauthorized" element={<Unauthorized />} />
 
-        <Route path='/admin/dashboard' element={<ProtectedRoute> <RoleRoute roles={["ADMIN"]}><DashboardAdmin /> </RoleRoute>  </ProtectedRoute>} />
-        <Route path='/admin/camions' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><CamionsPage /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/users' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><UsersPage /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/users/new' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><AjouterUser /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/users/edit/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ModifierUser /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/users/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterUser /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/camions/new' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><AjouterCamion /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/camions/edit/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ModifierCamion /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/camions/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterCamion /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/trajets' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><TrajetsPage /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/trajets/new' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><PublierTrajet /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/trajets/edit/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ModifierTrajet /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/trajets/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterTrajet /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/cargaisons' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><CargaisonsPage /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/cargaisons/new' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><CreerCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/cargaisons/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/cargaisons/edit/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ModifierCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/reservations' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ReservationsPage /></RoleRoute></ProtectedRoute>} />
-        <Route path='//admin/reservations/:id' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ConsulterReservation/></RoleRoute></ProtectedRoute>}/>
-        <Route path='/admin/paiements' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><PaiementsPage /></RoleRoute></ProtectedRoute>} />
-        <Route path='/admin/profile' element={<ProtectedRoute><RoleRoute roles={["ADMIN"]}><ProfileAdmin /></RoleRoute></ProtectedRoute>} />
+        {/* PAGE DESIGN SYSTEM (DEV) */}
+        <Route
+          path="/design-system"
+          element={
+            <AppLayout>
+              <DesignSystemPage />
+            </AppLayout>
+          }
+        />
 
-        <Route path='/transporteur/dashboard' element={<ProtectedRoute> <RoleRoute roles={["TRANSPORTEUR"]}>   <DashboardTransporteur />  </RoleRoute> </ProtectedRoute>} />
-        <Route path='/transporteur/trajets' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR"]}><MesTrajets /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/trajets/new' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR", "ADMIN"]}><PublierTrajet /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/trajets/edit/:id' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR", "ADMIN"]}><ModifierTrajet /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/trajets/:id' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR", "ADMIN"]}><ConsulterTrajet /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/camions' element={<ProtectedRoute ><RoleRoute roles={["TRANSPORTEUR"]}><MesCamions /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/camions/new' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR"]}><AjouterCamion /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/camions/edit/:id' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR"]}><ModifierCamion /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/camions/:id' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR"]}><ConsulterCamion /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/reservations' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR"]}><ReservationsRecues /></RoleRoute></ProtectedRoute>} />
-        <Route path='/transporteur/profile' element={<ProtectedRoute><RoleRoute roles={["TRANSPORTEUR"]}><Profile /></RoleRoute></ProtectedRoute>} />
+        {/* ================================================================= */}
+        {/* ROUTES CONNECTÉES ENVELOPPÉES DANS APPLAYOUT                      */}
+        {/* ================================================================= */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          {/* --- ADMIN --- */}
+          <Route path="/admin/dashboard" element={<RoleRoute roles={['ADMIN']}><DashboardAdmin /></RoleRoute>} />
+          <Route path="/admin/users" element={<RoleRoute roles={['ADMIN']}><UsersPage /></RoleRoute>} />
+          <Route path="/admin/users/new" element={<RoleRoute roles={['ADMIN']}><AjouterUser /></RoleRoute>} />
+          <Route path="/admin/users/edit/:id" element={<RoleRoute roles={['ADMIN']}><ModifierUser /></RoleRoute>} />
+          <Route path="/admin/users/:id" element={<RoleRoute roles={['ADMIN']}><ConsulterUser /></RoleRoute>} />
+          <Route path="/admin/camions" element={<RoleRoute roles={['ADMIN']}><CamionsPage /></RoleRoute>} />
+          <Route path="/admin/camions/new" element={<RoleRoute roles={['ADMIN']}><AjouterCamion /></RoleRoute>} />
+          <Route path="/admin/camions/edit/:id" element={<RoleRoute roles={['ADMIN']}><ModifierCamion /></RoleRoute>} />
+          <Route path="/admin/camions/:id" element={<RoleRoute roles={['ADMIN']}><ConsulterCamion /></RoleRoute>} />
+          <Route path="/admin/trajets" element={<RoleRoute roles={['ADMIN']}><TrajetsPage /></RoleRoute>} />
+          <Route path="/admin/trajets/new" element={<RoleRoute roles={['ADMIN']}><PublierTrajet /></RoleRoute>} />
+          <Route path="/admin/trajets/edit/:id" element={<RoleRoute roles={['ADMIN']}><ModifierTrajet /></RoleRoute>} />
+          <Route path="/admin/trajets/:id" element={<RoleRoute roles={['ADMIN']}><ConsulterTrajet /></RoleRoute>} />
+          <Route path="/admin/cargaisons" element={<RoleRoute roles={['ADMIN']}><CargaisonsPage /></RoleRoute>} />
+          <Route path="/admin/cargaisons/new" element={<RoleRoute roles={['ADMIN']}><CreerCargaison /></RoleRoute>} />
+          <Route path="/admin/cargaisons/:id" element={<RoleRoute roles={['ADMIN']}><ConsulterCargaison /></RoleRoute>} />
+          <Route path="/admin/cargaisons/edit/:id" element={<RoleRoute roles={['ADMIN']}><ModifierCargaison /></RoleRoute>} />
+          <Route path="/admin/reservations" element={<RoleRoute roles={['ADMIN']}><ReservationsPage /></RoleRoute>} />
+          <Route path="/admin/reservations/:id" element={<RoleRoute roles={['ADMIN']}><ConsulterReservation /></RoleRoute>} />
+          <Route path="/admin/paiements" element={<RoleRoute roles={['ADMIN']}><PaiementsPage /></RoleRoute>} />
+          <Route path="/admin/transactions" element={<Navigate to="/admin/paiements" replace />} />
+          <Route path="/admin/profile" element={<RoleRoute roles={['ADMIN']}><ProfileAdmin /></RoleRoute>} />
+          <Route path="/admin/parametres" element={<Navigate to="/admin/profile" replace />} />
 
-        <Route path='/expediteur/dashboard' element={<ProtectedRoute> <RoleRoute roles={["EXPEDITEUR"]}> <DashboardExpediteur /> </RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/trajets' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><TrajetsDisponibles /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/cargaisons/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ConsulterCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/cargaisons/:id/suivi' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><SuiviCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/suivi/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><SuiviCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/detailtrajet/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><DetailTrajet /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/cargaisons' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><MesCargaisons /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/cargaisons/edit/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ModifierCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/cargaisons/new' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><CreerCargaison /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/reservations' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><MesReservations /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/reservations/:id' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><DetailReservation /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/profile' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><ProfileExpediteur /></RoleRoute></ProtectedRoute>} />
-        <Route path='/expediteur/paiements' element={<ProtectedRoute><RoleRoute roles={["EXPEDITEUR"]}><Paiement /></RoleRoute></ProtectedRoute>} />
+          {/* Phase D : Vérifications, Litiges et Analytics */}
+          <Route path="/admin/verifications" element={<RoleRoute roles={['ADMIN']}><AdminVerificationsPage /></RoleRoute>} />
+          <Route path="/admin/litiges" element={<RoleRoute roles={['ADMIN']}><AdminLitigesPage /></RoleRoute>} />
+          <Route path="/admin/analytics" element={<RoleRoute roles={['ADMIN']}><AdminAnalyticsPage /></RoleRoute>} />
 
-        <Route path='*' element={<NotFoundPgae />} />
+          {/* --- TRANSPORTEUR (PHASE B) --- */}
+          <Route path="/transporteur/dashboard" element={<RoleRoute roles={['TRANSPORTEUR']}><DashboardTransporteur /></RoleRoute>} />
+          <Route path="/transporteur/trajets" element={<RoleRoute roles={['TRANSPORTEUR']}><MesTrajets /></RoleRoute>} />
+          <Route path="/transporteur/trajets/new" element={<RoleRoute roles={['TRANSPORTEUR', 'ADMIN']}><PublierTrajetPage /></RoleRoute>} />
+          <Route path="/transporteur/trajets/edit/:id" element={<RoleRoute roles={['TRANSPORTEUR', 'ADMIN']}><PublierTrajetPage /></RoleRoute>} />
+          <Route path="/transporteur/trajets/:id" element={<RoleRoute roles={['TRANSPORTEUR', 'ADMIN']}><MesTrajets /></RoleRoute>} />
+          <Route path="/transporteur/camions" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
+          <Route path="/transporteur/camions/new" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
+          <Route path="/transporteur/camions/edit/:id" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
+          <Route path="/transporteur/camions/:id" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
+          <Route path="/transporteur/reservations" element={<RoleRoute roles={['TRANSPORTEUR']}><OffresRecuesPage /></RoleRoute>} />
+          <Route path="/transporteur/offres" element={<RoleRoute roles={['TRANSPORTEUR']}><OffresRecuesPage /></RoleRoute>} />
+          <Route path="/transporteur/suivi/:id" element={<RoleRoute roles={['TRANSPORTEUR']}><SuiviGpsPage /></RoleRoute>} />
+          <Route path="/transporteur/revenus" element={<RoleRoute roles={['TRANSPORTEUR']}><RevenusPage /></RoleRoute>} />
+          <Route path="/transporteur/profile" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
+          <Route path="/transporteur/avis" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
+          <Route path="/transporteur/parametres" element={<Navigate to="/transporteur/profile" replace />} />
+
+          {/* --- EXPÉDITEUR (PHASE C) --- */}
+          <Route path="/expediteur/dashboard" element={<RoleRoute roles={['EXPEDITEUR']}><DashboardExpediteur /></RoleRoute>} />
+          <Route path="/expediteur/trajets" element={<RoleRoute roles={['EXPEDITEUR']}><TrajetsDisponibles /></RoleRoute>} />
+          <Route path="/expediteur/trajets/:id" element={<RoleRoute roles={['EXPEDITEUR']}><DetailTrajet /></RoleRoute>} />
+          <Route path="/expediteur/recherche" element={<Navigate to="/expediteur/trajets" replace />} />
+          <Route path="/expediteur/detailtrajet/:id" element={<RoleRoute roles={['EXPEDITEUR']}><DetailTrajet /></RoleRoute>} />
+          <Route path="/expediteur/cargaisons" element={<RoleRoute roles={['EXPEDITEUR']}><MesCargaisons /></RoleRoute>} />
+          <Route path="/expediteur/cargaisons/new" element={<RoleRoute roles={['EXPEDITEUR']}><MesCargaisons /></RoleRoute>} />
+          <Route path="/expediteur/cargaisons/edit/:id" element={<RoleRoute roles={['EXPEDITEUR']}><MesCargaisons /></RoleRoute>} />
+          <Route path="/expediteur/cargaisons/:id" element={<RoleRoute roles={['EXPEDITEUR']}><MesCargaisons /></RoleRoute>} />
+          <Route path="/expediteur/cargaisons/:id/suivi" element={<RoleRoute roles={['EXPEDITEUR']}><SuiviCargaison /></RoleRoute>} />
+          <Route path="/expediteur/suivi/:id" element={<RoleRoute roles={['EXPEDITEUR']}><SuiviCargaison /></RoleRoute>} />
+          <Route path="/expediteur/reservations" element={<RoleRoute roles={['EXPEDITEUR']}><MesReservations /></RoleRoute>} />
+          <Route path="/expediteur/reservations/:id" element={<RoleRoute roles={['EXPEDITEUR']}><DetailReservation /></RoleRoute>} />
+          <Route path="/expediteur/profile" element={<RoleRoute roles={['EXPEDITEUR']}><ProfileExpediteur /></RoleRoute>} />
+          <Route path="/expediteur/parametres" element={<Navigate to="/expediteur/profile" replace />} />
+          <Route path="/expediteur/paiements" element={<RoleRoute roles={['EXPEDITEUR']}><Paiement /></RoleRoute>} />
+          <Route path="/expediteur/paiement" element={<RoleRoute roles={['EXPEDITEUR']}><Paiement /></RoleRoute>} />
+          <Route path="/expediteur/finances" element={<Navigate to="/expediteur/paiements" replace />} />
+
+          {/* Placeholders fonctionnels pour futures pages Phase C */}
+          <Route path="/expediteur/favoris" element={<RoleRoute roles={['EXPEDITEUR']}><div style={{ padding: 20 }}><h3>Transporteurs favoris (Phase C)</h3><p>Disponible en Phase C.</p></div></RoleRoute>} />
+        </Route>
+
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
 export default AppRoutes;

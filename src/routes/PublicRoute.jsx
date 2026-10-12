@@ -1,29 +1,27 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import React from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-function PublicRoute({ children }) {
-  const token = localStorage.getItem("token");
+export const PublicRoute = () => {
+  const { user, isAuthenticated, isLoading } = useAuth();
 
-  if (token) {
-    try {
-      const user = jwtDecode(token);
-      if (user.role === "ADMIN") {
-        return <Navigate to="/admin/dashboard" replace />;
-      }
+  if (isLoading) {
+    return null;
+  }
 
-      if (user.role === "TRANSPORTEUR") {
-        return <Navigate to="/transporteur/dashboard" replace />;
-      }
-
-      if (user.role === "EXPEDITEUR") {
-        return <Navigate to="/expediteur/dashboard" replace />;
-      }
-    } catch (error) {
-      localStorage.removeItem("token");
+  if (isAuthenticated && user) {
+    if (user.role === 'ADMIN') {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+    if (user.role === 'TRANSPORTEUR') {
+      return <Navigate to="/transporteur/dashboard" replace />;
+    }
+    if (user.role === 'EXPEDITEUR') {
+      return <Navigate to="/expediteur/dashboard" replace />;
     }
   }
 
-  return <Outlet/>;
-}
+  return <Outlet />;
+};
 
 export default PublicRoute;

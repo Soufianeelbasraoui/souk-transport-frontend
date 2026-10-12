@@ -1,5 +1,6 @@
-export const logout=()=>{
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-}
+import { removeStoredToken } from '../api/client';
+
+export const logout = () => {
+  removeStoredToken();
+  window.location.href = '/login';
+};

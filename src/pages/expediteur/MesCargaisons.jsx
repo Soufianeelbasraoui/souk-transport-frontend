@@ -1,403 +1,523 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { 
-  FiMoreVertical, 
-  FiPackage, 
-  FiPlus, 
-  FiTrash2, 
-  FiEdit2, 
-  FiEye, 
-  FiTruck 
-} from "react-icons/fi";
-import { toast } from "react-toastify";
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  FiBox,
+  FiPlus,
+  FiSearch,
+  FiMapPin,
+  FiCheckCircle,
+  FiTruck,
+  FiDollarSign,
+  FiClock,
+  FiPhone,
+  FiUser,
+} from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import expediteurService from '../../api/services/expediteurService';
+import { parseApiError } from '../../utils/parseApiError';
+import { formatCurrency, formatNumber, formatDate } from '../../utils/format';
+import Button from '../../components/common/Button';
+import DataTable from '../../components/common/DataTable';
+import Badge from '../../components/common/Badge';
+import Tabs from '../../components/common/Tabs';
+import SidePanel from '../../components/common/SidePanel';
+import Modal from '../../components/common/Modal';
+import DemoBadge from '../../components/common/DemoBadge';
 
-import Sidebar from "../../components/layout/Sidebar";
-import PaginationComponent from "../../components/common/Pagination";
-import Loader from "../../components/common/Loader";
-import ConfirmDialog from "../../components/common/ConfirmDialog";
-import api from "../../services/api";
+const TYPES_MARCHANDISES = [
+  { id: 'GENERAL', label: 'Marchandise Générale' },
+  { id: 'ALIMENTAIRE', label: 'Alimentaire / Frais' },
+  { id: 'INDUSTRIEL', label: 'Industriel & Machines' },
+  { id: 'TEXTILE', label: 'Textile & Confection' },
+  { id: 'CONSTRUCTION', label: 'Matériaux de construction' },
+  { id: 'AGRICOLE', label: 'Produits Agricoles' },
+];
 
-import "./styles/MesCargaisons.css";
-
-function MesCargaisons() {
+export const MesCargaisons = () => {
+  const [activeTab, setActiveTab] = useState('TOUS');
+  const [search, setSearch] = useState('');
   const [cargaisons, setCargaisons] = useState([]);
-  const [filter, setFilter] = useState("TOUTES");
   const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const pageSize = 10;
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [activeDropdownId, setActiveDropdownId] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
+  // Panneau latéral (SidePanel)
+  const [selectedCargaison, setSelectedCargaison] = useState(null);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
 
-  const pageSize = 9;
+  // Modal d'ajout de cargaison
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newCargaison, setNewCargaison] = useState({
+    description: '',
+    typeMarchandise: 'GENERAL',
+    poids: '',
+    volume: '',
+    valeurDeclaree: '',
+    villeDepart: 'Casablanca',
+    villeArrivee: 'Tanger',
+    destinataireNom: '',
+    destinataireTelephone: '',
+  });
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".cargaison-action-wrapper")) {
-        setActiveDropdownId(null);
-      }
-    };
+  const fetchCargaisons = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await expediteurService.getMesCargaisons({
+        page,
+        size: pageSize,
+        statut: activeTab,
+      });
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+      const list = res?.content || (Array.isArray(res) ? res : []);
+      setCargaisons(list);
+      setTotalElements(res?.totalElements ?? list.length);
+    } catch (err) {
+      parseApiError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, activeTab]);
 
   useEffect(() => {
     fetchCargaisons();
-  }, [page, filter]);
+  }, [fetchCargaisons]);
 
-  const fetchCargaisons = async () => {
+  const handleCreateCargaison = async (e) => {
+    e.preventDefault();
+    if (!newCargaison.description || !newCargaison.poids) {
+      toast.error('Veuillez renseigner au moins une description et un poids.');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      setLoading(true);
-
-      const res = await api.get("/api/cargaisons/mes-cargaisons", {
-        params: { 
-          page, 
-          size: pageSize, 
-          ...(filter !== "TOUTES" && { statut: filter }) 
-        },
+      await expediteurService.creerCargaison({
+        ...newCargaison,
+        poids: Number(newCargaison.poids),
+        volume: newCargaison.volume ? Number(newCargaison.volume) : null,
+        valeurDeclaree: newCargaison.valeurDeclaree ? Number(newCargaison.valeurDeclaree) : null,
       });
 
-      setCargaisons(res.data?.content || []);
-      setTotalPages(res.data?.totalPages || 0);
-      setTotalElements(res.data?.totalElements || 0);
-    } catch (error) {
-      console.error("Erreur chargement cargaisons:", error);
-      toast.error("Erreur lors du chargement de vos cargaisons.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFilter = (value) => {
-    setFilter(value);
-    setPage(0);
-    setActiveDropdownId(null);
-  };
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage - 1);
-    setActiveDropdownId(null);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/api/cargaisons/${id}`);
-      toast.success("Cargaison supprimée avec succès !");
-      setDeleteId(null);
+      toast.success('Cargaison enregistrée avec succès !');
+      setAddModalOpen(false);
+      setNewCargaison({
+        description: '',
+        typeMarchandise: 'GENERAL',
+        poids: '',
+        volume: '',
+        valeurDeclaree: '',
+        villeDepart: 'Casablanca',
+        villeArrivee: 'Tanger',
+        destinataireNom: '',
+        destinataireTelephone: '',
+      });
       fetchCargaisons();
-    } catch (error) {
-      console.error("Erreur suppression cargaison :", error);
-      toast.error(
-        error.response?.data?.message || "Impossible de supprimer cette cargaison."
-      );
-      setDeleteId(null);
+    } catch (err) {
+      parseApiError(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const getBadgeStyle = (statut) => {
-    switch (statut) {
-      case "LIVREE":
-        return { label: "Livrée", class: "badge-livree" };
-      case "EN_TRANSIT":
-        return { label: "En transit", class: "badge-transit" };
-      case "SOUMISE":
-        return { label: "Soumise", class: "badge-attente" };
-      case "ANNULEE":
-        return { label: "Annulée", class: "badge-annulee" };
-      default:
-        return { label: statut || "Inconnu", class: "badge-default" };
+  const handleConfirmerLivraison = async () => {
+    if (!selectedCargaison) return;
+    setIsSubmitting(true);
+    try {
+      await expediteurService.confirmerLivraison(selectedCargaison.id);
+      toast.success('Réception confirmée ! Les fonds sont libérés au transporteur.');
+      fetchCargaisons();
+      setIsSidePanelOpen(false);
+    } catch (err) {
+      parseApiError(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const filteredCargaisons = cargaisons.filter((c) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      c.reference?.toLowerCase().includes(q) ||
+      c.description?.toLowerCase().includes(q) ||
+      c.villeDepart?.toLowerCase().includes(q) ||
+      c.villeArrivee?.toLowerCase().includes(q)
+    );
+  });
+
+  const columns = [
+    {
+      key: 'reference',
+      header: 'Réf. Expédition',
+      width: '130px',
+      render: (val, row) => <strong>{val || `CRG-#${row.id}`}</strong>,
+    },
+    {
+      key: 'description',
+      header: 'Marchandise',
+      render: (val, row) => (
+        <div>
+          <strong style={{ fontSize: 13, color: '#1A202C' }}>{val}</strong>
+          <div style={{ fontSize: 11, color: '#718096' }}>
+            {row.typeMarchandise || 'Générale'} • {formatNumber(row.poids)} kg
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'route',
+      header: 'Axe logistique',
+      render: (_, row) => (
+        <div>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>
+            {row.villeDepart} → {row.villeArrivee}
+          </span>
+          {row.dateCreation && (
+            <div style={{ fontSize: 11, color: '#718096' }}>{formatDate(row.dateCreation)}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'valeurDeclaree',
+      header: 'Valeur déclarée',
+      render: (val) => (val ? formatCurrency(val) : '—'),
+    },
+    {
+      key: 'statut',
+      header: 'Statut',
+      width: '130px',
+      render: (val) => <Badge status={val} />,
+    },
+    {
+      key: 'action',
+      header: 'Détails',
+      align: 'right',
+      render: (_, row) => (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setSelectedCargaison(row);
+            setIsSidePanelOpen(true);
+          }}
+        >
+          Consulter
+        </Button>
+      ),
+    },
+  ];
 
   return (
-    <div className="app admin-page">
-      <Sidebar />
-
-      <main className="main-content">
-        <div className="page-header d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h1>Mes Cargaisons</h1>
-            <p className="text-muted">
-              Gérez toutes vos marchandises expédiées.
-            </p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* HEADER */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1A3A5C', margin: 0 }}>
+              Mes Cargaisons & Expéditions
+            </h1>
+            <DemoBadge />
           </div>
-
-          <Link
-            to="/expediteur/cargaisons/new"
-            className="btn-primary px-4 py-2 rounded-3"
-          >
-            Ajouter une cargaison
-          </Link>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: '#718096' }}>
+            Suivez le statut de préparation, l'acheminement en transit et confirmez la livraison de vos colis.
+          </p>
         </div>
 
-        <div className="cargaisons-tabs-card mb-4">
-          <div className="cargaisons-tabs">
-            <button
-              type="button"
-              onClick={() => handleFilter("TOUTES")}
-              className={`tab-btn ${filter === "TOUTES" ? "active" : ""}`}
-            >
-              Toutes
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleFilter("SOUMISE")}
-              className={`tab-btn ${filter === "SOUMISE" ? "active" : ""}`}
-            >
-              En attente
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleFilter("EN_TRANSIT")}
-              className={`tab-btn ${filter === "EN_TRANSIT" ? "active" : ""}`}
-            >
-              En transit
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleFilter("LIVREE")}
-              className={`tab-btn ${filter === "LIVREE" ? "active" : ""}`}
-            >
-              Livrées
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleFilter("ANNULEE")}
-              className={`tab-btn ${filter === "ANNULEE" ? "active" : ""}`}
-            >
-              Annulées
-            </button>
-          </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Button variant="primary" size="md" icon={<FiPlus />} onClick={() => setAddModalOpen(true)}>
+            Nouvelle cargaison
+          </Button>
         </div>
+      </div>
 
-        <div className="row g-4">
-          {loading && (
-            <div className="col-12">
-              <div className="empty-state">
-                <Loader />
-              </div>
-            </div>
-          )}
+      {/* ONGLETS */}
+      <Tabs
+        tabs={[
+          { id: 'TOUS', label: 'Toutes les expéditions' },
+          { id: 'EN_ATTENTE', label: 'En attente' },
+          { id: 'EN_TRANSIT', label: 'En transit' },
+          { id: 'LIVREE', label: 'Livrées' },
+          { id: 'ANNULEE', label: 'Annulées' },
+        ]}
+        activeTab={activeTab}
+        onChange={(tabId) => {
+          setActiveTab(tabId);
+          setPage(0);
+        }}
+      />
 
-          {!loading && cargaisons.length > 0 &&
-            cargaisons.map((cargaison) => {
-              const badge = getBadgeStyle(cargaison.statutCargaison);
-              const isEnTransit = cargaison.statutCargaison === "EN_TRANSIT";
-              const isLivree = cargaison.statutCargaison === "LIVREE";
-              const isSoumise = cargaison.statutCargaison === "SOUMISE";
-              const isAnnulee = cargaison.statutCargaison === "ANNULEE";
-              
-              const canEdit = isSoumise; 
-              const canDelete = !isEnTransit; 
-
-              return (
-                <div
-                  key={cargaison.id}
-                  className="col-xl-4 col-lg-6 col-md-6 d-flex"
-                >
-                  <div className="card cargaison-card w-100">
-                    <div className="card-body d-flex flex-column">
-
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <span className={`status-badge ${badge.class}`}>
-                          {badge.label}
-                        </span>
-
-                        <div className="cargaison-action-wrapper">
-                          <button
-                            type="button"
-                            className={`btn-more ${activeDropdownId === cargaison.id ? "active" : ""}`}
-                            title="Options"
-                            onClick={() =>
-                              setActiveDropdownId(
-                                activeDropdownId === cargaison.id ? null : cargaison.id
-                              )
-                            }
-                          >
-                            <FiMoreVertical />
-                          </button>
-
-                          {activeDropdownId === cargaison.id && (
-                            <div className="cargaison-dropdown">
-                              <Link
-                                to={`/expediteur/cargaisons/${cargaison.id}`}
-                                className="cargaison-dropdown-item"
-                                onClick={() => setActiveDropdownId(null)}
-                              >
-                                <FiEye className="dropdown-item-icon icon-view" />
-                                <span>Voir détails</span>
-                              </Link>
-
-                              {canEdit && (
-                                <Link
-                                  to={`/expediteur/cargaisons/edit/${cargaison.id}`}
-                                  className="cargaison-dropdown-item"
-                                  onClick={() => setActiveDropdownId(null)}
-                                >
-                                  <FiEdit2 className="dropdown-item-icon icon-edit" />
-                                  <span>Modifier</span>
-                                </Link>
-                              )}
-
-                              {canDelete && (
-                                <>
-                                  <div className="cargaison-dropdown-divider" />
-                                  <button
-                                    type="button"
-                                    className="cargaison-dropdown-item delete"
-                                    onClick={() => {
-                                      setActiveDropdownId(null);
-                                      setDeleteId(cargaison.id);
-                                    }}
-                                  >
-                                    <FiTrash2 className="dropdown-item-icon icon-delete" />
-                                    <span>Supprimer</span>
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <h5 className="cargaison-title">
-                        {cargaison.description || "Marchandise"}
-                      </h5>
-
-                      <div className="row text-center info-box">
-                        <div className="col-6 border-end">
-                          <small>Poids</small>
-                          <strong>
-                            {cargaison.poids
-                              ? `${cargaison.poids} kg`
-                              : "N/A"}
-                          </strong>
-                        </div>
-
-                        <div className="col-6">
-                          <small>Prix</small>
-                          <strong>
-                            {cargaison.prix
-                              ? `${cargaison.prix} DH`
-                              : "0 DH"}
-                          </strong>
-                        </div>
-                      </div>
-
-                      <div className="card-footer-custom mt-auto">
-                        <div>
-                          <strong className="price">
-                            {cargaison.prix
-                              ? `${cargaison.prix} DH`
-                              : "0 DH"}
-                          </strong>
-
-                          <small className="payment">
-                            Paiement à la livraison
-                          </small>
-                        </div>
-
-                        {isEnTransit ? (
-                          <Link
-                            to={`/expediteur/cargaisons/${cargaison.id}/suivi`}
-                            className="btn-suivi"
-                            title="Suivre l'acheminement de la cargaison"
-                          >
-                            <FiTruck />
-                            <span>Suivi cargaison</span>
-                          </Link>
-                        ) : isSoumise ? (
-                          <div className="d-flex gap-2">
-                            <Link
-                              to={`/expediteur/cargaisons/edit/${cargaison.id}`}
-                              className="btn-cargaison-edit"
-                              title="Modifier la cargaison"
-                            >
-                              <FiEdit2 />
-                              <span>Modifier</span>
-                            </Link>
-                            <Link to={`/expediteur/cargaisons/${cargaison.id}`} className="btn-cargaison nav-link" >
-                              Détails
-                            </Link>
-                          </div>
-                        ) : (
-                          <Link to={`/expediteur/cargaisons/${cargaison.id}`} className="btn-cargaison" >
-                            Voir détails
-                          </Link>
-                        )}
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-
-          {!loading && cargaisons.length === 0 && (
-            <div className="col-12">
-              <div className="cargaisons-empty-card">
-                <div className="empty-icon-box">
-                  <FiPackage />
-                </div>
-                <h3>Aucune cargaison trouvée</h3>
-                <p>
-                  {filter !== "TOUTES"
-                    ? "Aucune cargaison ne correspond au filtre actuellement sélectionné."
-                    : "Vous n'avez pas encore créé de cargaison à expédier."}
-                </p>
-                <div className="empty-actions">
-                  {filter !== "TOUTES" ? (
-                    <button
-                      type="button"
-                      className="btn-empty-outline"
-                      onClick={() => handleFilter("TOUTES")}
-                    >
-                      Afficher toutes les cargaisons
-                    </button>
-                  ) : (
-                    <Link
-                      to="/expediteur/cargaisons/new"
-                      className="btn-empty-primary"
-                    >
-                      <FiPlus />
-                      <span>Ajouter une cargaison</span>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {!loading && totalElements > 0 && (
-          <PaginationComponent
-            page={page + 1}
-            totalPages={totalPages}
-            totalElements={totalElements}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-            itemLabel="Cargaisons"
+      {/* RECHERCHE */}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: 1, maxWidth: 360 }}>
+          <FiSearch size={15} style={{ position: 'absolute', left: 12, top: 11, color: '#718096' }} />
+          <input
+            type="text"
+            className="st-input"
+            style={{ paddingLeft: 36 }}
+            placeholder="Rechercher par référence, description..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
-        )}
+        </div>
+      </div>
 
-        <ConfirmDialog
-          show={deleteId !== null}
-          title="Supprimer la cargaison"
-          message="Êtes-vous sûr de vouloir supprimer définitivement cette cargaison ?"
-          onConfirm={() => handleDelete(deleteId)}
-          onCancel={() => setDeleteId(null)}
-        />
-      </main>
+      {/* TABLEAU */}
+      <DataTable
+        columns={columns}
+        data={filteredCargaisons}
+        isLoading={isLoading}
+        pagination={{
+          page,
+          pageSize,
+          totalElements,
+          onPageChange: (newPage) => setPage(newPage),
+        }}
+        emptyMessage="Aucune cargaison trouvée pour ce statut."
+      />
+
+      {/* SIDEPANEL DÉTAIL CARGAISON */}
+      <SidePanel
+        isOpen={isSidePanelOpen}
+        onClose={() => setIsSidePanelOpen(false)}
+        title={selectedCargaison?.reference || 'Détail de la cargaison'}
+        subtitle={`Créée le ${selectedCargaison ? formatDate(selectedCargaison.dateCreation) : ''}`}
+        footer={
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, width: '100%' }}>
+            {selectedCargaison?.statut === 'EN_TRANSIT' && (
+              <Button
+                variant="primary"
+                icon={<FiCheckCircle />}
+                onClick={handleConfirmerLivraison}
+                isLoading={isSubmitting}
+              >
+                Confirmer la bonne réception
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => setIsSidePanelOpen(false)}>
+              Fermer
+            </Button>
+          </div>
+        }
+      >
+        {selectedCargaison && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* STATUT */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Badge status={selectedCargaison.statut} />
+              {selectedCargaison.statut === 'EN_ATTENTE' && (
+                <Link to={`/expediteur/trajets?depart=${encodeURIComponent(selectedCargaison.villeDepart)}&arrivee=${encodeURIComponent(selectedCargaison.villeArrivee)}`}>
+                  <Button variant="secondary" size="sm">
+                    Trouver un camion →
+                  </Button>
+                </Link>
+              )}
+            </div>
+
+            {/* DESCRIPTION */}
+            <div style={{ backgroundColor: '#F8FAFC', padding: 16, borderRadius: 8, border: '1px solid #E2E8F0' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#718096', textTransform: 'uppercase' }}>
+                Description de la marchandise
+              </span>
+              <p style={{ margin: '6px 0 0', fontSize: 14, fontWeight: 600, color: '#1A202C' }}>
+                {selectedCargaison.description}
+              </p>
+            </div>
+
+            {/* ITINÉRAIRE */}
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#718096', textTransform: 'uppercase' }}>
+                Liaison géographique
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                <FiMapPin color="#1A3A5C" size={18} />
+                <div>
+                  <strong>{selectedCargaison.villeDepart}</strong>
+                  <div style={{ fontSize: 12, color: '#718096' }}>Lieu d'enlèvement</div>
+                </div>
+              </div>
+              <div style={{ borderLeft: '2px dashed #CBD5E0', height: 20, marginLeft: 9, margin: '4px 0' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <FiMapPin color="#F57C00" size={18} />
+                <div>
+                  <strong>{selectedCargaison.villeArrivee}</strong>
+                  <div style={{ fontSize: 12, color: '#718096' }}>Destination finale</div>
+                </div>
+              </div>
+            </div>
+
+            {/* SPÉCIFICATIONS PHYSIQUES */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', padding: 12, borderRadius: 6 }}>
+                <span style={{ fontSize: 11, color: '#718096' }}>Poids total</span>
+                <strong style={{ display: 'block', fontSize: 15, marginTop: 2 }}>
+                  {formatNumber(selectedCargaison.poids)} kg
+                </strong>
+              </div>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', padding: 12, borderRadius: 6 }}>
+                <span style={{ fontSize: 11, color: '#718096' }}>Volume estimé</span>
+                <strong style={{ display: 'block', fontSize: 15, marginTop: 2 }}>
+                  {selectedCargaison.volume ? `${selectedCargaison.volume} m³` : 'Standard'}
+                </strong>
+              </div>
+            </div>
+
+            {/* DESTINATAIRE */}
+            {selectedCargaison.destinataireNom && (
+              <div style={{ borderTop: '1px solid #EDF2F7', paddingTop: 14 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#718096', textTransform: 'uppercase' }}>
+                  Contact destinataire
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, fontSize: 13 }}>
+                  <FiUser color="#718096" />
+                  <strong>{selectedCargaison.destinataireNom}</strong>
+                </div>
+                {selectedCargaison.destinataireTelephone && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6, fontSize: 13, color: '#0D9488' }}>
+                    <FiPhone />
+                    <a href={`tel:${selectedCargaison.destinataireTelephone}`} style={{ color: '#0D9488', textDecoration: 'none' }}>
+                      {selectedCargaison.destinataireTelephone}
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </SidePanel>
+
+      {/* MODAL AJOUT DE CARGAISON */}
+      <Modal
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        title="Créer une nouvelle cargaison"
+        subtitle="Renseignez les détails de votre marchandise pour pouvoir la réserver ou recevoir des offres."
+        actions={
+          <>
+            <Button variant="outline" onClick={() => setAddModalOpen(false)}>
+              Annuler
+            </Button>
+            <Button variant="primary" onClick={handleCreateCargaison} isLoading={isSubmitting}>
+              Enregistrer la cargaison
+            </Button>
+          </>
+        }
+      >
+        <form onSubmit={handleCreateCargaison} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label className="st-label required">Description du colis ou palettes</label>
+            <input
+              type="text"
+              className="st-input"
+              placeholder="Ex : 4 palettes de matériel électrique et câbles"
+              value={newCargaison.description}
+              onChange={(e) => setNewCargaison({ ...newCargaison, description: e.target.value })}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label className="st-label required">Ville de départ</label>
+              <input
+                type="text"
+                className="st-input"
+                value={newCargaison.villeDepart}
+                onChange={(e) => setNewCargaison({ ...newCargaison, villeDepart: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="st-label required">Ville d'arrivée</label>
+              <input
+                type="text"
+                className="st-input"
+                value={newCargaison.villeArrivee}
+                onChange={(e) => setNewCargaison({ ...newCargaison, villeArrivee: e.target.value })}
+                required
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label className="st-label required">Poids (kg)</label>
+              <input
+                type="number"
+                className="st-input"
+                placeholder="Ex : 1200"
+                value={newCargaison.poids}
+                onChange={(e) => setNewCargaison({ ...newCargaison, poids: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="st-label">Volume (m³)</label>
+              <input
+                type="number"
+                className="st-input"
+                placeholder="Ex : 4"
+                value={newCargaison.volume}
+                onChange={(e) => setNewCargaison({ ...newCargaison, volume: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label className="st-label">Type de marchandise</label>
+              <select
+                className="st-input"
+                value={newCargaison.typeMarchandise}
+                onChange={(e) => setNewCargaison({ ...newCargaison, typeMarchandise: e.target.value })}
+              >
+                {TYPES_MARCHANDISES.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="st-label">Valeur marchande (MAD)</label>
+              <input
+                type="number"
+                className="st-input"
+                placeholder="Ex : 35000"
+                value={newCargaison.valeurDeclaree}
+                onChange={(e) => setNewCargaison({ ...newCargaison, valeurDeclaree: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label className="st-label">Nom destinataire</label>
+              <input
+                type="text"
+                className="st-input"
+                placeholder="Ex : Société Atlas Tanger"
+                value={newCargaison.destinataireNom}
+                onChange={(e) => setNewCargaison({ ...newCargaison, destinataireNom: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="st-label">Téléphone destinataire</label>
+              <input
+                type="text"
+                className="st-input"
+                placeholder="Ex : +212 6 00 00 00 00"
+                value={newCargaison.destinataireTelephone}
+                onChange={(e) => setNewCargaison({ ...newCargaison, destinataireTelephone: e.target.value })}
+              />
+            </div>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
-}
+};
 
 export default MesCargaisons;
