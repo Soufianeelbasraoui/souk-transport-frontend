@@ -49,7 +49,6 @@ function ModifierCargaison() {
       try {
         const res = await api.get(`/api/cargaisons/${id}`);
         const cargaison = res.data;
-        console.log("Cargaison chargée :", cargaison);
 
 
         const statut = cargaison.statutCargaison || "";

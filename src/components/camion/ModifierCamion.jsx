@@ -68,8 +68,6 @@ function ModifierCamion() {
         const camionResponse = await api.get(`/api/camions/${id}`);
         const camion = camionResponse.data;
 
-        console.log("Camion chargé :", camion);
-
         setValue("marque", camion.marque || "");
         setValue("modele", camion.modele || "");
         setValue("type", camion.type || "");
@@ -78,13 +76,10 @@ function ModifierCamion() {
         setValue( "disponible", camion.disponible ?? true);
         const typesResponse = await api.get("/api/camions/types");
 
-
         setTypesCamion(typesResponse.data || []);
-
       } catch (error) {
-        console.error( "Erreur chargement camion/types");
-
-        setSubmitError( "Impossible de charger les données du camion.");
+        console.error("Erreur chargement camion/types :", error);
+        setSubmitError("Impossible de charger les données du camion.");
       } finally {
         setLoading(false);
       }
@@ -92,7 +87,6 @@ function ModifierCamion() {
 
     chargerDonnees();
   }, [id, setValue]);
-
 
   const onSubmit = async (data) => {
     setSubmitError("");
@@ -108,21 +102,16 @@ function ModifierCamion() {
         disponible: data.disponible,
       };
 
-      console.log("Données envoyées :", camionModifie );
+      await api.put(`/api/camions/${id}`, camionModifie);
 
-      const response = await api.put(`/api/camions/${id}`, camionModifie);
-
-      console.log( "Camion modifié :", response.data);
-
-      setSubmitSuccess( "Camion modifié avec succès ! Redirection en cours..." );
+      setSubmitSuccess("Camion modifié avec succès ! Redirection en cours...");
 
       setTimeout(() => {
         navigate(retourPath);
       }, 1500);
-
     } catch (error) {
-      console.error( "Erreur modification camion :", );
-      setSubmitError( "Une erreur est survenue. Veuillez réessayer." );
+      console.error("Erreur modification camion :", error);
+      setSubmitError("Une erreur est survenue. Veuillez réessayer.");
     }
   };
 

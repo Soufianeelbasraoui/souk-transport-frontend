@@ -34,7 +34,6 @@ function CreerCargaison() {
   const user = token ? jwtDecode(token) : null;
 
   const isAdmin = user?.role === "ADMIN";
-  const isExpediteur = user?.role === "EXPEDITEUR";
 
   const [expediteurs, setExpediteurs] = useState([]);
   const [submitError, setSubmitError] = useState("");
@@ -88,7 +87,6 @@ function CreerCargaison() {
         payload.expediteurId = data.expediteurId;
       }
 
-      console.log("Payload envoyé :", payload);
       await api.post("/api/cargaisons", payload);
 
       setSubmitSuccess("Cargaison ajoutée avec succès !");

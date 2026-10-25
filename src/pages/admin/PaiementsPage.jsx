@@ -40,7 +40,6 @@ function PaiementsPage() {
     api
       .get(`/api/paiements?page=${page - 1}&size=${pageSize}`)
       .then((res) => {
-        console.log(res.data?.content)
         setPaiements(res.data?.content || []);
         setTotalPages(res.data?.totalPages || 1);
         setTotalElements(res.data?.totalElements || 0);

@@ -100,7 +100,6 @@ function SuiviCargaison() {
   const villeDepart = reservation?.villeDepart || "Casablanca";
   const villeArrivee = reservation?.villeArrivee || "Marrakech";
   const transporteurNom = reservation?.transporteurNom || "Ahmed K.";
-  const telephone = reservation?.transporteurTelephone || "+212 6 00 00 00 00";
 
   return (
     <div className="app">

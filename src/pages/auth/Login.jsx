@@ -1,52 +1,79 @@
-import { yupResolver } from "@hookform/resolvers/yup";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import api from "../../services/api";
-import "./Login.css";
-import { jwtDecode } from "jwt-decode";
+import { Link, useNavigate } from "react-router-dom";
+import { FiArrowLeft, FiX } from "react-icons/fi";
+import { FaGoogle } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
+import client from "../../api/client";
 import LeftPanel from "./LeftPanel/LeftPanel";
-import { FiArrowLeft } from "react-icons/fi";
+import "./Login.css";
 
-const schema = yup.object({
-  email: yup.string().email("Email invalide").required("L'email est obligatoire"),
-  password: yup.string().required("Le mot de passe est obligatoire")
+const loginSchema = yup.object({
+  email: yup
+    .string()
+    .email("Email invalide")
+    .required("L'email est obligatoire"),
+  password: yup
+    .string()
+    .required("Le mot de passe est obligatoire"),
+});
+
+const forgotPasswordSchema = yup.object({
+  email: yup
+    .string()
+    .email("Email invalide")
+    .required("L'adresse email est obligatoire"),
 });
 
 function Login() {
   const navigate = useNavigate();
+  const { login, loginAsDemoRole } = useAuth();
   const [loginError, setLoginError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+
+  // Modal Mot de passe oublié
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(loginSchema),
   });
 
-  const onsubmit = async (data) => {
+  const {
+    register: registerForgot,
+    handleSubmit: handleSubmitForgot,
+    reset: resetForgot,
+    formState: { errors: errorsForgot },
+  } = useForm({
+    resolver: yupResolver(forgotPasswordSchema),
+  });
+
+  const onSubmit = async (data) => {
     setLoginError("");
+    setIsLoading(true);
 
     try {
-      const response = await api.post("/auth/login", data);
-      const token = response.data.token;
-      
-      localStorage.setItem("token", token);
+      const user = await login(data.email, data.password, rememberMe);
+      toast.success(`Bienvenue, ${user?.prenom || user?.nom || "cher membre"} !`);
 
-      const user = jwtDecode(token);
-      if (user.role === "ADMIN") {
+      if (user?.role === "ADMIN") {
         navigate("/admin/dashboard");
-      } else if (user.role === "TRANSPORTEUR") {
+      } else if (user?.role === "TRANSPORTEUR") {
         navigate("/transporteur/dashboard");
-      } else if (user.role === "EXPEDITEUR") {
+      } else if (user?.role === "EXPEDITEUR") {
         navigate("/expediteur/dashboard");
+      } else {
+        navigate("/");
       }
-
     } catch (error) {
-      localStorage.removeItem("token");
-      
       if (error.response?.data?.message) {
         setLoginError(error.response.data.message);
       } else if (error.response?.status === 401) {
@@ -54,15 +81,45 @@ function Login() {
       } else if (error.response?.status === 403) {
         setLoginError("Accès refusé. Votre compte n'est pas actif.");
       } else {
-        setLoginError("Impossible de se connecter. Vérifiez que le serveur est disponible.");
+        setLoginError(error.message || "Impossible de se connecter. Vérifiez que le serveur est disponible.");
       }
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const onForgotSubmit = async (data) => {
+    setForgotLoading(true);
+    try {
+      const res = await client.post("/auth/forgot-password", { email: data.email });
+      toast.success(res.data?.message || "Un lien de réinitialisation vous a été envoyé par email.");
+      setForgotModalOpen(false);
+      resetForgot();
+    } catch (err) {
+      if (err.response?.data?.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.info("Si cette adresse email est enregistrée, vous recevrez les instructions par email.");
+        setForgotModalOpen(false);
+        resetForgot();
+      }
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    // Intégration Google Authentification
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+    // Si endpoint OAuth backend configuré, rediriger, sinon notifier
+    toast.info("Redirection vers l'authentification Google en cours...");
+    window.location.href = `${apiUrl}/oauth2/authorization/google`;
   };
 
   return (
     <div className="login-container">
       <LeftPanel />
-      
+
       <div className="right-panel-container">
         <div className="login-content-wrapper">
           <Link to="/" className="back-to-home-link">
@@ -81,33 +138,61 @@ function Login() {
               <p className="login-subtitle">Connectez-vous à votre compte</p>
             </div>
 
-            <form onSubmit={handleSubmit(onsubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-3">
                 <label className="form-label text-muted small fw-semibold">Email</label>
-                <input 
+                <input
                   type="email"
                   className="form-control"
                   placeholder="Entrez votre email"
                   {...register("email")}
                 />
-                {errors.email && (<span className="auth-error-text">{errors.email.message}</span>)}
+                {errors.email && (
+                  <span className="auth-error-text">{errors.email.message}</span>
+                )}
               </div>
 
-              <div className="mb-3">
+              <div className="mb-2">
                 <label className="form-label text-muted small fw-semibold">Mot de passe</label>
-                <input 
+                <input
                   type="password"
                   className="form-control"
                   placeholder="Entrez votre mot de passe"
                   {...register("password")}
                 />
-                {errors.password && (<span className="auth-error-text">{errors.password.message}</span>)}
+                {errors.password && (
+                  <span className="auth-error-text">{errors.password.message}</span>
+                )}
               </div>
 
-              {loginError && <p className="auth-error-text mb-2 text-danger small">{loginError}</p>}
+              {/* SE SOUVENIR DE MOI & MOT DE PASSE OUBLIÉ */}
+              <div className="auth-options-row">
+                <label className="remember-me-label">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <span>Se souvenir de moi</span>
+                </label>
 
-              <button type="submit" className="btn-submit mt-2">
-                Se connecter
+                <button
+                  type="button"
+                  className="forgot-password-btn"
+                  onClick={() => setForgotModalOpen(true)}
+                >
+                  Mot de passe oublié ?
+                </button>
+              </div>
+
+              {loginError && (
+                <div className="auth-error-box py-2 px-3 mb-2 text-danger small">
+                  {loginError}
+                </div>
+              )}
+
+              <button type="submit" className="btn-submit mt-1" disabled={isLoading}>
+                {isLoading ? "Connexion en cours..." : "Se connecter"}
               </button>
             </form>
 
@@ -116,12 +201,150 @@ function Login() {
               <span className="divider-text">ou</span>
             </div>
 
+            {/* BOUTON GOOGLE */}
+            <button
+              type="button"
+              className="btn-google"
+              onClick={handleGoogleLogin}
+              title="Continuer avec votre compte Google"
+            >
+              <FaGoogle className="google-icon" />
+              <span>Continuer avec Google</span>
+            </button>
+
+            {/* BOUTON CRÉER UN COMPTE */}
             <Link to="/register" className="btn-register-link">
               Créer un compte
             </Link>
+
+            {/* CONNEXION RAPIDE DE TEST (3 RÔLES) */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px dashed #CBD5E1', textAlign: 'center' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: 1, display: 'block', marginBottom: 10 }}>
+                🚀 Accès Rapide Démo (3 Rôles)
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                <button
+                  type="button"
+                  id="btn-login-transporteur"
+                  onClick={() => {
+                    loginAsDemoRole('TRANSPORTEUR');
+                    navigate('/transporteur/dashboard');
+                  }}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: 6,
+                    border: '1px solid #0D9488',
+                    backgroundColor: '#F0FDFA',
+                    color: '#0F766E',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🚛 Transporteur
+                </button>
+                <button
+                  type="button"
+                  id="btn-login-expediteur"
+                  onClick={() => {
+                    loginAsDemoRole('EXPEDITEUR');
+                    navigate('/expediteur/dashboard');
+                  }}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: 6,
+                    border: '1px solid #2563EB',
+                    backgroundColor: '#EFF6FF',
+                    color: '#1D4ED8',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  📦 Expéditeur
+                </button>
+                <button
+                  type="button"
+                  id="btn-login-admin"
+                  onClick={() => {
+                    loginAsDemoRole('ADMIN');
+                    navigate('/admin/dashboard');
+                  }}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: 6,
+                    border: '1px solid #7C3AED',
+                    backgroundColor: '#F5F3FF',
+                    color: '#6D28D9',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🛡️ Admin
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* MODAL MOT DE PASSE OUBLIÉ */}
+      {forgotModalOpen && (
+        <div className="modal-auth-overlay" onClick={() => setForgotModalOpen(false)}>
+          <div className="modal-auth-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-auth-header">
+              <div>
+                <h3 className="modal-auth-title">Réinitialisation du mot de passe</h3>
+                <p className="modal-auth-subtitle">
+                  Saisissez votre adresse email pour recevoir un lien de réinitialisation sécurisé.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal-auth-close"
+                onClick={() => setForgotModalOpen(false)}
+                aria-label="Fermer"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitForgot(onForgotSubmit)}>
+              <div className="mb-3">
+                <label className="form-label text-muted small fw-semibold">Adresse Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="votre.email@exemple.com"
+                  {...registerForgot("email")}
+                />
+                {errorsForgot.email && (
+                  <span className="auth-error-text">{errorsForgot.email.message}</span>
+                )}
+              </div>
+
+              <div className="modal-auth-actions">
+                <button
+                  type="button"
+                  className="btn-secondary-modal"
+                  onClick={() => setForgotModalOpen(false)}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  style={{ width: "auto", padding: "0.55rem 1.25rem" }}
+                  disabled={forgotLoading}
+                >
+                  {forgotLoading ? "Envoi en cours..." : "Envoyer le lien"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

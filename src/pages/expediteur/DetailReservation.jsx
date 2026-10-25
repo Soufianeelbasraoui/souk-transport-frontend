@@ -1,10 +1,27 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {  FiArrowLeft, FiMapPin,  FiBox, FiDollarSign,  FiCalendar,  FiCheckCircle, FiAlertCircle, FiTrash2, FiSlash} from "react-icons/fi";
+import {
+  FiArrowLeft,
+  FiMapPin,
+  FiBox,
+  FiDollarSign,
+  FiCalendar,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiTrash2,
+  FiSlash,
+  FiFileText,
+  FiMessageSquare,
+  FiStar,
+  FiAlertTriangle,
+} from "react-icons/fi";
 
 import Sidebar from "../../components/layout/Sidebar";
 import Loader from "../../components/common/Loader";
 import api from "../../services/api";
+import ContratModal from "../../components/contrat/ContratModal";
+import LaisserAvisModal from "../../components/avis/LaisserAvisModal";
+import NouveauLitigeModal from "../../components/litiges/NouveauLitigeModal";
 
 import "../../styles/global.css";
 import "./styles/DetailReservation.css";
@@ -15,6 +32,10 @@ function DetailReservation() {
 
   const [reservation, setReservation] = useState(null);
   const [paiement, setPaiement] = useState(null);
+
+  const [contratModalOpen, setContratModalOpen] = useState(false);
+  const [avisModalOpen, setAvisModalOpen] = useState(false);
+  const [litigeModalOpen, setLitigeModalOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -204,31 +225,100 @@ function DetailReservation() {
               </div>
 
       
-              <div className="detail-res-actions">
+              <div className="detail-res-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 20 }}>
+                {/* Contrat de transport numérique conforme */}
+                <button
+                  type="button"
+                  className="btn-action-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: '#1A3A5C' }}
+                  onClick={() => setContratModalOpen(true)}
+                >
+                  <FiFileText /> Contrat de transport (Loi 53-05)
+                </button>
+
+                {/* Messagerie instantanée en direct */}
+                <button
+                  type="button"
+                  className="btn-action-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: '#0D9488' }}
+                  onClick={() => navigate(`/chat?cargaisonId=${reservation.cargaisonId || reservation.id}`)}
+                >
+                  <FiMessageSquare /> Négocier / Discuter
+                </button>
+
+                {reservation.statutReservation === "ACCEPTEE" && !paiement && (
+                  <button 
+                    type="button"
+                    className="btn-action-primary" 
+                    onClick={() => navigate(`/expediteur/paiements?reservationId=${reservation.id}`)}
+                  >
+                    <FiDollarSign /> Paiement & Reçu
+                  </button>
+                )}
+
+                {/* Avis après livraison */}
+                {reservation.statutReservation === "ACCEPTEE" && (
+                  <button
+                    type="button"
+                    className="btn-action-primary"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: '#D97706' }}
+                    onClick={() => setAvisModalOpen(true)}
+                  >
+                    <FiStar /> Laisser un avis
+                  </button>
+                )}
+
+                {/* Signaler un litige */}
+                <button
+                  type="button"
+                  className="btn-action-outline"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderColor: '#DC2626', color: '#DC2626' }}
+                  onClick={() => setLitigeModalOpen(true)}
+                >
+                  <FiAlertTriangle /> Signaler un litige
+                </button>
+
                 {reservation.statutReservation === "EN_ATTENTE" && (
-                  <button className="btn-action-danger" onClick={annulerReservation}>
+                  <button type="button" className="btn-action-danger" onClick={annulerReservation}>
                     <FiSlash /> Annuler la réservation
                   </button>
                 )}
 
                 {(reservation.statutReservation === "ANNULEE" || reservation.statutReservation === "REFUSEE") && (
-                  <button className="btn-action-delete" onClick={supprimerReservation}>
+                  <button type="button" className="btn-action-delete" onClick={supprimerReservation}>
                     <FiTrash2 /> Supprimer
-                  </button>
-                )}
-
-                {reservation.statutReservation === "ACCEPTEE" && !paiement && (
-                  <button 
-                    className="btn-action-primary" 
-                    onClick={() => navigate(`/expediteur/paiements?reservationId=${reservation.id}`)}
-                  >
-                    <FiDollarSign /> Paiement à la livraison
                   </button>
                 )}
               </div>
 
             </div>
           )}
+
+          {/* Modal Contrat de transport */}
+          <ContratModal
+            isOpen={contratModalOpen}
+            onClose={() => setContratModalOpen(false)}
+            offreId={reservation?.id}
+            userRole="EXPEDITEUR"
+          />
+
+          {/* Modal Laisser un Avis */}
+          <LaisserAvisModal
+            isOpen={avisModalOpen}
+            onClose={() => setAvisModalOpen(false)}
+            transporteurId={reservation?.transporteurId || 1}
+            transporteurNom={reservation?.transporteurNom || 'Transporteur Partenaire'}
+            cargaisonId={reservation?.cargaisonId}
+            onAvisPublie={() => setSuccess("Avis enregistré avec succès !")}
+          />
+
+          {/* Modal Déclarer un Litige */}
+          <NouveauLitigeModal
+            isOpen={litigeModalOpen}
+            onClose={() => setLitigeModalOpen(false)}
+            defaultCargaisonId={reservation?.cargaisonId}
+            onSuccess={() => setSuccess("Votre dossier de litige a été ouvert avec succès.")}
+          />
         </div>
       </main>
     </div>

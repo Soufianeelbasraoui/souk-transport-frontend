@@ -44,7 +44,6 @@ function ReservationsPage() {
       setReservations(res.data?.content || []);
       setTotalPages(res.data?.totalPages || 1);
       setTotalElements(res.data?.totalElements || 0);
-      console.log(res.data?.content)
     })
       .catch((err) => {
         console.error("Erreur lors de la récupération :", err);

@@ -1,8 +1,9 @@
-
+/* Login Page Styling - Matching Reference Design */
 .login-container {
   min-height: 100vh;
   display: flex;
-  background: #f8fafc;
+  background-color: #f8fafc;
+  font-family: inherit;
 }
 
 .right-panel-container {
@@ -15,30 +16,36 @@
 
 .login-content-wrapper {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
 }
+
 .back-to-home-link {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   color: #64748b;
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  transition: color 0.2s ease;
 }
 
+.back-to-home-link:hover {
+  color: #ff6b00;
+}
 
 .login-card {
   background-color: #ffffff;
   border-radius: 16px;
-  padding: 2.25rem;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+  padding: 2.25rem 2.5rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
   border: 1px solid #e2e8f0;
 }
 
 .login-icon-box {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   background-color: #fff0e6;
   border-radius: 50%;
   display: inline-flex;
@@ -48,7 +55,7 @@
 
 .login-icon-text {
   color: #ff6b00;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: bold;
 }
 
@@ -56,37 +63,129 @@
   color: #0f172a;
   font-weight: 700;
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
 }
 
 .login-subtitle {
   color: #64748b;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+.login-card .form-label {
+  display: block;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.4rem;
+}
+
+.login-card .form-control {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-card .form-control:focus {
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+  outline: none;
+}
+
+.login-card .form-control::placeholder {
+  color: #94a3b8;
+}
+
+/* Options supplémentaires : Se souvenir de moi & Mot de passe oublié */
+.auth-options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.85rem 0 1.25rem;
+  font-size: 0.825rem;
+}
+
+.remember-me-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #64748b;
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+
+.remember-me-label input[type="checkbox"] {
+  accent-color: #ff6b00;
+  cursor: pointer;
+}
+
+.forgot-password-btn {
+  background: none;
+  border: none;
+  color: #ff6b00;
+  font-weight: 600;
+  font-size: 0.825rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.forgot-password-btn:hover {
+  color: #e05e00;
+  text-decoration: underline;
 }
 
 .auth-error-text {
-  color: #dc3545;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
+  color: #dc2626;
+  font-size: 0.775rem;
+  margin-top: 0.3rem;
   display: block;
 }
 
+.auth-error-box {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  font-size: 0.825rem;
+  border-radius: 8px;
+}
+
+.auth-success-box {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  font-size: 0.825rem;
+  border-radius: 8px;
+}
+
 .btn-submit {
-  background-color: #ff6b00;
+  background-color: #0d1b2a;
   color: #ffffff;
   border: none;
-  font-weight: 700;
-  padding: 0.6rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.7rem 1rem;
   width: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .btn-submit:hover {
-  background-color: #e05e00;
-  transform: translateY(-1px);
+  background-color: #1b263b;
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .divider-container {
@@ -96,6 +195,7 @@
 }
 
 .divider-line {
+  border: 0;
   border-top: 1px solid #e2e8f0;
   margin: 0;
 }
@@ -106,25 +206,142 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #ffffff;
-  padding: 0 0.5rem;
+  padding: 0 0.75rem;
   color: #94a3b8;
   font-size: 0.8rem;
+}
+
+/* Bouton Google Authentification */
+.btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0.65rem 1rem;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-google:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.google-icon {
+  color: #ea4335;
+  font-size: 1rem;
 }
 
 .btn-register-link {
   display: block;
   width: 100%;
   text-align: center;
-  padding: 0.55rem 1rem;
+  padding: 0.65rem 1rem;
   border: 1px solid #e2e8f0;
+  background-color: #ffffff;
   color: #0f172a;
   font-weight: 600;
-  border-radius: 6px;
+  font-size: 0.9rem;
+  border-radius: 8px;
   text-decoration: none;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-register-link:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+/* Modal Mot de passe oublié */
+.modal-auth-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1050;
+}
+
+.modal-auth-content {
+  background: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+  border: 1px solid #e2e8f0;
+}
+
+.modal-auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.modal-auth-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-auth-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.825rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.modal-auth-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.modal-auth-close:hover {
+  color: #0f172a;
+}
+
+.modal-auth-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 1.25rem;
+}
+
+.btn-secondary-modal {
+  padding: 0.55rem 1rem;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary-modal:hover {
   background-color: #f8fafc;
 }
 

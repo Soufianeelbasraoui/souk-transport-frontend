@@ -1,35 +1,43 @@
-import { yupResolver } from "@hookform/resolvers/yup";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import api from "../../services/api";
+import { Link, useNavigate } from "react-router-dom";
+import { FiArrowLeft, FiPackage, FiTruck } from "react-icons/fi";
+import { FaUser, FaGoogle } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
-import { FiPackage, FiTruck, FiArrowLeft } from "react-icons/fi";
-import { FaUser } from "react-icons/fa";
-import "./Register.css";
+import { toast } from "react-toastify";
+import api from "../../services/api";
 import LeftPanel from "./LeftPanel/LeftPanel";
+import "./Register.css";
 
-const expediteurSchema = yup.object({
+const schema = yup.object({
   nom: yup.string().required("Le nom est obligatoire"),
   prenom: yup.string().required("Le prénom est obligatoire"),
   email: yup.string().email("Email invalide").required("L'email est obligatoire"),
-  password: yup.string().min(6, "Au moins 6 caractères").required("Le mot de passe est obligatoire"),
-  telephone: yup.string().matches(/^(06|07)[0-9]{8}$/, "Numéro invalide").nullable(),
+  password: yup.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").required("Le mot de passe est obligatoire"),
+  telephone: yup.string().required("Le téléphone est obligatoire"),
   ville: yup.string().required("La ville est obligatoire"),
-  nomEntreprise: yup.string().required("Nom d'entreprise obligatoire"),
-  adresseEntreprise: yup.string().required("Adresse obligatoire"),
-});
-
-const transporteurSchema = yup.object({
-  nom: yup.string().required("Le nom est obligatoire"),
-  prenom: yup.string().required("Le prénom est obligatoire"),
-  email: yup.string().email("Email invalide").required("L'email est obligatoire"),
-  password: yup.string().min(6, "Au moins 6 caractères").required("Le mot de passe est obligatoire"),
-  telephone: yup.string().matches(/^(06|07)[0-9]{8}$/, "Numéro invalide").nullable(),
-  ville: yup.string().required("La ville est obligatoire"),
-  cin: yup.string().required("Le CIN est obligatoire"),
-  numeroPermis: yup.string().required("Numéro de permis obligatoire"),
+  nomEntreprise: yup.string().when("$role", {
+    is: "EXPEDITEUR",
+    then: (schema) => schema.required("Le nom de l'entreprise est obligatoire"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  adresseEntreprise: yup.string().when("$role", {
+    is: "EXPEDITEUR",
+    then: (schema) => schema.required("L'adresse de l'entreprise est obligatoire"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  cin: yup.string().when("$role", {
+    is: "TRANSPORTEUR",
+    then: (schema) => schema.required("Le CIN est obligatoire"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  numeroPermis: yup.string().when("$role", {
+    is: "TRANSPORTEUR",
+    then: (schema) => schema.required("Le numéro de permis est obligatoire"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });
 
 function Register() {
@@ -37,14 +45,16 @@ function Register() {
   const [role, setRole] = useState("EXPEDITEUR");
   const [registerError, setRegisterError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
     reset,
+    formState: { errors },
   } = useForm({
-    resolver: yupResolver(role === "EXPEDITEUR" ? expediteurSchema : transporteurSchema),
+    resolver: yupResolver(schema),
+    context: { role },
   });
 
   const handleRoleChange = (newRole) => {
@@ -57,11 +67,12 @@ function Register() {
   const onSubmit = async (data) => {
     setRegisterError("");
     setSuccessMessage("");
+    setIsLoading(true);
 
     try {
       if (role === "EXPEDITEUR") {
         const response = await api.post("/auth/register/expediteur", data);
-        const token = response.data.token;
+        const token = response.data?.token;
 
         if (token) {
           localStorage.setItem("token", token);
@@ -77,10 +88,8 @@ function Register() {
           }, 1000);
         }
       } else {
-
         await api.post("/auth/register/transporteur", data);
-        
-        setSuccessMessage( "Votre compte a été créé avec succès ! Il est actuellement en attente de validation par l'administrateur." );
+        setSuccessMessage("Votre compte a été créé avec succès ! Il est actuellement en attente de validation par l'administrateur.");
 
         setTimeout(() => {
           navigate("/login");
@@ -89,17 +98,28 @@ function Register() {
     } catch (error) {
       if (error.response?.status === 409) {
         setRegisterError("Adresse email déjà utilisée.");
+      } else if (error.response?.data?.message) {
+        setRegisterError(error.response.data.message);
       } else if (error.response?.status === 400) {
         setRegisterError("Informations saisies invalides.");
       } else {
         setRegisterError("Erreur lors de l'inscription.");
       }
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleGoogleRegister = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+    toast.info("Redirection vers l'authentification Google en cours...");
+    window.location.href = `${apiUrl}/oauth2/authorization/google`;
   };
 
   return (
     <div className="register-page-wrapper">
       <LeftPanel />
+
       <div className="right-panel-container">
         <div className="register-card-wrapper">
           <Link to="/" className="back-to-home-link">
@@ -139,38 +159,68 @@ function Register() {
               <div className="row g-2">
                 <div className="col-6 mb-2">
                   <label className="form-label text-muted extra-small fw-semibold mb-1">Nom</label>
-                  <input type="text" className="form-control form-control-sm" placeholder="Nom" {...register("nom")} />
+                  <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="Nom"
+                    {...register("nom")}
+                  />
                   {errors.nom && <span className="auth-error-text">{errors.nom.message}</span>}
                 </div>
                 <div className="col-6 mb-2">
                   <label className="form-label text-muted extra-small fw-semibold mb-1">Prénom</label>
-                  <input type="text" className="form-control form-control-sm" placeholder="Prénom" {...register("prenom")} />
+                  <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="Prénom"
+                    {...register("prenom")}
+                  />
                   {errors.prenom && <span className="auth-error-text">{errors.prenom.message}</span>}
                 </div>
               </div>
 
               <div className="mb-2">
                 <label className="form-label text-muted extra-small fw-semibold mb-1">Email</label>
-                <input type="email" className="form-control form-control-sm" placeholder="exemple@email.com" {...register("email")} />
+                <input
+                  type="email"
+                  className="form-control form-control-sm"
+                  placeholder="exemple@email.com"
+                  {...register("email")}
+                />
                 {errors.email && <span className="auth-error-text">{errors.email.message}</span>}
               </div>
 
               <div className="row g-2">
                 <div className="col-6 mb-2">
                   <label className="form-label text-muted extra-small fw-semibold mb-1">Mot de passe</label>
-                  <input type="password" className="form-control form-control-sm" placeholder="Min 6 caractères" {...register("password")} />
+                  <input
+                    type="password"
+                    className="form-control form-control-sm"
+                    placeholder="Min 6 caractères"
+                    {...register("password")}
+                  />
                   {errors.password && <span className="auth-error-text">{errors.password.message}</span>}
                 </div>
                 <div className="col-6 mb-2">
                   <label className="form-label text-muted extra-small fw-semibold mb-1">Téléphone</label>
-                  <input type="text" className="form-control form-control-sm" placeholder="0612345678" {...register("telephone")} />
+                  <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="0612345678"
+                    {...register("telephone")}
+                  />
                   {errors.telephone && <span className="auth-error-text">{errors.telephone.message}</span>}
                 </div>
               </div>
 
               <div className="mb-2">
                 <label className="form-label text-muted extra-small fw-semibold mb-1">Ville</label>
-                <input type="text" className="form-control form-control-sm" placeholder="Ex: Casablanca" {...register("ville")} />
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  placeholder="Ex: Casablanca"
+                  {...register("ville")}
+                />
                 {errors.ville && <span className="auth-error-text">{errors.ville.message}</span>}
               </div>
 
@@ -178,12 +228,22 @@ function Register() {
                 <div className="row g-2">
                   <div className="col-6 mb-2">
                     <label className="form-label text-muted extra-small fw-semibold mb-1">Entreprise</label>
-                    <input type="text" className="form-control form-control-sm" placeholder="Nom" {...register("nomEntreprise")} />
+                    <input
+                      type="text"
+                      className="form-control form-control-sm"
+                      placeholder="Nom"
+                      {...register("nomEntreprise")}
+                    />
                     {errors.nomEntreprise && <span className="auth-error-text">{errors.nomEntreprise.message}</span>}
                   </div>
                   <div className="col-6 mb-2">
                     <label className="form-label text-muted extra-small fw-semibold mb-1">Adresse</label>
-                    <input type="text" className="form-control form-control-sm" placeholder="Adresse" {...register("adresseEntreprise")} />
+                    <input
+                      type="text"
+                      className="form-control form-control-sm"
+                      placeholder="Adresse"
+                      {...register("adresseEntreprise")}
+                    />
                     {errors.adresseEntreprise && <span className="auth-error-text">{errors.adresseEntreprise.message}</span>}
                   </div>
                 </div>
@@ -193,12 +253,22 @@ function Register() {
                 <div className="row g-2">
                   <div className="col-6 mb-2">
                     <label className="form-label text-muted extra-small fw-semibold mb-1">CIN</label>
-                    <input type="text" className="form-control form-control-sm" placeholder="AB123456" {...register("cin")} />
+                    <input
+                      type="text"
+                      className="form-control form-control-sm"
+                      placeholder="AB123456"
+                      {...register("cin")}
+                    />
                     {errors.cin && <span className="auth-error-text">{errors.cin.message}</span>}
                   </div>
                   <div className="col-6 mb-2">
                     <label className="form-label text-muted extra-small fw-semibold mb-1">Permis</label>
-                    <input type="text" className="form-control form-control-sm" placeholder="N° Permis" {...register("numeroPermis")} />
+                    <input
+                      type="text"
+                      className="form-control form-control-sm"
+                      placeholder="N° Permis"
+                      {...register("numeroPermis")}
+                    />
                     {errors.numeroPermis && <span className="auth-error-text">{errors.numeroPermis.message}</span>}
                   </div>
                 </div>
@@ -207,17 +277,32 @@ function Register() {
               {registerError && <div className="auth-error-box py-1 px-2 mb-2">{registerError}</div>}
               {successMessage && <div className="auth-success-box py-1 px-2 mb-2">{successMessage}</div>}
 
-              <button type="submit" className="btn-submit mt-2">Créer mon compte</button>
+              <button type="submit" className="btn-submit mt-2" disabled={isLoading}>
+                {isLoading ? "Création en cours..." : "Créer mon compte"}
+              </button>
             </form>
 
-            <div className="divider-container my-2">
+            <div className="divider-container my-3">
               <hr className="divider-line" />
               <span className="divider-text">ou</span>
             </div>
 
+            {/* BOUTON GOOGLE */}
+            <button
+              type="button"
+              className="btn-google"
+              onClick={handleGoogleRegister}
+              title="S'inscrire avec votre compte Google"
+            >
+              <FaGoogle className="google-icon" />
+              <span>S'inscrire avec Google</span>
+            </button>
+
             <div className="text-center">
               <span className="text-muted extra-small me-1">Déjà inscrit ?</span>
-              <Link to="/login" className="auth-link-highlight">Se connecter</Link>
+              <Link to="/login" className="auth-link-highlight">
+                Se connecter
+              </Link>
             </div>
           </div>
         </div>
