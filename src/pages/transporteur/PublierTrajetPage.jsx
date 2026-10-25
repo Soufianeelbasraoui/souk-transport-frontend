@@ -10,6 +10,7 @@ import {
   FiArrowRight,
   FiArrowLeft,
   FiInfo,
+  FiTrendingUp,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import transporteurService from '../../api/services/transporteurService';
@@ -21,6 +22,7 @@ import Select from '../../components/common/Select';
 import Stepper from '../../components/common/Stepper';
 import Card from '../../components/common/Card';
 import DemoBadge from '../../components/common/DemoBadge';
+import TarificationEstimatorModal from '../../components/tarification/TarificationEstimatorModal';
 
 const schema = yup.object({
   villeDepart: yup.string().required('La ville de départ est obligatoire'),
@@ -49,6 +51,7 @@ export const PublierTrajetPage = () => {
   const [villes, setVilles] = useState([]);
   const [camions, setCamions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEstimatorOpen, setIsEstimatorOpen] = useState(false);
 
   const {
     register,
@@ -264,37 +267,47 @@ export const PublierTrajetPage = () => {
                 {camions.length === 0 ? (
                   <div style={{ padding: 14, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, fontSize: 13, color: '#92400E' }}>
                     <p style={{ margin: '0 0 8px 0', fontWeight: 600 }}>Aucun camion enregistré dans votre flotte.</p>
-                    <p style={{ margin: 0 }}>
-                      Pour publier un trajet, vous devez d'abord associer un camion :{' '}
-                      <Link to="/transporteur/camions" style={{ color: '#0D9488', fontWeight: 700, textDecoration: 'underline' }}>
-                        Ajouter un camion
-                      </Link>
+                    <p style={{ margin: '0 0 12px 0' }}>
+                      Pour publier un trajet, vous devez d'abord ajouter un véhicule dans votre parc automobile.
                     </p>
+                    <Link to="/transporteur/camions/new" style={{ textDecoration: 'none' }}>
+                      <Button variant="primary" size="sm">
+                        + Ajouter un camion maintenant
+                      </Button>
+                    </Link>
                   </div>
                 ) : (
-                  <Select
-                    label="Sélectionner le camion"
-                    required={true}
-                    error={errors.camionId?.message}
-                    {...register('camionId')}
-                  >
-                    {camions.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.marque} {c.modele} ({c.immatriculation}) - {c.typeCamion}
-                      </option>
-                    ))}
-                  </Select>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <label className="st-label required" style={{ margin: 0 }}>Sélectionner le camion</label>
+                      <Link to="/transporteur/camions/new" style={{ fontSize: 12, color: '#0D9488', fontWeight: 600, textDecoration: 'underline' }}>
+                        + Ajouter un autre camion
+                      </Link>
+                    </div>
+                    <Select
+                      required={true}
+                      error={errors.camionId?.message}
+                      {...register('camionId')}
+                    >
+                      {camions.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.marque} {c.modele} ({c.immatriculation}) - {c.type || c.typeCamion}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
                 )}
 
                 {selectedCamion && (
-                  <div style={{ backgroundColor: '#F8FAFC', padding: 14, borderRadius: 6, border: '1px solid #E2E8F0' }}>
-                    <div style={{ fontSize: 12, color: '#718096' }}>Détails du véhicule :</div>
+                  <div style={{ backgroundColor: '#F8FAFC', padding: 14, borderRadius: 6, border: '1px solid #E2E8F0', marginTop: 12 }}>
+                    <div style={{ fontSize: 12, color: '#718096' }}>Détails du véhicule sélectionné :</div>
                     <strong style={{ fontSize: 14, color: '#1A3A5C' }}>
-                      {selectedCamion.marque} {selectedCamion.modele}
+                      {selectedCamion.marque} {selectedCamion.modele} ({selectedCamion.immatriculation})
                     </strong>
                     <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 12, color: '#4A5568' }}>
-                      <span>Charge max : {formatNumber(selectedCamion.chargeUtileKg)} kg</span>
-                      <span>Volume : {selectedCamion.volumeM3} m³</span>
+                      <span>Charge max : <strong>{formatNumber(selectedCamion.capacite ?? selectedCamion.chargeUtileKg)} kg</strong></span>
+                      <span>Volume : <strong>{selectedCamion.volumeCapacite ?? selectedCamion.volumeM3} m³</strong></span>
+                      <span>Catégorie : <strong>{selectedCamion.type || selectedCamion.typeCamion}</strong></span>
                     </div>
                   </div>
                 )}
@@ -331,6 +344,28 @@ export const PublierTrajetPage = () => {
                     error={errors.volumeDisponible?.message}
                     {...register('volumeDisponible')}
                   />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: '#2D3748' }}>Moteur d'estimation :</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsEstimatorOpen(true)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#1A3A5C',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    <FiTrendingUp /> Estimer le tarif conseillé
+                  </button>
                 </div>
 
                 <Select
@@ -457,6 +492,21 @@ export const PublierTrajetPage = () => {
           </Card>
         </div>
       </div>
+
+      {/* MODAL ESTIMATEUR DE PRIX CONSEILLÉ */}
+      <TarificationEstimatorModal
+        isOpen={isEstimatorOpen}
+        onClose={() => setIsEstimatorOpen(false)}
+        defaultDepart={formData.villeDepart}
+        defaultArrivee={formData.villeArrivee}
+        onSelectPrix={(conseille) => {
+          const p = Number(formData.poidsDisponible) || 1000;
+          const prixKgEstime = (conseille / p).toFixed(2);
+          setValue('typeTarification', 'PRIX_FIXE_KG');
+          setValue('prixKg', Number(prixKgEstime));
+          toast.success(`Tarif conseillé appliqué : ${prixKgEstime} DH/kg (${conseille} DH total)`);
+        }}
+      />
     </div>
   );
 };

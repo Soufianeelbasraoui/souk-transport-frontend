@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FiCheck,
   FiX,
@@ -6,6 +7,8 @@ import {
   FiPackage,
   FiMapPin,
   FiClock,
+  FiMessageSquare,
+  FiFileText,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import transporteurService from '../../api/services/transporteurService';
@@ -19,11 +22,17 @@ import Input from '../../components/common/Input';
 import EmptyState from '../../components/common/EmptyState';
 import Skeleton from '../../components/common/Skeleton';
 import DemoBadge from '../../components/common/DemoBadge';
+import ContratModal from '../../components/contrat/ContratModal';
 
 export const OffresRecuesPage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('TOUS');
   const [offres, setOffres] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Modal de contrat de transport officiel
+  const [contratModalOpen, setContratModalOpen] = useState(false);
+  const [contratOffreId, setContratOffreId] = useState(null);
 
   // Modal de contre-offre
   const [contreOffreModal, setContreOffreModal] = useState(false);
@@ -198,42 +207,68 @@ export const OffresRecuesPage = () => {
                     </div>
                   </div>
 
-                  {isEnAttente && (
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <Button
-                        variant="primary"
-                        style={{ backgroundColor: '#2E7D32' }}
-                        size="sm"
-                        icon={<FiCheck />}
-                        onClick={() => handleAccepter(id)}
-                      >
-                        Accepter
-                      </Button>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      icon={<FiMessageSquare />}
+                      onClick={() => navigate(`/chat?offreId=${id}`)}
+                      title="Discuter directement avec l'expéditeur"
+                    >
+                      Discuter
+                    </Button>
 
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        icon={<FiDollarSign />}
-                        onClick={() => {
-                          setSelectedOffre(offre);
-                          setNouveauPrix(String(offre.prixPropose || ''));
-                          setContreOffreModal(true);
-                        }}
-                      >
-                        Contre-offre
-                      </Button>
-
+                    {offre.statutOffre === 'ACCEPTEE' && (
                       <Button
                         variant="outline"
                         size="sm"
-                        style={{ color: '#C62828' }}
-                        icon={<FiX />}
-                        onClick={() => handleRefuser(id)}
+                        icon={<FiFileText />}
+                        onClick={() => {
+                          setContratOffreId(id);
+                          setContratModalOpen(true);
+                        }}
                       >
-                        Refuser
+                        Contrat
                       </Button>
-                    </div>
-                  )}
+                    )}
+
+                    {isEnAttente && (
+                      <>
+                        <Button
+                          variant="primary"
+                          style={{ backgroundColor: '#2E7D32' }}
+                          size="sm"
+                          icon={<FiCheck />}
+                          onClick={() => handleAccepter(id)}
+                        >
+                          Accepter
+                        </Button>
+
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          icon={<FiDollarSign />}
+                          onClick={() => {
+                            setSelectedOffre(offre);
+                            setNouveauPrix(String(offre.prixPropose || ''));
+                            setContreOffreModal(true);
+                          }}
+                        >
+                          Contre-offre
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          style={{ color: '#C62828' }}
+                          icon={<FiX />}
+                          onClick={() => handleRefuser(id)}
+                        >
+                          Refuser
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -295,6 +330,13 @@ export const OffresRecuesPage = () => {
           </div>
         </div>
       </Modal>
+
+      {/* MODAL CONTRAT OFFICIEL DE TRANSPORT */}
+      <ContratModal
+        isOpen={contratModalOpen}
+        onClose={() => setContratModalOpen(false)}
+        offreId={contratOffreId}
+      />
     </div>
   );
 };

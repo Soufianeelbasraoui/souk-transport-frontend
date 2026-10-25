@@ -153,6 +153,32 @@ export const RevenusPage = () => {
       width: '120px',
       render: (val) => <Badge status={val} />,
     },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right',
+      render: (_, row) => (
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+          {row.methodePaiement === 'CASH' && row.statut !== 'PAYE' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  await transporteurService.confirmerCash(row.id);
+                  toast.success('Paiement en espèces confirmé par le transporteur.');
+                  fetchFinances();
+                } catch {
+                  toast.error('Erreur lors de la confirmation cash.');
+                }
+              }}
+            >
+              Confirmer Cash
+            </Button>
+          )}
+        </div>
+      ),
+    },
   ];
 
   return (

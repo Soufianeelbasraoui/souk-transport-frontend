@@ -63,12 +63,21 @@ export const SuiviGpsPage = () => {
     [35.7595, -5.8340], // Tanger
   ];
 
+  const [evenements, setEvenements] = useState([]);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [eventType, setEventType] = useState('PAUSE');
+  const [eventDesc, setEventDesc] = useState('');
+  const [postingEvent, setPostingEvent] = useState(false);
+
   const fetchSuivi = async () => {
     try {
-      const data = await transporteurService.getSuiviTrajet(trajetId);
+      const [data, evts] = await Promise.all([
+        transporteurService.getSuiviTrajet(trajetId),
+        transporteurService.getEvenementsTrajet(trajetId),
+      ]);
       setSuiviData(data);
+      setEvenements(evts || []);
     } catch {
-      // Fallback coordonnées Maroc
       setSuiviData({
         trajetId,
         departNom: 'Casablanca (Port)',
@@ -89,25 +98,57 @@ export const SuiviGpsPage = () => {
     fetchSuivi();
   }, [trajetId]);
 
-  // Simulation d'avancée de la position GPS
-  const handleAvancerGps = () => {
+  // Actualisation et émission de la position GPS vers le backend
+  const handleAvancerGps = async () => {
     setIsSimulating(true);
-    setTimeout(() => {
-      setSuiviData((prev) => {
-        const nextPct = Math.min(100, (prev?.progressionPct || 50) + 8);
-        const nextDist = Math.max(0, (prev?.distanceRestanteKm || 140) - 18);
-        return {
-          ...prev,
-          progressionPct: nextPct,
-          distanceRestanteKm: nextDist,
-          latitudeActuelle: (prev?.latitudeActuelle || 34.261) + 0.08,
-          longitudeActuelle: (prev?.longitudeActuelle || -6.58) + 0.05,
-          vitesseKmH: 82,
-        };
+    const nextLat = (suiviData?.latitudeActuelle || 34.261) + 0.08;
+    const nextLng = (suiviData?.longitudeActuelle || -6.58) + 0.05;
+    const nextPct = Math.min(100, (suiviData?.progressionPct || 50) + 8);
+    const nextDist = Math.max(0, (suiviData?.distanceRestanteKm || 140) - 18);
+
+    try {
+      await transporteurService.enregistrerPositionGps(trajetId, {
+        latitude: nextLat,
+        longitude: nextLng,
+        vitesseKmH: 82,
+        cap: 35,
       });
+
+      setSuiviData((prev) => ({
+        ...prev,
+        progressionPct: nextPct,
+        distanceRestanteKm: nextDist,
+        latitudeActuelle: nextLat,
+        longitudeActuelle: nextLng,
+        vitesseKmH: 82,
+      }));
+      toast.success('Position GPS transmise au système télématique (+18 km).');
+    } catch {
+      toast.error('Erreur lors de la transmission GPS.');
+    } finally {
       setIsSimulating(false);
-      toast.success('Position GPS actualisée (+18 km enregistrés).');
-    }, 400);
+    }
+  };
+
+  const handleAjouterEvenement = async (e) => {
+    e.preventDefault();
+    setPostingEvent(true);
+    try {
+      const ev = await transporteurService.ajouterEvenementTrajet(trajetId, {
+        type: eventType,
+        description: eventDesc,
+        latitude: suiviData?.latitudeActuelle,
+        longitude: suiviData?.longitudeActuelle,
+      });
+      setEvenements((prev) => [ev, ...prev]);
+      setShowEventModal(false);
+      setEventDesc('');
+      toast.success(`Événement ${eventType} consigné sur la feuille de route.`);
+    } catch {
+      toast.error("Erreur lors de l'enregistrement de l'événement.");
+    } finally {
+      setPostingEvent(false);
+    }
   };
 
   const currentLat = suiviData?.latitudeActuelle || 34.261;
@@ -135,6 +176,14 @@ export const SuiviGpsPage = () => {
               Retour aux trajets
             </Button>
           </Link>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setShowEventModal(true)}
+          >
+            + Signaler événement
+          </Button>
 
           <Button
             variant="secondary"
@@ -242,6 +291,101 @@ export const SuiviGpsPage = () => {
           </MapContainer>
         )}
       </Card>
+
+      {/* FEUILLE DE ROUTE & TIMELINE D'ÉVÉNEMENTS */}
+      <Card title="Journal de Bord & Événements Télématiques" subtitle="Historique certifié horodaté du trajet">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {evenements.length === 0 ? (
+            <div style={{ color: '#718096', fontSize: 13, textAlign: 'center', padding: 16 }}>
+              Aucun incident ou arrêt consigné pour l'instant.
+            </div>
+          ) : (
+            evenements.map((evt, idx) => (
+              <div
+                key={evt.id || idx}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #EDF2F7',
+                }}
+              >
+                <span style={{
+                  padding: '3px 8px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  backgroundColor: evt.type === 'INCIDENT' ? '#FED7D7' : '#E2E8F0',
+                  color: evt.type === 'INCIDENT' ? '#C53030' : '#2D3748',
+                }}>
+                  {evt.type}
+                </span>
+                <span style={{ fontSize: 13, color: '#4A5568', flex: 1 }}>
+                  {evt.description || 'Événement de route enregistré'}
+                </span>
+                <span style={{ fontSize: 12, color: '#A0AEC0' }}>
+                  {evt.timestamp ? new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </Card>
+
+      {/* MODAL AJOUT ÉVÉNEMENT */}
+      {showEventModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+        }}>
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, maxWidth: 480, width: '100%', padding: 24 }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700, color: '#1A202C' }}>
+              Signaler un événement de trajet
+            </h3>
+            <form onSubmit={handleAjouterEvenement} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 4 }}>Type d'événement :</label>
+                <select
+                  value={eventType}
+                  onChange={(e) => setEventType(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #CBD5E0', fontSize: 14 }}
+                >
+                  <option value="PAUSE">Pause chauffeur / Repos réglementaire</option>
+                  <option value="PEAGE">Passage péage autoroutier</option>
+                  <option value="CONTROLE">Contrôle routier / Gendarmerie</option>
+                  <option value="RETARD">Ralentissement / Embouteillage</option>
+                  <option value="INCIDENT">Panne ou incident mécanique</option>
+                  <option value="LIVRAISON">Arrivée quai de déchargement</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 4 }}>Précisions :</label>
+                <textarea
+                  rows={3}
+                  placeholder="Ex: Arrêt station autoroutière Bouznika pour contrôle arrimage..."
+                  value={eventDesc}
+                  onChange={(e) => setEventDesc(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #CBD5E0', fontSize: 13 }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
+                <Button type="button" variant="secondary" onClick={() => setShowEventModal(false)}>
+                  Annuler
+                </Button>
+                <Button type="submit" variant="primary" loading={postingEvent}>
+                  Enregistrer
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
