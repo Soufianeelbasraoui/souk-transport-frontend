@@ -500,46 +500,202 @@ export const transporteurService = {
     return res.data;
   },
 
-  // 6. CAMIONS & FLOTTE
-  getMesCamions: async ({ page = 0, size = 10 } = {}) => {
-    if (isMockEnabled()) {
-      await delay(300, 500);
-      const camions = [
-        {
-          id: 1,
-          marque: 'Volvo',
-          modele: 'FH 500 Globetrotter',
-          immatriculation: '12345-A-6',
-          typeCamion: 'SEMI',
-          annee: 2022,
-          chargeUtileKg: 24000,
-          volumeM3: 85,
-          statut: 'ACTIF',
-          equipements: ['GPS', 'HAYON', 'BACHE'],
-          zonesDesservies: ['Casablanca-Settat', 'Tanger-Tétouan-Al Hoceïma', 'Marrakech-Safi'],
-        },
-        {
-          id: 2,
-          marque: 'Mercedes-Benz',
-          modele: 'Atego 1224',
-          immatriculation: '9876-B-1',
-          typeCamion: 'CAMION_10T',
-          annee: 2020,
-          chargeUtileKg: 10000,
-          volumeM3: 42,
-          statut: 'ACTIF',
-          equipements: ['GPS', 'REFRIGERATION'],
-          zonesDesservies: ['Fès-Meknès', 'Oriental', 'Rabat-Salé-Kénitra'],
-        },
-      ];
-      return mockPagedResponse(camions, page, size);
-    }
+  // 6. CAMIONS & FLOTTE (Connecté à CamionController /api/camions)
+  getMesCamions: async ({ page = 0, size = 12 } = {}) => {
     try {
       const res = await client.get('/api/camions/mesCamions', { params: { page, size } });
       return res.data;
     } catch {
+      if (isMockEnabled()) {
+        const camions = [
+          {
+            id: 1,
+            marque: 'Volvo',
+            modele: 'FH 500 Globetrotter',
+            immatriculation: '12345-A-6',
+            type: 'SEMI',
+            typeCamion: 'SEMI',
+            annee: 2022,
+            capacite: 24000,
+            chargeUtileKg: 24000,
+            volumeCapacite: 85,
+            volumeM3: 85,
+            disponible: true,
+            equipements: ['GPS', 'HAYON', 'BACHE'],
+            zonesPreferentielles: ['Casablanca-Settat', 'Tanger-Tétouan-Al Hoceïma', 'Marrakech-Safi'],
+          },
+          {
+            id: 2,
+            marque: 'Mercedes-Benz',
+            modele: 'Atego 1224',
+            immatriculation: '9876-B-1',
+            type: 'CAMION_10T',
+            typeCamion: 'CAMION_10T',
+            annee: 2020,
+            capacite: 10000,
+            chargeUtileKg: 10000,
+            volumeCapacite: 42,
+            volumeM3: 42,
+            disponible: true,
+            equipements: ['GPS', 'REFRIGERATION'],
+            zonesPreferentielles: ['Fès-Meknès', 'Oriental', 'Rabat-Salé-Kénitra'],
+          },
+        ];
+        return mockPagedResponse(camions, page, size);
+      }
       return mockPagedResponse([], page, size);
     }
+  },
+
+  ajouterCamion: async (camionData) => {
+    const payload = {
+      marque: camionData.marque?.trim(),
+      modele: camionData.modele?.trim(),
+      type: camionData.type || camionData.typeCamion || 'SEMI',
+      immatriculation: camionData.immatriculation?.trim().toUpperCase(),
+      capacite: Number(camionData.capacite ?? camionData.chargeUtileKg ?? 20000),
+      volumeCapacite: Number(camionData.volumeCapacite ?? camionData.volumeM3 ?? 60),
+      annee: camionData.annee ? Number(camionData.annee) : new Date().getFullYear(),
+      photoPrincipale: camionData.photoPrincipale || null,
+      disponible: camionData.disponible !== undefined ? camionData.disponible : true,
+      equipements: Array.isArray(camionData.equipements) ? camionData.equipements : [],
+      zonesPreferentielles: Array.isArray(camionData.zonesPreferentielles) ? camionData.zonesPreferentielles : [],
+    };
+    const res = await client.post('/api/camions', payload);
+    return res.data;
+  },
+
+  modifierCamion: async (id, camionData) => {
+    const payload = {
+      marque: camionData.marque?.trim(),
+      modele: camionData.modele?.trim(),
+      type: camionData.type || camionData.typeCamion || 'SEMI',
+      immatriculation: camionData.immatriculation?.trim().toUpperCase(),
+      capacite: Number(camionData.capacite ?? camionData.chargeUtileKg ?? 20000),
+      volumeCapacite: Number(camionData.volumeCapacite ?? camionData.volumeM3 ?? 60),
+      annee: camionData.annee ? Number(camionData.annee) : null,
+      photoPrincipale: camionData.photoPrincipale || null,
+      disponible: camionData.disponible !== undefined ? camionData.disponible : true,
+      equipements: Array.isArray(camionData.equipements) ? camionData.equipements : [],
+      zonesPreferentielles: Array.isArray(camionData.zonesPreferentielles) ? camionData.zonesPreferentielles : [],
+    };
+    const res = await client.put(`/api/camions/${id}`, payload);
+    return res.data;
+  },
+
+  supprimerCamion: async (id) => {
+    const res = await client.delete(`/api/camions/${id}`);
+    return res.data;
+  },
+
+  // 7. ÉVÉNEMENTS & TÉLÉMÉTRIE TEMPS RÉEL DU TRAJET
+  enregistrerPositionGps: async (trajetId, { latitude, longitude, vitesseKmH = 0, cap = 0 }) => {
+    if (isMockEnabled()) {
+      await delay(150, 250);
+      return { trajetId, latitude, longitude, vitesseKmH, timestamp: new Date().toISOString() };
+    }
+    const res = await client.post(`/api/trajets/${trajetId}/positions`, {
+      latitude: Number(latitude),
+      longitude: Number(longitude),
+      vitesseKmH: Number(vitesseKmH),
+      cap: Number(cap),
+    });
+    return res.data;
+  },
+
+  ajouterEvenementTrajet: async (trajetId, { type, description = '', latitude = null, longitude = null, photoPreuve = null }) => {
+    if (isMockEnabled()) {
+      await delay(200, 350);
+      return { id: Date.now(), trajetId, type, description, timestamp: new Date().toISOString() };
+    }
+    const res = await client.post(`/api/trajets/${trajetId}/evenements`, {
+      type,
+      description,
+      latitude: latitude ? Number(latitude) : null,
+      longitude: longitude ? Number(longitude) : null,
+      photoPreuve,
+    });
+    return res.data;
+  },
+
+  getEvenementsTrajet: async (trajetId) => {
+    if (isMockEnabled()) {
+      await delay(150, 300);
+      return [
+        { id: 1, type: 'DEPART', description: 'Départ du port de Casablanca', timestamp: new Date(Date.now() - 3600000 * 2).toISOString() },
+        { id: 2, type: 'PEAGE', description: 'Passage péage Bouznika', timestamp: new Date(Date.now() - 3600000 * 1.5).toISOString() },
+      ];
+    }
+    try {
+      const res = await client.get(`/api/trajets/${trajetId}/evenements`);
+      return Array.isArray(res.data) ? res.data : [];
+    } catch {
+      return [];
+    }
+  },
+
+  // 8. ACTIONS FINANCIÈRES & RIB
+  confirmerCash: async (paiementId) => {
+    if (isMockEnabled()) {
+      await delay(200, 400);
+      return { id: paiementId, statutPaiement: 'PAYE', methodePaiement: 'CASH' };
+    }
+    const res = await client.patch(`/api/finances/paiements/${paiementId}/confirmer-cash`);
+    return res.data;
+  },
+
+  enregistrerCompteBancaire: async ({ nomBanque, titulaire, rib }) => {
+    if (isMockEnabled()) {
+      await delay(250, 400);
+      return { nomBanque, titulaire, rib };
+    }
+    const res = await client.post('/api/finances/transporteur/compte-bancaire', {
+      nomBanque,
+      titulaire,
+      rib,
+    });
+    return res.data;
+  },
+
+  // 9. GESTION COMPLÈTE DU CAMION
+  ajouterCamion: async (camionData) => {
+    if (isMockEnabled()) {
+      await delay(300, 500);
+      return { id: Date.now(), ...camionData, statut: 'ACTIF' };
+    }
+    const res = await client.post('/api/camions', camionData);
+    return res.data;
+  },
+
+  modifierCamion: async (id, camionData) => {
+    if (isMockEnabled()) {
+      await delay(300, 500);
+      return { id, ...camionData };
+    }
+    const res = await client.put(`/api/camions/${id}`, camionData);
+    return res.data;
+  },
+
+  supprimerCamion: async (id) => {
+    if (isMockEnabled()) {
+      await delay(200, 400);
+      return { success: true };
+    }
+    const res = await client.delete(`/api/camions/${id}`);
+    return res.data;
+  },
+
+  ajouterPhotoCamion: async (id, file) => {
+    if (isMockEnabled()) {
+      await delay(300, 500);
+      return { photoUrl: URL.createObjectURL(file) };
+    }
+    const formData = new FormData();
+    formData.append('fichier', file);
+    const res = await client.post(`/api/camions/${id}/photos`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
   },
 
   getVilles: async () => {

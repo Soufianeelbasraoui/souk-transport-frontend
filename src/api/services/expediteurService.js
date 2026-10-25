@@ -494,7 +494,34 @@ export const expediteurService = {
       await delay(300, 500);
       return { id: Date.now(), reference: `CRG-2025-${Math.floor(100 + Math.random() * 900)}`, ...cargaisonData, statut: 'EN_ATTENTE' };
     }
-    const res = await client.post('/api/cargaisons', cargaisonData);
+
+    const validTypes = ['ALIMENTAIRE', 'ELECTRONIQUE', 'FRAGILE', 'TEXTILE', 'MATERIAUX', 'REFRIGERE', 'DANGEREUX'];
+    let typeMarchandise = cargaisonData.typeMarchandise;
+    if (typeMarchandise === 'FRIGO' || typeMarchandise === 'PERISSABLE') {
+      typeMarchandise = 'REFRIGERE';
+    } else if (typeMarchandise === 'CONSTRUCTION' || typeMarchandise === 'INDUSTRIEL') {
+      typeMarchandise = 'MATERIAUX';
+    } else if (typeMarchandise === 'AGRICOLE') {
+      typeMarchandise = 'ALIMENTAIRE';
+    } else if (typeMarchandise === 'GENERAL' || typeMarchandise === 'STANDARD' || typeMarchandise === '' || !validTypes.includes(typeMarchandise)) {
+      typeMarchandise = null;
+    }
+
+    const payload = {
+      description: cargaisonData.description,
+      poids: Number(cargaisonData.poids),
+      volume: cargaisonData.volume ? Number(cargaisonData.volume) : null,
+      valeurDeclaree: cargaisonData.valeurDeclaree ? Number(cargaisonData.valeurDeclaree) : null,
+      typeMarchandise,
+      assurance: Boolean(cargaisonData.assurance),
+      instructionsSpeciales: cargaisonData.instructionsSpeciales || null,
+      photoUrls: Array.isArray(cargaisonData.photoUrls) ? cargaisonData.photoUrls : [],
+    };
+    if (cargaisonData.expediteurId) {
+      payload.expediteurId = Number(cargaisonData.expediteurId);
+    }
+
+    const res = await client.post('/api/cargaisons', payload);
     return res.data;
   },
 
@@ -609,6 +636,73 @@ export const expediteurService = {
       return { id: paiementId, statutPaiement: 'CONFIRME', message: 'Paiement CMI approuvé avec succès.' };
     }
     const res = await client.patch(`/api/finances/paiements/${paiementId}/valider-cmi`);
+    return res.data;
+  },
+
+  // 6. GESTION DES RÉSERVATIONS EXPÉDITEUR
+  getMesReservations: async ({ page = 0, size = 10 } = {}) => {
+    if (isMockEnabled()) {
+      await delay(250, 400);
+      const list = [
+        {
+          id: 1,
+          cargaisonId: 1,
+          trajetId: 101,
+          statut: 'CONFIRMEE',
+          prixConvenu: 2800,
+          dateCreation: '2025-01-18T10:00:00',
+          trajet: {
+            villeDepart: 'Casablanca',
+            villeArrivee: 'Tanger',
+            dateDepart: '2025-01-20T08:00:00',
+            transporteurNom: 'Mohamed El Fassi Transport',
+          },
+        },
+      ];
+      return mockPagedResponse(list, page, size);
+    }
+    try {
+      const res = await client.get('/api/reservations/expediteur/mes-reservations', { params: { page, size } });
+      const raw = res.data;
+      const content = raw.content || (Array.isArray(raw) ? raw : []);
+      return {
+        content,
+        totalElements: raw.totalElements ?? content.length,
+        totalPages: raw.totalPages ?? 1,
+      };
+    } catch {
+      return mockPagedResponse([], page, size);
+    }
+  },
+
+  getReservationById: async (id) => {
+    if (isMockEnabled()) {
+      await delay(200, 350);
+      return {
+        id: Number(id),
+        cargaisonId: 1,
+        trajetId: 101,
+        statut: 'CONFIRMEE',
+        prixConvenu: 2800,
+        dateCreation: '2025-01-18T10:00:00',
+        trajet: {
+          villeDepart: 'Casablanca',
+          villeArrivee: 'Tanger',
+          dateDepart: '2025-01-20T08:00:00',
+          transporteurNom: 'Mohamed El Fassi Transport',
+        },
+      };
+    }
+    const res = await client.get(`/api/reservations/${id}`);
+    return res.data;
+  },
+
+  annulerReservation: async (id) => {
+    if (isMockEnabled()) {
+      await delay(250, 400);
+      return { id, statut: 'ANNULEE' };
+    }
+    const res = await client.patch(`/api/reservations/${id}/annuler`);
     return res.data;
   },
 };
