@@ -12,6 +12,10 @@ import {
   FiArrowLeft,
   FiBarChart2,
   FiCheckSquare,
+  FiMessageSquare,
+  FiStar,
+  FiAward,
+  FiAlertTriangle,
 } from 'react-icons/fi';
 import Modal from '../../common/Modal';
 import { useAuth } from '../../../context/AuthContext';
@@ -33,16 +37,23 @@ export const GlobalSearchModal = ({ isOpen, onClose }) => {
   const quickLinksByRole = {
     TRANSPORTEUR: [
       { title: t('nav.myTrips', 'Mes Trajets'), path: '/transporteur/trajets', icon: FiTruck, desc: 'Consulter et gérer les trajets' },
-      { title: t('nav.publishTrip', 'Publier un trajet'), path: '/transporteur/trajets/new', icon: FiTruck, desc: 'Créer une nouvelle liaison' },
-      { title: t('nav.receivedOffers', 'Offres reçues'), path: '/transporteur/reservations', icon: FiPackage, desc: 'Réservations et négociations' },
-      { title: t('nav.earnings', 'Revenus & finances'), path: '/transporteur/revenus', icon: FiDollarSign, desc: 'Solde et demandes de retrait' },
-      { title: t('nav.myTrucks', 'Mon camion'), path: '/transporteur/camions', icon: FiTruck, desc: 'Gestion de la flotte' },
+      { title: t('nav.publishTrip', 'Publier un trajet'), path: '/transporteur/trajets/new', icon: FiTruck, desc: 'Créer une nouvelle liaison avec tarification' },
+      { title: t('nav.receivedOffers', 'Offres reçues'), path: '/transporteur/reservations', icon: FiPackage, desc: 'Réservations et contrats' },
+      { title: t('nav.chat', 'Messagerie instantanée'), path: '/chat', icon: FiMessageSquare, desc: 'Négocier en direct avec les expéditeurs' },
+      { title: t('nav.reviews', 'Avis & Notations'), path: '/transporteur/avis', icon: FiStar, desc: 'Réputation et score de confiance' },
+      { title: t('nav.subscription', 'Abonnement & Quotas'), path: '/transporteur/abonnements', icon: FiAward, desc: 'Formules Standard, Pro et Flotte' },
+      { title: t('nav.disputes', 'Litiges & Réclamations'), path: '/transporteur/litiges', icon: FiAlertTriangle, desc: 'Dossiers de médiation et arbitrage' },
+      { title: t('nav.earnings', 'Revenus & finances'), path: '/transporteur/revenus', icon: FiDollarSign, desc: 'Solde, RIB et retraits' },
+      { title: t('nav.myTrucks', 'Mon camion & Documents'), path: '/transporteur/camions', icon: FiTruck, desc: 'Gestion de flotte et KYC' },
     ],
     EXPEDITEUR: [
       { title: t('nav.searchTrips', 'Rechercher un trajet'), path: '/expediteur/trajets', icon: FiSearch, desc: 'Trouver un transporteur disponible' },
-      { title: t('nav.newShipment', 'Nouvelle cargaison'), path: '/expediteur/cargaisons/new', icon: FiPackage, desc: 'Expédier des marchandises' },
+      { title: t('nav.newShipment', 'Nouvelle cargaison'), path: '/expediteur/cargaisons/new', icon: FiPackage, desc: 'Expédier des marchandises au souk' },
       { title: t('nav.myCargo', 'Mes expéditions'), path: '/expediteur/cargaisons', icon: FiPackage, desc: 'Suivre le statut de mes envois' },
-      { title: t('nav.transactions', 'Finances & Factures'), path: '/expediteur/paiements', icon: FiDollarSign, desc: 'Consulter mes factures et reçus' },
+      { title: t('nav.chat', 'Messagerie instantanée'), path: '/chat', icon: FiMessageSquare, desc: 'Négocier en direct avec les transporteurs' },
+      { title: t('nav.favorites', 'Transporteurs favoris & IA'), path: '/expediteur/favoris', icon: FiStar, desc: 'Partenaires de confiance recommandés' },
+      { title: t('nav.disputes', 'Litiges & Réclamations'), path: '/expediteur/litiges', icon: FiAlertTriangle, desc: 'Signaler un problème sur une livraison' },
+      { title: t('nav.transactions', 'Finances & Factures'), path: '/expediteur/paiements', icon: FiDollarSign, desc: 'Télécharger factures PDF et reçus' },
     ],
     ADMIN: [
       { title: t('nav.users', 'Gestion des Utilisateurs'), path: '/admin/users', icon: FiUsers, desc: 'Comptes transporteurs et expéditeurs' },

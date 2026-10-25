@@ -51,6 +51,7 @@ import OffresRecuesPage from '../pages/transporteur/OffresRecuesPage';
 import SuiviGpsPage from '../pages/transporteur/SuiviGpsPage';
 import RevenusPage from '../pages/transporteur/RevenusPage';
 import MonCamionProfilePage from '../pages/transporteur/MonCamionProfilePage';
+import AjouterCamionPage from '../pages/transporteur/AjouterCamionPage';
 
 // Pages Expéditeur
 import DashboardExpediteur from '../pages/expediteur/DashboardExpediteur';
@@ -62,6 +63,13 @@ import DetailReservation from '../pages/expediteur/DetailReservation';
 import Paiement from '../pages/expediteur/Paiement';
 import ProfileExpediteur from '../pages/expediteur/Profile';
 import SuiviCargaison from '../pages/expediteur/SuiviCargaison';
+import FavorisPage from '../pages/expediteur/FavorisPage';
+
+// Pages Communes & Transverses (Nouvelles fonctionnalités connectées au backend)
+import ChatPage from '../pages/chat/ChatPage';
+import LitigesPage from '../pages/litiges/LitigesPage';
+import AvisPage from '../pages/transporteur/AvisPage';
+import AbonnementPage from '../pages/transporteur/AbonnementPage';
 
 
 function AppRoutes() {
@@ -129,25 +137,31 @@ function AppRoutes() {
           <Route path="/admin/litiges" element={<RoleRoute roles={['ADMIN']}><AdminLitigesPage /></RoleRoute>} />
           <Route path="/admin/analytics" element={<RoleRoute roles={['ADMIN']}><AdminAnalyticsPage /></RoleRoute>} />
 
-          {/* --- TRANSPORTEUR (PHASE B) --- */}
+          {/* --- ROUTES TRANSVERSES CONNECTÉES --- */}
+          <Route path="/chat" element={<RoleRoute roles={['TRANSPORTEUR', 'EXPEDITEUR', 'ADMIN']}><ChatPage /></RoleRoute>} />
+
+          {/* --- TRANSPORTEUR (PHASE B & SUITE) --- */}
           <Route path="/transporteur/dashboard" element={<RoleRoute roles={['TRANSPORTEUR']}><DashboardTransporteur /></RoleRoute>} />
           <Route path="/transporteur/trajets" element={<RoleRoute roles={['TRANSPORTEUR']}><MesTrajets /></RoleRoute>} />
           <Route path="/transporteur/trajets/new" element={<RoleRoute roles={['TRANSPORTEUR', 'ADMIN']}><PublierTrajetPage /></RoleRoute>} />
           <Route path="/transporteur/trajets/edit/:id" element={<RoleRoute roles={['TRANSPORTEUR', 'ADMIN']}><PublierTrajetPage /></RoleRoute>} />
           <Route path="/transporteur/trajets/:id" element={<RoleRoute roles={['TRANSPORTEUR', 'ADMIN']}><MesTrajets /></RoleRoute>} />
           <Route path="/transporteur/camions" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
-          <Route path="/transporteur/camions/new" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
+          <Route path="/transporteur/camions/new" element={<RoleRoute roles={['TRANSPORTEUR']}><AjouterCamionPage /></RoleRoute>} />
           <Route path="/transporteur/camions/edit/:id" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
           <Route path="/transporteur/camions/:id" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
           <Route path="/transporteur/reservations" element={<RoleRoute roles={['TRANSPORTEUR']}><OffresRecuesPage /></RoleRoute>} />
           <Route path="/transporteur/offres" element={<RoleRoute roles={['TRANSPORTEUR']}><OffresRecuesPage /></RoleRoute>} />
+          <Route path="/transporteur/messages" element={<RoleRoute roles={['TRANSPORTEUR']}><ChatPage /></RoleRoute>} />
           <Route path="/transporteur/suivi/:id" element={<RoleRoute roles={['TRANSPORTEUR']}><SuiviGpsPage /></RoleRoute>} />
           <Route path="/transporteur/revenus" element={<RoleRoute roles={['TRANSPORTEUR']}><RevenusPage /></RoleRoute>} />
+          <Route path="/transporteur/abonnements" element={<RoleRoute roles={['TRANSPORTEUR']}><AbonnementPage /></RoleRoute>} />
+          <Route path="/transporteur/litiges" element={<RoleRoute roles={['TRANSPORTEUR']}><LitigesPage /></RoleRoute>} />
+          <Route path="/transporteur/avis" element={<RoleRoute roles={['TRANSPORTEUR']}><AvisPage /></RoleRoute>} />
           <Route path="/transporteur/profile" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
-          <Route path="/transporteur/avis" element={<RoleRoute roles={['TRANSPORTEUR']}><MonCamionProfilePage /></RoleRoute>} />
           <Route path="/transporteur/parametres" element={<Navigate to="/transporteur/profile" replace />} />
 
-          {/* --- EXPÉDITEUR (PHASE C) --- */}
+          {/* --- EXPÉDITEUR (PHASE C & SUITE) --- */}
           <Route path="/expediteur/dashboard" element={<RoleRoute roles={['EXPEDITEUR']}><DashboardExpediteur /></RoleRoute>} />
           <Route path="/expediteur/trajets" element={<RoleRoute roles={['EXPEDITEUR']}><TrajetsDisponibles /></RoleRoute>} />
           <Route path="/expediteur/trajets/:id" element={<RoleRoute roles={['EXPEDITEUR']}><DetailTrajet /></RoleRoute>} />
@@ -161,14 +175,14 @@ function AppRoutes() {
           <Route path="/expediteur/suivi/:id" element={<RoleRoute roles={['EXPEDITEUR']}><SuiviCargaison /></RoleRoute>} />
           <Route path="/expediteur/reservations" element={<RoleRoute roles={['EXPEDITEUR']}><MesReservations /></RoleRoute>} />
           <Route path="/expediteur/reservations/:id" element={<RoleRoute roles={['EXPEDITEUR']}><DetailReservation /></RoleRoute>} />
+          <Route path="/expediteur/messages" element={<RoleRoute roles={['EXPEDITEUR']}><ChatPage /></RoleRoute>} />
+          <Route path="/expediteur/favoris" element={<RoleRoute roles={['EXPEDITEUR']}><FavorisPage /></RoleRoute>} />
+          <Route path="/expediteur/litiges" element={<RoleRoute roles={['EXPEDITEUR']}><LitigesPage /></RoleRoute>} />
           <Route path="/expediteur/profile" element={<RoleRoute roles={['EXPEDITEUR']}><ProfileExpediteur /></RoleRoute>} />
           <Route path="/expediteur/parametres" element={<Navigate to="/expediteur/profile" replace />} />
           <Route path="/expediteur/paiements" element={<RoleRoute roles={['EXPEDITEUR']}><Paiement /></RoleRoute>} />
           <Route path="/expediteur/paiement" element={<RoleRoute roles={['EXPEDITEUR']}><Paiement /></RoleRoute>} />
           <Route path="/expediteur/finances" element={<Navigate to="/expediteur/paiements" replace />} />
-
-          {/* Placeholders fonctionnels pour futures pages Phase C */}
-          <Route path="/expediteur/favoris" element={<RoleRoute roles={['EXPEDITEUR']}><div style={{ padding: 20 }}><h3>Transporteurs favoris (Phase C)</h3><p>Disponible en Phase C.</p></div></RoleRoute>} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   FiMenu,
@@ -10,6 +10,10 @@ import {
   FiLogOut,
   FiExternalLink,
   FiHelpCircle,
+  FiRefreshCw,
+  FiTruck,
+  FiPackage,
+  FiShield,
 } from 'react-icons/fi';
 import { useAuth } from '../../../context/AuthContext';
 import Breadcrumb from '../../common/Breadcrumb';
@@ -17,7 +21,8 @@ import DemoBadge from '../../common/DemoBadge';
 import NotificationDropdown from './NotificationDropdown';
 
 export const AppHeader = ({ onToggleSidebar, onOpenSearch, onOpenShortcuts }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, loginAsDemoRole } = useAuth();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -64,6 +69,10 @@ export const AppHeader = ({ onToggleSidebar, onOpenSearch, onOpenShortcuts }) =>
       litiges: t('nav.disputes', 'Litiges'),
       analytics: t('nav.analytics', 'Analytics'),
       paiements: t('nav.transactions', 'Finances & Paiements'),
+      messages: 'Messagerie',
+      chat: 'Messagerie',
+      favoris: 'Transporteurs favoris',
+      abonnements: 'Abonnements & Quotas',
       new: 'Nouveau',
       edit: 'Modification',
       'design-system': 'Design System',
@@ -265,6 +274,94 @@ export const AppHeader = ({ onToggleSidebar, onOpenSearch, onOpenShortcuts }) =>
                 <FiExternalLink size={14} />
                 <span>Voir la page publique</span>
               </Link>
+
+              <div style={{ borderTop: '1px solid #E2E8F0', margin: '4px 0' }} />
+
+              <div style={{ padding: '6px 14px' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>
+                  Changer de rôle (Test) :
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {user?.role !== 'TRANSPORTEUR' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        loginAsDemoRole('TRANSPORTEUR');
+                        setDropdownOpen(false);
+                        navigate('/transporteur/dashboard');
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '5px 8px',
+                        borderRadius: 4,
+                        border: '1px solid #0D9488',
+                        backgroundColor: '#F0FDFA',
+                        color: '#0F766E',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <FiTruck size={13} /> <span>Transporteur</span>
+                    </button>
+                  )}
+                  {user?.role !== 'EXPEDITEUR' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        loginAsDemoRole('EXPEDITEUR');
+                        setDropdownOpen(false);
+                        navigate('/expediteur/dashboard');
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '5px 8px',
+                        borderRadius: 4,
+                        border: '1px solid #2563EB',
+                        backgroundColor: '#EFF6FF',
+                        color: '#1D4ED8',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <FiPackage size={13} /> <span>Expéditeur</span>
+                    </button>
+                  )}
+                  {user?.role !== 'ADMIN' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        loginAsDemoRole('ADMIN');
+                        setDropdownOpen(false);
+                        navigate('/admin/dashboard');
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '5px 8px',
+                        borderRadius: 4,
+                        border: '1px solid #7C3AED',
+                        backgroundColor: '#F5F3FF',
+                        color: '#6D28D9',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <FiShield size={13} /> <span>Administrateur</span>
+                    </button>
+                  )}
+                </div>
+              </div>
 
               <div style={{ borderTop: '1px solid #E2E8F0', margin: '4px 0' }} />
 
