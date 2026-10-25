@@ -92,6 +92,30 @@ export const AuthProvider = ({ children }) => {
     return response.data;
   }, []);
 
+  const DEMO_TOKENS = {
+    TRANSPORTEUR: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0cmFuc3BvcnRldXJAc291a3RyYW5zcG9ydC5tYSIsIm5vbSI6IkVsIEZhc3NpIiwicHJlbm9tIjoiTW9oYW1lZCIsInJvbGUiOiJUUkFOU1BPUlRFVVIiLCJ1c2VySWQiOjIsInRyYW5zcG9ydGV1cklkIjoxLCJleHAiOjk5OTk5OTk5OTl9.test',
+    EXPEDITEUR: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJleHBlZGl0ZXVyQHNvdWt0cmFuc3BvcnQubWEiLCJub20iOiJCZW5uYW5pIiwicHJlbm9tIjoiS2FyaW0iLCJyb2xlIjoiRVhQRURJVEVVUiIsInVzZXJJZCI6MywiZXhwIjo5OTk5OTk5OTk5fQ.test',
+    ADMIN: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBzb3VrdHJhbnNwb3J0Lm1hIiwibm9tIjoiQWRtaW4iLCJwcmVub20iOiJQcmluY2lwYWwiLCJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOjEsImV4cCI6OTk5OTk5OTk5OX0.test',
+  };
+
+  const loginAsDemoRole = useCallback((roleToLogin) => {
+    const targetRole = roleToLogin?.toUpperCase() || 'TRANSPORTEUR';
+    const fakeToken = DEMO_TOKENS[targetRole] || DEMO_TOKENS.TRANSPORTEUR;
+    const decoded = jwtDecode(fakeToken);
+    const userObj = {
+      email: decoded.sub,
+      nom: decoded.nom || '',
+      prenom: decoded.prenom || '',
+      role: decoded.role || '',
+      userId: decoded.userId || null,
+      transporteurId: decoded.transporteurId || null,
+    };
+    setStoredToken(fakeToken, true);
+    setToken(fakeToken);
+    setUser(userObj);
+    return userObj;
+  }, []);
+
   const logout = useCallback(() => {
     const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
     if (refreshToken) {
@@ -119,6 +143,7 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     isAuthenticated: !!token && !!user,
     login,
+    loginAsDemoRole,
     registerExpediteur,
     registerTransporteur,
     logout,

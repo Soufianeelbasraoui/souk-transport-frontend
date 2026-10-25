@@ -30,7 +30,7 @@ const forgotPasswordSchema = yup.object({
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loginAsDemoRole } = useAuth();
   const [loginError, setLoginError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -216,6 +216,75 @@ function Login() {
             <Link to="/register" className="btn-register-link">
               Créer un compte
             </Link>
+
+            {/* CONNEXION RAPIDE DE TEST (3 RÔLES) */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px dashed #CBD5E1', textAlign: 'center' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: 1, display: 'block', marginBottom: 10 }}>
+                🚀 Accès Rapide Démo (3 Rôles)
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                <button
+                  type="button"
+                  id="btn-login-transporteur"
+                  onClick={() => {
+                    loginAsDemoRole('TRANSPORTEUR');
+                    navigate('/transporteur/dashboard');
+                  }}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: 6,
+                    border: '1px solid #0D9488',
+                    backgroundColor: '#F0FDFA',
+                    color: '#0F766E',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🚛 Transporteur
+                </button>
+                <button
+                  type="button"
+                  id="btn-login-expediteur"
+                  onClick={() => {
+                    loginAsDemoRole('EXPEDITEUR');
+                    navigate('/expediteur/dashboard');
+                  }}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: 6,
+                    border: '1px solid #2563EB',
+                    backgroundColor: '#EFF6FF',
+                    color: '#1D4ED8',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  📦 Expéditeur
+                </button>
+                <button
+                  type="button"
+                  id="btn-login-admin"
+                  onClick={() => {
+                    loginAsDemoRole('ADMIN');
+                    navigate('/admin/dashboard');
+                  }}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: 6,
+                    border: '1px solid #7C3AED',
+                    backgroundColor: '#F5F3FF',
+                    color: '#6D28D9',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🛡️ Admin
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
