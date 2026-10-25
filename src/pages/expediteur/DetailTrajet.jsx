@@ -7,9 +7,12 @@ import {
   FiShield,
   FiStar,
   FiCheckCircle,
+  FiMessageSquare,
+  FiHeart,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import expediteurService from '../../api/services/expediteurService';
+import favoriService from '../../api/services/favoriService';
 import { parseApiError } from '../../utils/parseApiError';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/format';
 import Button from '../../components/common/Button';
@@ -42,6 +45,24 @@ export const DetailTrajet = () => {
   const [negocierModalOpen, setNegocierModalOpen] = useState(false);
   const [prixNegocie, setPrixNegocie] = useState('');
   const [messageNegociation, setMessageNegociation] = useState('');
+  const [isFavori, setIsFavori] = useState(false);
+
+  const handleToggleFavori = async () => {
+    const transporteurId = trajet?.transporteurId || 1;
+    try {
+      if (isFavori) {
+        await favoriService.supprimerFavori(transporteurId);
+        setIsFavori(false);
+        toast.info('Transporteur retiré de vos favoris.');
+      } else {
+        await favoriService.ajouterFavori(transporteurId);
+        setIsFavori(true);
+        toast.success('Transporteur ajouté à vos favoris !');
+      }
+    } catch {
+      toast.error('Erreur lors de la mise à jour des favoris.');
+    }
+  };
 
   // 1. Charger les données du trajet et les cargaisons de l'expéditeur
   useEffect(() => {
@@ -325,7 +346,30 @@ export const DetailTrajet = () => {
                 </div>
               </div>
 
-              <Badge status="VERIFIE" label="Certifié SoukTransport" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={handleToggleFavori}
+                  title={isFavori ? "Retirer de mes favoris" : "Ajouter aux transporteurs favoris"}
+                  style={{
+                    backgroundColor: isFavori ? '#FEE2E2' : '#F1F5F9',
+                    border: '1px solid',
+                    borderColor: isFavori ? '#FCA5A5' : '#CBD5E1',
+                    borderRadius: '50%',
+                    width: 36,
+                    height: 36,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: isFavori ? '#DC2626' : '#64748B',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <FiHeart size={16} fill={isFavori ? '#DC2626' : 'none'} />
+                </button>
+                <Badge status="VERIFIE" label="Certifié SoukTransport" />
+              </div>
             </div>
           </Card>
 
@@ -528,6 +572,16 @@ export const DetailTrajet = () => {
                   style={{ width: '100%', justifyContent: 'center' }}
                 >
                   Proposer un tarif différent
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="md"
+                  icon={<FiMessageSquare />}
+                  onClick={() => navigate(`/chat?trajetId=${trajet.id}`)}
+                  style={{ width: '100%', justifyContent: 'center', color: '#0D9488', fontWeight: 600 }}
+                >
+                  Poser une question en direct
                 </Button>
               </div>
 

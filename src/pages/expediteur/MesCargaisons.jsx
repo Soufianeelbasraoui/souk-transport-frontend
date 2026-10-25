@@ -7,6 +7,9 @@ import {
   FiCheckCircle,
   FiPhone,
   FiUser,
+  FiStar,
+  FiAlertTriangle,
+  FiTrendingUp,
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import expediteurService from '../../api/services/expediteurService';
@@ -19,14 +22,19 @@ import Tabs from '../../components/common/Tabs';
 import SidePanel from '../../components/common/SidePanel';
 import Modal from '../../components/common/Modal';
 import DemoBadge from '../../components/common/DemoBadge';
+import LaisserAvisModal from '../../components/avis/LaisserAvisModal';
+import NouveauLitigeModal from '../../components/litiges/NouveauLitigeModal';
+import TarificationEstimatorModal from '../../components/tarification/TarificationEstimatorModal';
 
 const TYPES_MARCHANDISES = [
-  { id: 'GENERAL', label: 'Marchandise Générale' },
-  { id: 'ALIMENTAIRE', label: 'Alimentaire / Frais' },
-  { id: 'INDUSTRIEL', label: 'Industriel & Machines' },
+  { id: '', label: 'Fret Standard / Général' },
+  { id: 'ALIMENTAIRE', label: 'Alimentaire & Périssable' },
+  { id: 'REFRIGERE', label: 'Frigorifique / Réfrigéré' },
+  { id: 'MATERIAUX', label: 'Matériaux de construction & BTP' },
   { id: 'TEXTILE', label: 'Textile & Confection' },
-  { id: 'CONSTRUCTION', label: 'Matériaux de construction' },
-  { id: 'AGRICOLE', label: 'Produits Agricoles' },
+  { id: 'ELECTRONIQUE', label: 'Électronique & Équipement' },
+  { id: 'FRAGILE', label: 'Marchandises Fragiles' },
+  { id: 'DANGEREUX', label: 'Matières Dangereuses (ADR)' },
 ];
 
 export const MesCargaisons = () => {
@@ -45,9 +53,12 @@ export const MesCargaisons = () => {
   // Modal d'ajout de cargaison
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAvisModalOpen, setIsAvisModalOpen] = useState(false);
+  const [isLitigeModalOpen, setIsLitigeModalOpen] = useState(false);
+  const [isEstimatorModalOpen, setIsEstimatorModalOpen] = useState(false);
   const [newCargaison, setNewCargaison] = useState({
     description: '',
-    typeMarchandise: 'GENERAL',
+    typeMarchandise: '',
     poids: '',
     volume: '',
     valeurDeclaree: '',
@@ -100,7 +111,7 @@ export const MesCargaisons = () => {
       setAddModalOpen(false);
       setNewCargaison({
         description: '',
-        typeMarchandise: 'GENERAL',
+        typeMarchandise: '',
         poids: '',
         volume: '',
         valeurDeclaree: '',
@@ -291,6 +302,25 @@ export const MesCargaisons = () => {
               >
                 Confirmer la bonne réception
               </Button>
+            )}
+            {selectedCargaison?.statut === 'LIVREE' && (
+              <>
+                <Button
+                  variant="secondary"
+                  icon={<FiStar />}
+                  onClick={() => setIsAvisModalOpen(true)}
+                >
+                  Noter la prestation
+                </Button>
+                <Button
+                  variant="outline"
+                  icon={<FiAlertTriangle />}
+                  onClick={() => setIsLitigeModalOpen(true)}
+                  style={{ color: '#E53E3E', borderColor: '#FED7D7' }}
+                >
+                  Signaler un litige
+                </Button>
+              </>
             )}
             <Button variant="outline" onClick={() => setIsSidePanelOpen(false)}>
               Fermer
@@ -510,8 +540,53 @@ export const MesCargaisons = () => {
               />
             </div>
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+            <button
+              type="button"
+              onClick={() => setIsEstimatorModalOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#1A3A5C',
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                textDecoration: 'underline',
+              }}
+            >
+              <FiTrendingUp /> Estimer le coût conseillé avec l'IA
+            </button>
+          </div>
         </form>
       </Modal>
+
+      {/* MODAL LAISSER UN AVIS */}
+      <LaisserAvisModal
+        isOpen={isAvisModalOpen}
+        onClose={() => setIsAvisModalOpen(false)}
+        cargaisonId={selectedCargaison?.id}
+        transporteurId={selectedCargaison?.transporteurId || 1}
+        transporteurNom={selectedCargaison?.transporteurNom}
+      />
+
+      {/* MODAL OUVRIR UN LITIGE */}
+      <NouveauLitigeModal
+        isOpen={isLitigeModalOpen}
+        onClose={() => setIsLitigeModalOpen(false)}
+        offreId={selectedCargaison?.offreId || 201}
+      />
+
+      {/* MODAL ESTIMATEUR TARIF */}
+      <TarificationEstimatorModal
+        isOpen={isEstimatorModalOpen}
+        onClose={() => setIsEstimatorModalOpen(false)}
+        defaultDepart={newCargaison.villeDepart}
+        defaultArrivee={newCargaison.villeArrivee}
+      />
     </div>
   );
 };

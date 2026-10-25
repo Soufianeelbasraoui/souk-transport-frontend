@@ -20,6 +20,7 @@ import {
 } from 'recharts';
 import { toast } from 'react-toastify';
 import expediteurService from '../../api/services/expediteurService';
+import factureService from '../../api/services/factureService';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/format';
 import KpiCard from '../../components/common/KpiCard';
 import Card from '../../components/common/Card';
@@ -101,17 +102,15 @@ export const Paiement = () => {
     }
   };
 
-  const handleDownloadPdf = (facture) => {
-    toast.info(`Téléchargement de la facture ${facture.numeroFacture || `#${facture.id}`} en cours...`);
-    const dummyPdf = `%PDF-1.4 Facture SoukTransport ${facture.numeroFacture}\nMontant: ${facture.montantTTC} MAD`;
-    const blob = new Blob([dummyPdf], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `facture-${facture.numeroFacture || facture.id}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  const handleDownloadPdf = async (facture) => {
+    try {
+      toast.info(`Téléchargement de la facture ${facture.numeroFacture || `#${facture.id}`}...`);
+      const blob = await factureService.telechargerFacturePdf(facture.id || 1);
+      factureService.declencherTelechargement(blob, `facture_${facture.numeroFacture || facture.id}.pdf`);
+      toast.success('Facture PDF téléchargée.');
+    } catch {
+      toast.error('Erreur lors du téléchargement de la facture.');
+    }
   };
 
   const columns = [
